@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="../static/img/favicon.png">
+    <link rel="stylesheet" href="../static/css/vendor//bootstrap.min.css"/>
+    <link rel="stylesheet" href="../static/css/main.css"/>
+    <link rel="stylesheet" href="../static/css/style.css"/>
+    <script type="text/javascript" src="../static/javascript/main.js"></script>
+    <title>
+      OrxaGrid Solar MVP Results 
+    </title>  
+  </head>  
+  <body>
+    <header></header>
+    <div id="app-header" > 
+      <img src="../static/img/ORXA_Logo_Wordmark.png" class="logo"  alt="OrxaGrid"/><br/><br/>
+    </div>
+
+    <div class="container-fluid" >
+        <div>
+          <h4 style="font-size: 14px;">Results</h4>
+        </div> 
+        <div class="row align-items-start">
+          <div class="col-sm-4">
+            <br/>
+            {{ report | safe}}
+            <br/>
+            <img src="data:image/png;base64, {{ curve }}" />
+          </div>
+          <div class="col-sm-6">
+            <br/>
+            <img src="data:image/png;base64, {{ loads }}" style="position:'relative';left:-120px;" />
+            <br/>
+            <br/>
+            <br/>
+            <img src="data:image/png;base64, {{ sample_week }}" style="position:'relative';left:-120px;" />
+          </div>
+        
+          <button type="button" id="logoutBtn" class="btnStandard" onclick="window.location.href='/logout' ">Logout</button>
+
+          <button id="downloadBtn" class="btnStandard" onclick="getPdf()">Download Results</button>
+
+          <button id="backBtn" type="button" class="btnStandard" onclick="window.location.href='{{ url_for( 'home' ) }}' ">Back</button>
+        </div>
+    </div>
+
+    <div id="app-footer">
+      <strong>&copy; 2017-2020 Copyright. <a href="http://www.orxagrid.com/"> Orxa Grid </a></strong>All rights reserved.
+    </div>                         
+  </body>
+</html>
