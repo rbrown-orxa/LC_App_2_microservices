@@ -28,7 +28,7 @@ def pv_aggregated_load_profile_optimiser(request):
         curve, loads, report = pv_optimiser.api(data, temp_files)
 
     total_pv_size = report.loc['optimal_size_kwp']
-    roof_sizes_m2 = request.form.getlist('roof_size_m2')
+    roof_sizes_m2 = request.form.getlist('roof_size_m2', type=float)
 
     return(_allocate_pv_to_roofs(roof_sizes_m2, total_pv_size))
 
@@ -128,7 +128,7 @@ def _get_fixed_fields(request, fields=['lon', 'lat',
     Returns: Dictionary of {expected form fields:field values}
     """
     return { field : request.form.get(field, None)
-            for field in fields}
+            for field in fields }
 
 
 def _get_variable_fields(request,
@@ -172,7 +172,7 @@ def _make_temp_files(request, key='file'):
 
 def _allocate_pv_to_roofs(roof_sizes_m2=[], total_pv_size_kWp=0):
     """Allocate the PV sizes based on ratio of roof sizes"""
-    roof_sizes_m2 = [float(x) for x in roof_sizes_m2]
+    # roof_sizes_m2 = [float(x) for x in roof_sizes_m2]
     return [roof / sum(roof_sizes_m2) * total_pv_size_kWp
             for roof in roof_sizes_m2]
 
