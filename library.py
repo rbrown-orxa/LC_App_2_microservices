@@ -12,7 +12,10 @@ import os
 
 def pv_aggregated_load_profile_optimiser(request):
     """
-    Get list of optimal pv size for a set of roofs.
+    Get list of optimal pv size for a set of roofs by summing all the load
+    profiles, taking the average of variable roof parameters, optimising
+    the aggregate system and distributing the suggested solar PV capacity
+    across the participant roofs according to the ratios of surface area.
     request: the dict-like request object passed by Flask
     Returns: list of floats
     """    
@@ -138,7 +141,7 @@ def _get_variable_fields(request,
     fields: list of the expected keys in req.form
     Returns: Dictionary of {expected form fields:field values}
     """
-    form_data = { field: req.form.getlist(field) for field in fields }
+    form_data = { field: request.form.getlist(field) for field in fields }
     if average_each_field:
         form_data = { field : statistics.mean(values)
                     for field, values in form_data.items() }
@@ -158,7 +161,7 @@ def _make_temp_files(request, key='file'):
     try:
         for file in files:
             temp_filename = tempfile.mktemp(suffix='.csv')
-            print(f'Temporary file will be created at {temp_filename}')
+            # print(f'Temporary file will be created at {temp_filename}')
             # with open(temp_filename, 'wb') as temp_file:
             file.save(temp_filename)
             temp_filenames.append(temp_filename)
@@ -175,62 +178,53 @@ def _allocate_pv_to_roofs(roof_sizes_m2=[], total_pv_size_kWp=0):
 
 
 if __name__ == '__main__':
-    pass
-    #test _allocate_pv_to_roofs
-    rv = _allocate_pv_to_roofs([10, 20, 30], 100+200+300)
-    print(rv)
+    import unittest
+    from unittest import TestCase, mock
 
-
-    #test make_temp_files
-    print('Testing get_file_names()')
-    class Req:
+    class Request:
         pass
-    req = Req()
-    with open('tempfile1.tmp', 'wb') as f1, \
-        open('tempfile2.tmp', 'wb') as f2:
-        f1.write(b'1,2,3')
-        f2.write(b'4,5,6')
 
-    with open('tempfile1.tmp', 'rb') as f1, \
-        open('tempfile2.tmp', 'rb') as f2:
-            fs1 = werkzeug.datastructures.FileStorage(f1, filename='tempfile1.tmp')
-            fs2 = werkzeug.datastructures.FileStorage(f2, filename='tempfile2.tmp')
-            req.files = werkzeug.datastructures.MultiDict([('file', fs1), ('file', fs2)])
-            with _make_temp_files(req, 'file') as rv:
-                print(rv, '\n\n')
+    class test_library(TestCase):
 
+        def test__allocate_pv_to_roofs(self):
+            rv = _allocate_pv_to_roofs([10, 20, 30], 100+200+300)
+            self.assertEqual(rv, [100.0, 200.0, 300.0])
 
-    #test get_var_form_fields
-    print('Testing get_variable_fields() without averaging')
-    class Req:
-        pass
-    req = Req()
-    req.form = werkzeug.datastructures.MultiDict([('azim', 120), ('azim', 180)])
-    fields = ['azim']
-    rv = _get_variable_fields(req,fields)
-    print(rv, '\n\n')
+        def test__make_temp_files(self):
+            request = Request()
+            with open('tempfile1.tmp', 'wb') as f1, \
+                open('tempfile2.tmp', 'wb') as f2:
+                f1.write(b'1,2,3')
+                f2.write(b'4,5,6')
 
-    print('Testing get_variable_fields() with averaging')
-    import werkzeug
-    class Req:
-        pass
-    req = Req()
-    req.form = werkzeug.datastructures.MultiDict([('azim', 120), ('azim', 180)])
-    fields = ['azim']
-    rv = _get_variable_fields(req,fields,average_each_field=True)
-    print(rv, '\n\n')
+            with open('tempfile1.tmp', 'rb') as f1, \
+                open('tempfile2.tmp', 'rb') as f2:
+                    fs1 = werkzeug.datastructures.FileStorage(f1, filename='tempfile1.tmp')
+                    fs2 = werkzeug.datastructures.FileStorage(f2, filename='tempfile2.tmp')
+                    request.files = werkzeug.datastructures.MultiDict([('file', fs1), ('file', fs2)])
+                    with _make_temp_files(request, 'file') as rv:
+                        self.assertIsInstance(rv, list)
+                        self.assertEqual(len(rv), 2)
 
+        def test___get_variable_fields(self):
+            request = Request()
+            request.form = werkzeug.datastructures.MultiDict([('azim', 120), ('azim', 180)])
+            fields = ['azim']
+            rv = _get_variable_fields(request, fields)
+            self.assertEqual(rv['azim'], [120, 180])
 
-    #test get_fixed_fields
-    print('Testing get_fixed_fields()')
-    class Req:
-        pass
-    req = Req()
-    req.form = {'lat':10.0, 'lon':0.0, 'cost':20.0}
-    fields = ['lat', 'lon', 'cost']
-    rv = _get_fixed_fields(req, fields)
-    print(rv, '\n\n')
+            request = Request()
+            request.form = werkzeug.datastructures.MultiDict([('azim', 120), ('azim', 180)])
+            fields = ['azim']
+            rv = _get_variable_fields(request,fields,average_each_field=True)
+            self.assertEqual(rv['azim'], 150)
+
+        def test__get_fixed_fields(self):
+            request = Request()
+            request.form = {'lat':10.0, 'lon':0.0, 'cost':20.0}
+            fields = ['lat', 'lon', 'cost', 'missing']
+            rv = _get_fixed_fields(request, fields)
+            self.assertEqual(rv, {'lat': 10.0, 'lon': 0.0, 'cost': 20.0, 'missing': None})
 
 
-
- 
+    unittest.main()
