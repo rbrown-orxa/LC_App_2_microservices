@@ -57,8 +57,6 @@ def pv_allocate_size_by_roof_eff_optimiser(request):
     roof_size_m2, roofpitch, azimuth = ( form_data['roof_size_m2'].copy(),
                                         form_data['roofpitch'].copy(),
                                         form_data['azimuth'].copy() )
-
-
     #Initialise dataframe
     load_add = pd.DataFrame()    
     #Get generation per kw   
@@ -84,7 +82,6 @@ def pv_allocate_size_by_roof_eff_optimiser(request):
 
         #Calculate roof efficieny
         roof_eff_1kw = []
-        tmp_df = load_add
 
         roof_eff_1kw = [ roof_generation / (365*24) 
                         for roof_generation in generation_1kw_sum ]
@@ -96,9 +93,8 @@ def pv_allocate_size_by_roof_eff_optimiser(request):
         for roof in roof_eff_1kw: #iterate over each roof
             tmp_df = load_add
             tmp_ratio = roof / sum(roof_eff_1kw) #float
-            tmp_df['kWh'] = tmp_df['kWh'] * tmp_ratio # series  ['1kWp_generation_kw']
+            tmp_df['kWh'] = tmp_df['kWh'] * tmp_ratio['1kWp_generation_kw'] # series  ['1kWp_generation_kw']
             load_kw.append(tmp_df) # list of series -> load for each roof
-        
         
         #optimise PV size
         cost_per_kWp = float(form_data['cost_per_kWp'])
@@ -113,7 +109,7 @@ def pv_allocate_size_by_roof_eff_optimiser(request):
         for gen_1_kw, load_kw, roof_size_m2 in zip(
                 generation_1kw, load_kw, roof_size_m2):
             df_cost_curve = pv_optimiser.cost_curve(
-                                    generation_1kw=generation_1kw,
+                                    generation_1kw=gen_1_kw,
                                     load_kwh=load_kw,
                                     cost_per_kWp=cost_per_kWp,
                                     import_cost=import_cost,
