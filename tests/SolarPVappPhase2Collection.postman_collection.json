@@ -1,0 +1,150 @@
+{
+	"info": {
+		"_postman_id": "f691193f-29fd-4d8c-9730-0467f84625c1",
+		"name": "SolarPVappPhase2Collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "http://127.0.0.1:5000/submit",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "multipart/form-data",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"description": "Building 1 base load",
+							"type": "file",
+							"src": "/D:/Orxagrid/work/AzureML/Market/latest/solarpv/tests/test_input_files/Factory_Heavy_loads_15min.csv"
+						},
+						{
+							"key": "lat",
+							"value": "18.640976",
+							"type": "text"
+						},
+						{
+							"key": "lon",
+							"value": "73.833332",
+							"type": "text"
+						},
+						{
+							"key": "cost_per_kWp",
+							"value": "1200",
+							"type": "text"
+						},
+						{
+							"key": "import_cost",
+							"value": "0.10",
+							"type": "text"
+						},
+						{
+							"key": "export_price",
+							"value": "0.01",
+							"type": "text"
+						},
+						{
+							"key": "expected_life_yrs",
+							"value": "25",
+							"type": "text"
+						},
+						{
+							"key": "roof_size_m2",
+							"value": "100",
+							"type": "text"
+						},
+						{
+							"key": "azimuth",
+							"value": "180",
+							"type": "text"
+						},
+						{
+							"key": "roofpitch",
+							"value": "45",
+							"type": "text"
+						},
+						{
+							"key": "file",
+							"description": "Building 2 base load",
+							"type": "file",
+							"src": "/D:/Orxagrid/work/AzureML/Market/latest/solarpv/tests/test_input_files/Factory_Heavy_loads_no_underscore.csv"
+						},
+						{
+							"key": "no_of_buildings",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "azimuth",
+							"value": "175",
+							"type": "text"
+						},
+						{
+							"key": "roofpitch",
+							"value": "40",
+							"type": "text"
+						},
+						{
+							"key": "roof_size_m2",
+							"value": "150",
+							"type": "text"
+						},
+						{
+							"key": "no_of_buildings",
+							"value": "2",
+							"description": "No of buildings",
+							"type": "text"
+						},
+						{
+							"key": "building_type",
+							"value": "1",
+							"description": "Residential",
+							"type": "text"
+						},
+						{
+							"key": "no_of_charge_points",
+							"value": "15",
+							"description": "No of charge points in building 1",
+							"type": "text"
+						},
+						{
+							"key": "no_of_charge_points",
+							"value": "20",
+							"description": "No of charge points in building 2",
+							"type": "text"
+						}
+					],
+					"options": {
+						"formdata": {}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5000/submit",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"submit"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

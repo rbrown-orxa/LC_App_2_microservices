@@ -8,10 +8,13 @@ import tempfile
 from flask import render_template
 import nbimporter
 import pandas as pd
-import library
-
 import plotting
-import pv_optimiser
+
+#import pv_optimiser
+import aggregated_load as agg
+
+
+
 
 matplotlib.use('Agg')
 app = Flask(__name__)
@@ -59,14 +62,20 @@ def get_data():
         #            'expected_life_yrs', 'roof_size_m2', 'azimuth', 'roofpitch']
         
         #Call allocate pv size by roof efficiency function
-        print("Allocate PV size based on roof efficiency")
-        optimal_size = library.pv_allocate_size_by_roof_eff_optimiser(request)
-        print(optimal_size)
+        #print("Allocate PV size based on roof efficiency")
+        #optimal_size,load = load_allocation.pv_allocate_size_by_roof_eff_optimiser(request)
+        
         
         #Call aggregated load profile function
         #print("Allocate PV size based on aggregated load profile based on average roof paramters")
-        #optimal_size = library.pv_aggregated_load_profile_optimiser(request)
+        #optimal_size,load = load_allocation.pv_aggregated_load_profile_optimiser(request)
         #print(optimal_size)
+        #print(load)
+        
+        #print(optimal_size)
+        #print(load)
+        
+        load = agg.sum_of_base_load_and_ev_load(request,"roofeff")
         
         #if 'debug_api' in request.form:
         #    return(form_data)
