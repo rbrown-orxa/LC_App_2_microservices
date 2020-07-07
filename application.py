@@ -75,7 +75,10 @@ def get_data():
         #print(optimal_size)
         #print(load)
         
-        load = agg.sum_of_base_load_and_ev_load(request,"roofeff")
+        pv_size,load = agg.optimise_aggregated_load(request,"aggr")
+        print(pv_size)
+        print(load)
+        #load = agg.optimise_aggregated_load_profile_without_battery(request,load)
         
         #if 'debug_api' in request.form:
         #    return(form_data)
