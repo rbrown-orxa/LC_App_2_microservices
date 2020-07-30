@@ -75,9 +75,14 @@ def get_data():
         #print(optimal_size)
         #print(load)
         
-        pv_size,load = agg.optimise_aggregated_load(request,"aggr")
-        print(pv_size)
-        print(load)
+        #pv_size,load = agg.optimise_aggregated_load(request,"aggr")
+        #print(pv_size)
+        #print(load)
+        p_load,p_gen = agg.aggregate_building_load_and_generation(request)
+        print(p_load)
+        print(p_gen)
+        p_load.to_csv("examples/p_load.csv")
+        p_gen.to_csv("examples/p_gen.csv")
         #load = agg.optimise_aggregated_load_profile_without_battery(request,load)
         
         #if 'debug_api' in request.form:
