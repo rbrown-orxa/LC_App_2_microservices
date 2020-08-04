@@ -25,7 +25,8 @@
                     "pitch_deg": 1,
                     "num_ev_chargers": 1,
                     "pv_size_kwp_optional": 1.0,
-                    "load_profile_csv_optional": "time,kw\n,12:00:00,3.0"
+                    "load_profile_csv_optional": "time,kw\n,12:00:00,3.0",
+                    "annual_kwh_consumption_optional": 1.0
                 },
                 {
                     "name": "building 2",
@@ -35,7 +36,8 @@
                     "pitch_deg": 1,
                     "num_ev_chargers": 1,
                     "pv_size_kwp_optional": 1.0,
-                    "load_profile_csv_optional": "time,kw\n,12:00:00,3.0"
+                    "load_profile_csv_optional": "time,kw\n,12:00:00,3.0",
+                    "annual_kwh_consumption_optional": 1.0
                 }
             ]
         }
@@ -159,7 +161,8 @@
                         "pitch_deg": 1,
                         "num_ev_chargers": 1,
                         "pv_size_kwp_optional": 1.0,
-                        "load_profile_csv_optional": "time,kw\n,12:00:00,3.0"
+                        "load_profile_csv_optional": "time,kw\n,12:00:00,3.0",
+                        "annual_kwh_consumption_optional": 1.0
                     },
                     {
                         "name": "building 2",
@@ -169,7 +172,8 @@
                         "pitch_deg": 1,
                         "num_ev_chargers": 1,
                         "pv_size_kwp_optional": 1.0,
-                        "load_profile_csv_optional": "time,kw\n,12:00:00,3.0"
+                        "load_profile_csv_optional": "time,kw\n,12:00:00,3.0",
+                        "annual_kwh_consumption_optional": 1.0
                     }
                 ]
             ],
@@ -192,7 +196,8 @@
                                 "pitch_deg": 1,
                                 "num_ev_chargers": 1,
                                 "pv_size_kwp_optional": 1.0,
-                                "load_profile_csv_optional": "time,kw\n,12:00:00,3.0"
+                                "load_profile_csv_optional": "time,kw\n,12:00:00,3.0",
+                                "annual_kwh_consumption_optional": 1.0
                             }
                         ],
                         "required": [
@@ -203,7 +208,8 @@
                             "pitch_deg",
                             "num_ev_chargers",
                             "pv_size_kwp_optional",
-                            "load_profile_csv_optional"
+                            "load_profile_csv_optional",
+                            "annual_kwh_consumption_optional"
                         ],
                         "properties": {
                             "name": {
@@ -284,6 +290,16 @@
                                 "default": "",
                                 "examples": [
                                     "time,kw\n,12:00:00,3.0"
+                                ]
+                            },
+                            "annual_kwh_consumption_optional": {
+                                "$id": "#/properties/building_data/items/anyOf/0/properties/annual_kwh_consumption_optional",
+                                "type": "number",
+                                "title": "The annual_kwh_consumption_optional schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": 0.0,
+                                "examples": [
+                                    1.0
                                 ]
                             }
                         },
