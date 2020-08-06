@@ -3,12 +3,15 @@ import werkzeug
 import jsonschema
 import json
 import tempfile
-
+import os
 
 app = Flask(__name__)
 with open('my-schema.json', 'r') as schema_file:
 	schema = json.load(schema_file)
 
+app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024 * 5 # limit file upload size to 5 MB
+app.config['UPLOAD_EXTENSIONS'] = ['.csv']
+app.config['UPLOAD_PATH'] = 'tmp'
 
 @app.route("/")
 def index():
@@ -23,21 +26,30 @@ def api():
 		return ({'error':'unexpected server error'}, 500)
 
 
-@app.route("/upload")
+@app.route("/upload", methods=['POST'])
 def upload():
-	file = request.files.get('file', None)
-	if file is not None:
+	try:
+		file = request.files.get('file', None)
 		return handle_upload(file)
-	else:
-		return ({'error':'no file'}, 400)
-
+	except werkzeug.exceptions.RequestEntityTooLarge:
+		return ( {'error':'file size too big'}, 400 )
+	except:
+		return ( {'error':'file upload error'}, 500 )
+		
 
 def handle_upload(file):
-	temp_filename = tempfile.mktemp(suffix='.csv')
-	print(f'Temporary file will be created at {temp_filename}')
-	with open(temp_filename, 'wb') as temp_file:
+	if file is None:
+		return ({'error':'no file'}, 400)
+	if file.filename == '':
+		return ({'error':'no filename'}, 400)
+	if os.path.splitext(file.filename)[1] not in app.config['UPLOAD_EXTENSIONS']:
+		return ({'error':'incorrect file type'}, 400)
+	if not os.path.exists(app.config['UPLOAD_PATH']):
+		os.mkdir(app.config['UPLOAD_PATH'])
+	fd, path = tempfile.mkstemp(dir=app.config['UPLOAD_PATH'])
+	with open(fd, 'wb') as temp_file:
 		file.save(temp_file)
-	return ( {'file':temp_filename} )
+	return ( {'handle':os.path.basename(path)} )
 
 
 def handle_api(request):
