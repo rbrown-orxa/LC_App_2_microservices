@@ -1,9 +1,10 @@
-from flask import Flask, request
+from flask import Flask, request, send_from_directory
 import werkzeug
 import jsonschema
 import json
 import tempfile
 import os
+import functools
 
 app = Flask(__name__)
 with open('my-schema.json', 'r') as schema_file:
@@ -13,39 +14,56 @@ app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024 * 5 # limit file upload size to 5
 app.config['UPLOAD_EXTENSIONS'] = ['.csv']
 app.config['UPLOAD_PATH'] = 'tmp'
 
+if not os.path.exists(app.config['UPLOAD_PATH']):
+	os.mkdir(app.config['UPLOAD_PATH'])
+
+
+def handle_exceptions(func):
+		@functools.wraps(func)
+		def wrapper(*args, **kwargs):
+			try:
+				return func(*args, **kwargs)
+			except Exception as err:
+				return handle(err)
+		def handle(err):
+			msg = str(err).split('\n')[0]
+			code = msg.split()[0]
+			if code.isnumeric():
+				return ( {'error':msg}, code )
+			return ( {'error':msg}, 500 )
+		return wrapper
+
+
 @app.route("/")
 def index():
 	return {'hello':'world'}
 
 
 @app.route("/api")
+@handle_exceptions
 def api():
-	try:
-		return handle_api(request)
-	except:
-		return ({'error':'unexpected server error'}, 500)
+	return handle_api(request)
 
 
 @app.route("/upload", methods=['POST'])
+@handle_exceptions
 def upload():
-	try:
-		file = request.files.get('file', None)
-		return handle_upload(file)
-	except werkzeug.exceptions.RequestEntityTooLarge:
-		return ( {'error':'file size too big'}, 400 )
-	except:
-		return ( {'error':'file upload error'}, 500 )
+	file = request.files.get('file', None)
+	return handle_upload(file)
+
 		
+@app.route("/download/<handle>")
+@handle_exceptions
+def download(handle):
+	return send_from_directory(app.config['UPLOAD_PATH'],
+		handle, as_attachment=True)	
+
 
 def handle_upload(file):
-	if file is None:
-		return ({'error':'no file'}, 400)
-	if file.filename == '':
-		return ({'error':'no filename'}, 400)
-	if os.path.splitext(file.filename)[1] not in app.config['UPLOAD_EXTENSIONS']:
-		return ({'error':'incorrect file type'}, 400)
-	if not os.path.exists(app.config['UPLOAD_PATH']):
-		os.mkdir(app.config['UPLOAD_PATH'])
+	assert file and file.filename, '422 No file provided'
+	extension = os.path.splitext(file.filename)[1]
+	assert extension in app.config['UPLOAD_EXTENSIONS'], '415 Unsupported Media Type'
+
 	fd, path = tempfile.mkstemp(dir=app.config['UPLOAD_PATH'])
 	with open(fd, 'wb') as temp_file:
 		file.save(temp_file)
@@ -53,14 +71,13 @@ def handle_upload(file):
 
 
 def handle_api(request):
+	content = request.json
 	try:
-		content = request.json
 		jsonschema.validate(instance=content, schema=schema)
-	except werkzeug.exceptions.BadRequest as err:
-		return ({'error':f'invalid json: {err}'}, 400)
-	except jsonschema.exceptions.ValidationError as err:
-		return ({'error':err.message}, 400)
-	return content
+		return content
+	except Exception as err:
+		assert False, f'422 {err}'
+
 
 
 if __name__ == '__main__':
