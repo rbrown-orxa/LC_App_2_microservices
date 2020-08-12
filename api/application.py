@@ -19,30 +19,41 @@ utils.init_file_handler(app.config['UPLOAD_PATH'])
 def upload():
     """Upload a file for later use
     File properties must comply with /file_requirements
+    Request:
+        Content-Type: multipart/form-data
+        Content-Disposition: form-data; name="file"; filename="example.csv"
     Return:
-    application/json
-    { "handle" :str } if successful.
-    { "error": str } if not successul."""
+        application/json
+        { "handle" :str } if successful.
+        { "error": str } if not successul."""
     return library._upload(request)
 
 
-@app.route("/api")
+@app.route("/optimise")
 @auto.doc()
 @utils.handle_exceptions
-def api():
+def optimise():
     """Optimise a solar and battery system size
-    Request: According to /schema
+    Request:
+        Content-Type: application/json
+        Body: According to /schema
     Return:
-    application/json
-    According to /result_schema
+        application/json
+        According to /result_schema
     """
-    return library._api(request)
+    return library._optimise(request)
 
 
 @app.route("/schema")
 @auto.doc()
 def schema():
-    """Get api request json-schema definition"""
+    """Get api request json-schema definition
+    Request:
+        Body: none
+    Return:
+        Content-Type: application/json
+        Body: json-schema definition
+    """
     return utils._schema()
         
 
@@ -51,8 +62,11 @@ def schema():
 @utils.handle_exceptions
 def download(handle):
     """Retrieve a file by it's <handle>:str
+    Request:
+        Body: none
     Return:
-    application/octet-stream
+        Content-Type: application/octet-stream
+        Content-Disposition: attachment; filename=example_handle
     """
     return library._download(handle)
 
@@ -61,11 +75,14 @@ def download(handle):
 @auto.doc()
 def file_requirements():
     """Get requirements for uploaded files
+    Request:
+        Body: none
     Return:
-    application/json
-    { "max_size_bytes": num, "valid_extensions": [str, str, ...] }
+        Content-Type: application/json
+        Body:
+        { "max_size_bytes": num, "valid_extensions": [str, str, ...] }
     Example:
-    { "max_size_bytes": 5242880, "valid_extensions": [ ".csv" ] }"""
+        { "max_size_bytes": 5242880, "valid_extensions": [ ".csv" ] }"""
     return library._file_requirements()
 
 

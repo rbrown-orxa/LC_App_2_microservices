@@ -1,6 +1,5 @@
 import os
 import functools
-from markdown import markdown
 
 
 def handle_exceptions(func):

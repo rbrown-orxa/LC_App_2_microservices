@@ -1,25 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# # TODO
-# ---
-# * Green Button Data
-# * Orxa PDS data
-# * ~~Single Column data~~
-# * ~~Row per day data~~
-# * Infer datetime
-# * ~~Find header row~~
-# * ~~Find rows to skip~~
-# * ~~Find columns to drop~~
-# * ~~Find date column~~
-# * ~~Find datetime column~~
-# * ~~Find time column~~
-# * Check if time given in hh:mm or periods (e.g. 1, 2, ...)
-# * Check if full year present
-
-# In[1]:
-
-
 import pandas as pd
 import datetime
 import numpy as np
@@ -27,23 +5,9 @@ import csv
 import re
 import statistics
 import dateutil
-import os
 from datetime import timedelta
-
-try:
-    from tkinter.filedialog import askopenfilename
-except:
-    pass
-
-
-# def is_full_year():
-#     raise NotImplementedError
-#     # need to know reporting rate
-#     formats = ['row_per_day', 'single_column']
-#     df = pd.read_csv(filepath, skiprows=skiprows)
-#     return df
-
-# In[2]:
+import warnings
+import pytz
 
 
 def columns_to_drop(filepath, skiprows):
@@ -82,21 +46,6 @@ def columns_to_drop(filepath, skiprows):
     return list(drop)
 
 
-# In[13]:
-
-
-columns_to_drop(path, 2)
-
-
-# In[ ]:
-
-
-
-
-
-# In[3]:
-
-
 def rows_to_skip(filepath):
     """
     Find rows to skip when reading csv file into dataframe.
@@ -116,31 +65,6 @@ def rows_to_skip(filepath):
         mode = statistics.mode(widths.values())
         return [row for row, width in widths.items() 
                 if width < mode]
-
-
-# In[14]:
-
-
-rows_to_skip(path)
-
-
-# csv.list_dialects()
-
-# csv.unix_dialect
-
-# with open(path) as f:
-#     dialect = csv.unix_dialect
-#     reader=csv.reader(f, dialect)
-#     for row in reader:
-#         print(row)
-
-# In[ ]:
-
-
-
-
-
-# In[4]:
 
 
 def get_format(filepath):
@@ -164,21 +88,6 @@ def get_format(filepath):
         return 'row_per_day'
     else:
         return 'single_column'
-
-
-# In[15]:
-
-
-get_format(path)
-
-
-# In[ ]:
-
-
-
-
-
-# In[5]:
 
 
 def get_units(filepath):
@@ -215,21 +124,6 @@ def get_units(filepath):
                 if not len(unique) > 1:
                     return converter[list(found)[0].lower()]
     return 'W'
-
-
-# In[16]:
-
-
-get_units(path)
-
-
-# In[ ]:
-
-
-
-
-
-# In[6]:
 
 
 def date_column(filepath, skiprows, skipcolumns):
@@ -272,21 +166,6 @@ def date_column(filepath, skiprows, skipcolumns):
         rv = try_parse(df=dfc)
         if rv:
             return rv
-
-
-# In[18]:
-
-
-date_column(path, [0,1], ['total'])
-
-
-# In[ ]:
-
-
-
-
-
-# In[7]:
 
 
 def datetime_column(filepath, skiprows, skipcolumns):
@@ -339,20 +218,6 @@ def datetime_column(filepath, skiprows, skipcolumns):
             return rv
 
 
-# In[19]:
-
-
-datetime_column(path, [0,1], ['total'])
-
-
-# In[ ]:
-
-
-
-
-
-# In[8]:
-
 
 def has_header_row(filepath, skiprows=[0]):
     """
@@ -395,21 +260,6 @@ def has_header_row(filepath, skiprows=[0]):
         return None
 
 
-# In[25]:
-
-
-has_header_row(path, skiprows=[0,1])
-
-
-# In[ ]:
-
-
-
-
-
-# In[9]:
-
-
 def time_column(filepath, skiprows):
     df = pd.read_csv(filepath, skiprows=skiprows, sep=None, engine='python')
     #Fill NA values the previos value
@@ -448,21 +298,6 @@ def time_column(filepath, skiprows):
     return None
 
 
-# In[26]:
-
-
-time_column(path, [0,1])
-
-
-# In[ ]:
-
-
-
-
-
-# In[10]:
-
-
 def time_periodic(df_or_file, skiprows, time_column):
     if isinstance(df_or_file, pd.core.frame.DataFrame):
         df = df_or_file
@@ -473,21 +308,6 @@ def time_periodic(df_or_file, skiprows, time_column):
         return df[time_column].nunique()
     
     return None
-
-
-# In[27]:
-
-
-time_periodic(path, [0,1], '00:30')
-
-
-# In[ ]:
-
-
-
-
-
-# In[11]:
 
 
 def make_schema(path):
@@ -502,90 +322,243 @@ def make_schema(path):
     s['time_column'] = time_column(path, s['skiprows'])
     s['time_periodic'] = time_periodic(
         path, s['skiprows'], s['time_column'])
-
-#     if s['datetime_column'] and s['time_column']:
-#         print('got here 111')
-#         s['skipcolumns'].append(s['time_column'])
-#         s['time_column'] = None # we don't need both, and it causes an error in use_schema.ipynb
-
-    
     return s
 
 
-# df = pd.read_csv(path, sep=None, engine='python')
-#     
-
-# df.drop(columns=['Units', 'Date.1'])
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
+# def test(path):
+#     s = {}
+#     s['skiprows'] = rows_to_skip(path)
+#     print(s)
+#     s['skipcolumns'] = columns_to_drop(path, s['skiprows'])
+#     print(s)    
+#     s['date_column'] = date_column(path, s['skiprows'], s['skipcolumns'])
+#     print(s)
+#     s['datetime_column'] = datetime_column(path, s['skiprows'], s['skipcolumns'])
+#     print(s)
+#     s['file_format'] = get_format(path)
+#     print(s)
+#     s['units'] = get_units(path)
+#     print(s)
+#     s['header'] = has_header_row(path, s['skiprows'])
+#     print(s)
+#     s['time_column'] = time_column(path, s['skiprows'])
+#     print(s)
+#     s['time_periodic'] = time_periodic(path, s['skiprows'], s['time_column'])
 
 
-# In[ ]:
+def make_df(path, schema):
+    s = schema
+#     print('***', s['skipcolumns'])
+
+    df = (
+    pd.read_csv(path,
+                skiprows=s['skiprows'],
+                header=s['header'],
+                sep=None,
+                engine='python')
+         
+    )
+    
+#     print(df.head(1))
+    df = df.drop(columns=s['skipcolumns'])
+    
+    return df
+
+
+def num_rpd_periods(df, schema):
+    if not schema['file_format'] == 'row_per_day':
+        return None
+    periods = list(df.drop(columns=[schema['date_column']]).columns)
+    try:
+        periods = [int(period) for period in periods]
+    except:
+        return None
+    return len(set(periods))
+
+
+def wide_to_long(df, schema):
+    if not schema['file_format'] == 'row_per_day':
+        return df, schema
+    
+    # use different var_name matching date_column is labeled as time
+    if schema['date_column'] == 'time':
+        df = df.rename(columns = {schema['date_column']:'Date'})
+        schema['date_column'] = 'Date'
+    
+    df = df.melt(id_vars = schema['date_column'],
+            var_name = 'time',
+            value_name = 'reading')
+    try:
+        df['time'] = df['time'].astype(int)
+    except:
+        pass
+#     schema['skiprows'] = []
+#     schema['skipcolumns'] = []    
+    schema['time_column'] = 'time'
+    schema['file_format'] = 'single_column'
+    schema['time_periodic'] = time_periodic(df, [], 'time')
+    return df, schema
+
+
+def periodic_df(df, schema):
+    s = schema
+    if not all( [
+        s['time_column'],
+        s['time_periodic'],
+        s['date_column']
+    ] ):
+        return df, s
+    period = timedelta(hours=24) / s['time_periodic']
+    df[s['time_column']] = df[s['time_column']] * period   
+    
+    s['time_periodic'] = None
+        
+    return df, s
+
+
+def convert_times(df, schema):
+    s = schema
+    
+    if not s['time_column']:
+        return df, s
+    
+    if s['time_periodic']:
+        return df, s
+    
+    try:
+        timedelta = (
+            pd.to_datetime(df[s['time_column']]) 
+            - pd.to_datetime('00:00:00') )
+
+        df[s['time_column']] = timedelta
+    except:
+        pass
+    
+    return df, s
+
+
+def convert_dates(df, schema):
+    s = schema
+#     print(df)
+    
+    def try_parse_date(col):
+        chars = [' ', '-', '_', '/', '#']
+        for char in chars:
+            dfc = df.copy()
+            dfc[col] = dfc[col].str.split(char).str.join(' ')
+            try:
+                dfc[col] = pd.to_datetime(dfc[col])
+                return dfc
+            except:
+                pass
+        return df
+        
+    
+    if s['datetime_column']:
+        df = try_parse_date(s['datetime_column'])
+        
+    elif s['date_column'] and s['time_column']:
+        df = try_parse_date(s['date_column'])
+
+        df['datetime'] = (
+            df[s['date_column']] + df[s['time_column']]
+        )
+        s['datetime_column'] = 'datetime'
+        
+    cols_to_drop = []
+    if s['date_column']:
+        cols_to_drop.append(s['date_column'])
+    if s['time_column']:
+        cols_to_drop.append(s['time_column'])
+    if cols_to_drop:
+        df = df.drop(columns=cols_to_drop)
+
+    s['date_column'] = None
+    s['time_column'] = None
+    df = df.set_index(s['datetime_column'])  
+    
+    df = df.sort_index()
+
+    return df, s
+
+
+def sum_phases(df, schema):
+    s = schema
+    rv = df.sum(axis=1).to_frame(name=s['units'])
+    return rv
+
+
+def apply_schema(path):
+    s = make_schema(path)
+    df = make_df(path, s)
+    df, s = wide_to_long(df, s)
+    df, s = periodic_df(df, s)
+    df, s = convert_times(df, s)
+    df, s = convert_dates(df, s)
+    df = sum_phases(df, s)
+    return df, s
+
+
+def csv_file_import(path):
+    df, schema = apply_schema(path)
+    units = schema['units']
+    return df, units
+
+
+def handle_units(load, units):
+    """
+    Accept load in a range of units.
+    Return load in kWh.
+    """
+    multiplier = {'kW':10**3, 'kWh':10**3, 'MW':10*6, 'MWh':10**6, 'W':1}
+    if not units in multiplier:
+        raise KeyError('Could not find units of power or energy')
+    load = (load * multiplier[units]) / 10**3 # load now in kW
+    warnings.warn('Need to fix energy integration when resampling', RuntimeWarning)
+ 
+    return load.rename(columns={units:'kWh'})
+    
+
+def handle_times(load, units):
+    if 'h' not in units:
+        return load.resample('1h').mean()
+    return load.resample('1h').sum()
+
+def is_utc(load):
+    return isinstance(load.index[0].tzinfo, pytz.UTC)
+
+def is_tz_aware(load):
+    return load.index[0].tzinfo is not None
+
+def hour_of_year(load):
+    pass
+
+def is_full_year(load):
+    return len(df) >= 365 * 24
+
+def pad_missing_hours(load):
+    pass
+
+def pad_missing_days(load):
+    pass
+
+
+
+path = '/Users/robertbrown/Downloads/Factory_Heavy_loads_15min.csv'
+
+df, units = csv_file_import(path)
+
+df = handle_units(df, units)
+
+df = handle_times(df, units)
+
+assert not is_tz_aware(df)
 
 
 
 
 
-# In[ ]:
 
-
-s = {}
-s['skiprows'] = rows_to_skip(path)
-s['skipcolumns'] = columns_to_drop(path, s['skiprows'])
-s['date_column'] = date_column(path, s['skiprows'], s['skipcolumns'])
-s['datetime_column'] = datetime_column(path, s['skiprows'], s['skipcolumns'])
-s['file_format'] = get_format(path)
-s['units'] = get_units(path)
-s['header'] = has_header_row(path, s['skiprows'])
-s['time_column'] = time_column(path, s['skiprows'])
-s['time_periodic'] = time_periodic(path, s['skiprows'], s['time_column'])
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# ## Tests
-
-# In[30]:
-
-
-path = askopenfilename(initialdir='../..')
-
-
-# path = 'D:/Orxagrid/work/AzureML/Market/identity/test/solarpvapp/test/TTT-LL0039_pivot.csv'
-
-# In[31]:
-
-
-s = make_schema(path)
-s
-
-
-# In[ ]:
 
 
 

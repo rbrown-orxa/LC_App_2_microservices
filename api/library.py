@@ -17,7 +17,7 @@ def _upload(request):
     return ( {'handle':os.path.basename(path)} )
 
 
-def _api(request):
+def _optimise(request):
     with open('my-schema.json', 'r') as schema_file:
         schema = json.load(schema_file)
     content = request.json
