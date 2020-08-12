@@ -537,11 +537,10 @@ def is_full_year(load):
     return len(df) >= 365 * 24
 
 def pad_missing_hours(load):
-    pass
+    raise NotImplementedError
 
 def pad_missing_days(load):
-    pass
-
+    raise NotImplementedError
 
 
 path = '/Users/robertbrown/Downloads/Factory_Heavy_loads_15min.csv'
@@ -553,6 +552,10 @@ df = handle_units(df, units)
 df = handle_times(df, units)
 
 assert not is_tz_aware(df)
+
+assert is_full_year(df)
+
+
 
 
 

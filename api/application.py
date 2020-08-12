@@ -1,4 +1,5 @@
 from flask import Flask, request, send_from_directory
+from flask_cors import CORS
 from flask_selfdoc import Autodoc
 import os
 
@@ -9,6 +10,7 @@ import config
 
 app = Flask(__name__)
 app.config.from_object(config)
+CORS(app)
 auto = Autodoc(app)
 utils.init_file_handler(app.config['UPLOAD_PATH'])
 
