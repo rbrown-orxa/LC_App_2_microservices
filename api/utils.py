@@ -1,5 +1,6 @@
 import os
 import functools
+import traceback
 
 
 def handle_exceptions(func):
@@ -8,6 +9,7 @@ def handle_exceptions(func):
             try:
                 return func(*args, **kwargs)
             except Exception as err:
+                # print(traceback.format_exc(err))
                 return handle(err)
         def handle(err):
             msg = str(err).split('\n')[0]

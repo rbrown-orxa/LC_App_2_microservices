@@ -4,17 +4,26 @@ import json
 import tempfile
 import os
 
+from ingest_file import process_load_file
+
 
 def _upload(request):
     file = request.files.get('file', None)
+    lat, lon = ( request.form.get(num, None) for num in ['lat', 'lon'] )
+
+    assert all ([ lat, lon ]), '400 lat and lon fields required'
     assert file and file.filename, '422 No file provided'
     extension = os.path.splitext(file.filename)[1]
     assert extension in current_app.config['UPLOAD_EXTENSIONS'], '415 Unsupported Media Type'
 
-    fd, path = tempfile.mkstemp(dir=current_app.config['UPLOAD_PATH'])
+    fd, raw_path = tempfile.mkstemp(dir=current_app.config['UPLOAD_PATH'])
     with open(fd, 'wb') as temp_file:
         file.save(temp_file)
-    return ( {'handle':os.path.basename(path)} )
+
+    fd, processed_path = tempfile.mkstemp(dir=current_app.config['UPLOAD_PATH'])
+    process_load_file(path_in=raw_path, lat=lat, lon=lon, path_out=processed_path)
+
+    return ( {'handle':os.path.basename(processed_path)} )
 
 
 def _optimise(request):

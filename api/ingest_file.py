@@ -8,6 +8,8 @@ import dateutil
 from datetime import timedelta
 import warnings
 import pytz
+from timezonefinder import TimezoneFinder
+import datetime as dt
 
 
 def columns_to_drop(filepath, skiprows):
@@ -499,13 +501,55 @@ def apply_schema(path):
     return df, s
 
 
-def csv_file_import(path):
+def is_tz_aware(load):
+    return load.index[0].tzinfo is not None
+
+
+def csv_file_import(path, lat, lon):
+    """Read csv, return df with naive local time and electrical unit"""
+    
     df, schema = apply_schema(path)
     units = schema['units']
+    print(f'Lat: {lat}, Lon: {lon}')
+    
+    if is_tz_aware(df):
+        return ( df.tz_localize(None,
+                    ambiguous='infer',
+                    nonexistent='shift_forward'),
+                units )
     return df, units
+    
+    
+    # if not is_tz_aware(df):
+    #     tf = TimezoneFinder()
+    #     timezone_str = tf.timezone_at(lat=lat, lng=lon)
+    #     assert timezone_str
+    #     print(f'Timezone: {timezone_str}')
+        
+    #     # convert local time to UTC
+    #     df = (df.tz_localize(
+    #                     timezone_str,
+    #                     ambiguous='NaT',
+    #                     nonexistent='shift_forward') #add local offset
+    #     #add local offset
+    #                 # .tz_convert('UTC') #convert to UTC offset
+    #                 .tz_localize(
+    #                     tz=None,
+    #                     ambiguous='infer',
+    #                     nonexistent='shift_forward'
+    #                     )) #remove offset
+    #     return df, units
+    
+    # # df = df.tz_convert('UTC') #convert to UTC offset
+    # df = df.tz_localize(
+    #                     tz=None,
+    #                     ambiguous='infer',
+    #                     nonexistent='shift_forward'
+    #                     ) #remove offset
+    # return df, units
 
 
-def handle_units(load, units):
+def units_to_kwh(load, units):
     """
     Accept load in a range of units.
     Return load in kWh.
@@ -519,7 +563,7 @@ def handle_units(load, units):
     return load.rename(columns={units:'kWh'})
     
 
-def handle_times(load, units):
+def resample_hourly(load, units):
     if 'h' not in units:
         return load.resample('1h').mean()
     return load.resample('1h').sum()
@@ -527,14 +571,11 @@ def handle_times(load, units):
 def is_utc(load):
     return isinstance(load.index[0].tzinfo, pytz.UTC)
 
-def is_tz_aware(load):
-    return load.index[0].tzinfo is not None
-
 def hour_of_year(load):
     pass
 
 def is_full_year(load):
-    return len(df) >= 365 * 24
+    return len(load) >= 365 * 24
 
 def pad_missing_hours(load):
     raise NotImplementedError
@@ -543,19 +584,113 @@ def pad_missing_days(load):
     raise NotImplementedError
 
 
-path = '/Users/robertbrown/Downloads/Factory_Heavy_loads_15min.csv'
+def to_hour_of_year(df):
+    # Put datetime index into hourly intervals
+    old_len = len(df)
+    start = df.sort_index().index[0].date()
+    end = df.sort_index().index[-1].date()
+    start = start - dt.timedelta(days=1)
+    end = end + dt.timedelta(days=1)
+    desired_index = pd.date_range(start, end, freq='1H')
+    df=    ( df.reindex(
+                df.index.union(desired_index))
+                .interpolate()
+                .reindex(desired_index)
+                .dropna() )
+    df = df[:old_len]
+    
+    # Convert index to hour of year
+    times = df.index.to_series()
+    df.index = ( (times.dt.week-1) *7 * 24 
+                                 + times.dt.weekday * 24 
+                                 + times.dt.hour )
+    return df
 
-df, units = csv_file_import(path)
 
-df = handle_units(df, units)
-
-df = handle_times(df, units)
-
-assert not is_tz_aware(df)
-
-assert is_full_year(df)
+def clip_to_year(load):
+    return load[:24*7*52]
 
 
+def process_load_file(path_in, lat, lon, path_out):
+    warnings.warn('Need to shift hour of year to ensure we start on same day (e.g.) a Monday for EV, PV and building loads'
+                  , RuntimeWarning)
+    df, units = csv_file_import(path_in, lat, lon)
+    df = units_to_kwh(df, units)
+    df = resample_hourly(df, units)
+    assert is_full_year(df)
+    df = to_hour_of_year(df)
+    df = df.sort_index()
+    df = clip_to_year(df)
+    df.to_csv(path_out)
+    
+
+
+
+
+if __name__ == '__main__':
+    # path = '../examples/tests/Factory_Heavy_loads_15min.csv'
+    path = '../examples/tests/tz_aware_factory_heavy_loads.csv'
+    lat, lon = 18.495858, 73.883544 # Pune
+    # New York
+    # 40.720046, -73.869629
+    
+    process_load_file(path, lat, lon, '../examples/tests/out.csv')
+
+
+
+
+# EV profiles are in local time
+# Building profiles are in local time
+# Need PV profiles in local time, as below
+"""
+#Get PV data
+token = '38707fa2a8eb32d983c8fcf348fffd82fe2aa7aa'
+api_base = 'https://www.renewables.ninja/api/'
+s = requests.session()
+s.headers = {'Authorization': 'Token ' + token}
+url = api_base + 'data/pv'
+args = {
+    'lat': 18.495858,
+    'lon': 73.883544,
+    'date_from': '2018-01-01',
+    'date_to': '2018-01-30',
+    'dataset': 'merra2',
+    'capacity': 1.0,
+    'system_loss': 0.1,
+    'tracking': 0,
+    'tilt': 30,
+    'azim': 180,
+    'format': 'json',
+    'interpolate': False, 
+    'local_time': True
+}
+r = s.get(url, params=args)
+print( r.status_code, r.reason )
+parsed_response = json.loads(r.text)
+generation = pd.read_json(json.dumps(parsed_response['data']), orient='index')
+old_len = len(generation)
+generation = generation.set_index('local_time')
+generation = generation.tz_localize(None)
+
+# Put datetime index into hourly intervals
+start = generation.sort_index().index[0].date()
+end = generation.sort_index().index[-1].date()
+start = start - dt.timedelta(days=1)
+end = end + dt.timedelta(days=1)
+desired_index = pd.date_range(start, end, freq='1H')
+generation=    ( generation.reindex(
+                    generation.index.union(desired_index))
+                    .interpolate()
+                    .reindex(desired_index)
+                    .dropna() )
+generation = generation[:old_len]
+
+# Convert index to hour of year
+times = generation.index.to_series()
+generation.index = ( (times.dt.week-1) *7 * 24 
+                             + times.dt.weekday * 24 
+                             + times.dt.hour )
+"""
 
 
 
