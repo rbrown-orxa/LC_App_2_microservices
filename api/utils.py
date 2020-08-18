@@ -32,6 +32,12 @@ def _schema():
     return schema
 
 
+def _result_schema():
+    with open('result-schema.json') as file:
+        schema = file.read()
+    return schema
+
+
 def get_consumption_profile(file,consumption_kwh,building_type):
     df = pd.read_csv(file)    
     return(
