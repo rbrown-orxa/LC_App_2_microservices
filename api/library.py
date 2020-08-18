@@ -4,7 +4,8 @@ import json
 import tempfile
 import os
 
-from ingest_file import process_load_file,get_consumption_profile
+import utils
+from ingest_file import process_load_file
 
 
 def _upload(request):
@@ -27,12 +28,33 @@ def _upload(request):
 
 
 def _optimise(request):
+    development_rv = {
+        'results':
+        {
+            'success': True, 
+            'battery_size_kwh': 1.0,
+            'annual_import_site_kwh': 1.0, 
+            'annual_import_ev_kwh': 1.0,
+            'annual_import_total_kwh': 1.0,
+            'annual_import_with_pv_kwh': 1.0, 
+            'annual_import_with_pv_and_battery_kwh': 1.0,
+            'original_import_cost': 1.0, 
+            'with_ev_import_cost': 1.0,
+            'optimised_import_cost': 1.0,
+            'buildings':
+            [
+                {'name':'building_2', 'pv_size_kw': 1.0, 'num_chargers':1},
+                {'name':'building_2', 'pv_size_kw': 1.0, 'num_chargers':1},
+                {'name':'building_2', 'pv_size_kw': 1.0, 'num_chargers':1},
+            ]
+        }
+    }
     with open('my-schema.json', 'r') as schema_file:
         schema = json.load(schema_file)
     content = request.json
     try:
         jsonschema.validate(instance=content, schema=schema)
-        return content
+        return json.dumps( development_rv )
     except Exception as err:
         assert False, f'422 {err}'
 
@@ -48,10 +70,20 @@ def _file_requirements():
     return { 'max_size_bytes': current_app.config['MAX_CONTENT_LENGTH'],
              'valid_extensions': current_app.config['UPLOAD_EXTENSIONS'] }
     
+
 def _consumption(request):
     
     annual_kwh_consumption,building_type = ( request.form.get(num, None) for num in ['annual_kwh_consumption_optional','building_type'] )
     
     assert all ([ annual_kwh_consumption, building_type ]), '400 annual_kwh_consumption and building_type fields required'
     
-    return (json.dumps(get_consumption_profile(current_app.config['PROFILES_BUILDING'],annual_kwh_consumption,building_type)))
+    annual_kwh_consumption = float(annual_kwh_consumption)
+    assert isinstance(building_type, str)
+    
+    rv = utils.get_consumption_profile( current_app.config['PROFILES_BUILDING'],
+                                    annual_kwh_consumption,
+                                    building_type )
+        
+    return rv.to_json()
+        
+

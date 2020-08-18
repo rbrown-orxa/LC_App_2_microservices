@@ -1,6 +1,7 @@
 import os
 import functools
 import traceback
+import pandas as pd
 
 
 def handle_exceptions(func):
@@ -29,3 +30,10 @@ def _schema():
     with open('my-schema.json') as file:
         schema = file.read()
     return schema
+
+
+def get_consumption_profile(file,consumption_kwh,building_type):
+    df = pd.read_csv(file)    
+    return(
+        df['domestic_kW']*consumption_kwh if building_type == "domestic" else df['non_domestic_kW']*consumption_kwh
+            )
