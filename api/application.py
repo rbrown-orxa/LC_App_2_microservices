@@ -110,6 +110,26 @@ def file_requirements():
         { "max_size_bytes": 5242880, "valid_extensions": [ ".csv" ] }"""
     return library._file_requirements()
 
+@app.route("/consumption")
+@auto.doc()
+def consumption():
+    """Get api request consumption profile
+
+     Request:
+        Content-Type: multipart/form-data
+        
+        Content-Disposition: form-data; name="annual_kwh_consumption_optional"
+        2400
+        
+        Content-Disposition: form-data; name="building_type"
+        domestic/work/public/commercial/delivery
+
+    Return:
+        Content-Type: application/json
+        { "error": str } if not successul.    """
+ 
+    return library._consumption(request)
+
 
 @app.route('/')
 def documentation():

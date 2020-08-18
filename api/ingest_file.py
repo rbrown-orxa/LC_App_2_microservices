@@ -624,9 +624,11 @@ def process_load_file(path_in, lat, lon, path_out):
     df.to_csv(path_out)
     
 
-
-
-
+def get_consumption_profile(file,consumption_kwh,building_type):
+    df = pd.read_csv(file)    
+    return([df['domestic_kW']*consumption_kwh if building_type == "domestic" else df['non_domestic_kW']*consumption_kwh])
+    
+    
 if __name__ == '__main__':
     # path = '../examples/tests/Factory_Heavy_loads_15min.csv'
     path = '../examples/tests/tz_aware_factory_heavy_loads.csv'
@@ -636,7 +638,10 @@ if __name__ == '__main__':
     
     process_load_file(path, lat, lon, '../examples/tests/out.csv')
 
-
+    file = '../data/building_profiles.csv'
+    consumption_kwh,building_type=2400,'domestic'
+    
+    get_consumption_profile(file,consumption_kwh,building_type)
 
 
 # EV profiles are in local time

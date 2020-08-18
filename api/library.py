@@ -4,7 +4,7 @@ import json
 import tempfile
 import os
 
-from ingest_file import process_load_file
+from ingest_file import process_load_file,get_consumption_profile
 
 
 def _upload(request):
@@ -47,3 +47,11 @@ def _download(handle):
 def _file_requirements():
     return { 'max_size_bytes': current_app.config['MAX_CONTENT_LENGTH'],
              'valid_extensions': current_app.config['UPLOAD_EXTENSIONS'] }
+    
+def _consumption(request):
+    
+    annual_kwh_consumption,building_type = ( request.form.get(num, None) for num in ['annual_kwh_consumption_optional','building_type'] )
+    
+    assert all ([ annual_kwh_consumption, building_type ]), '400 annual_kwh_consumption and building_type fields required'
+    
+    return (json.dumps(get_consumption_profile(current_app.config['PROFILES_BUILDING'],annual_kwh_consumption,building_type)))
