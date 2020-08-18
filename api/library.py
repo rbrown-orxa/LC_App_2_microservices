@@ -31,16 +31,19 @@ def _optimise(request):
     development_rv = {
         'results': {
 
-            'success': True, 
-            'battery_size_kwh': 1.0,
-            'annual_import_site_kwh': 1.0, 
-            'annual_import_ev_kwh': 1.0,
-            'annual_import_total_kwh': 1.0,
-            'annual_import_with_pv_kwh': 1.0, 
-            'annual_import_with_pv_and_battery_kwh': 1.0,
-            'original_import_cost': 1.0, 
-            'with_ev_import_cost': 1.0,
-            'optimised_import_cost': 1.0,
+            'site':{
+                'success': True, 
+                'battery_size_kwh': 1.0,
+                'annual_import_site_kwh': 1.0, 
+                'annual_import_ev_kwh': 1.0,
+                'annual_import_total_kwh': 1.0,
+                'annual_import_with_pv_kwh': 1.0, 
+                'annual_import_with_pv_and_battery_kwh': 1.0,
+                'original_import_cost': 1.0, 
+                'with_ev_import_cost': 1.0,
+                'optimised_import_cost': 1.0
+            },
+
             'buildings': [
                 {'name':'building_1', 'pv_size_kw': 1.0, 'num_chargers':1},
                 {'name':'building_2', 'pv_size_kw': 1.0, 'num_chargers':1},
