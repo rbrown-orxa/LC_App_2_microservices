@@ -30,6 +30,7 @@ def _upload(request):
 def _optimise(request):
     development_rv = {
         'results': {
+
             'success': True, 
             'battery_size_kwh': 1.0,
             'annual_import_site_kwh': 1.0, 
@@ -44,6 +45,7 @@ def _optimise(request):
                 {'name':'building_1', 'pv_size_kw': 1.0, 'num_chargers':1},
                 {'name':'building_2', 'pv_size_kw': 1.0, 'num_chargers':1},
                 {'name':'building_3', 'pv_size_kw': 1.0, 'num_chargers':1},
+
             ]
         }
     }
