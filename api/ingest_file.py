@@ -623,11 +623,6 @@ def process_load_file(path_in, lat, lon, path_out):
     df = clip_to_year(df)
     df.to_csv(path_out)
     
-
-def get_consumption_profile(file,consumption_kwh,building_type):
-    df = pd.read_csv(file)    
-    return([df['domestic_kW']*consumption_kwh if building_type == "domestic" else df['non_domestic_kW']*consumption_kwh])
-    
     
 if __name__ == '__main__':
     # path = '../examples/tests/Factory_Heavy_loads_15min.csv'
@@ -644,8 +639,8 @@ if __name__ == '__main__':
     get_consumption_profile(file,consumption_kwh,building_type)
 
 
-# EV profiles are in local time
-# Building profiles are in local time
+# EV profiles are in local time (should start on a Monday)
+# Building profiles are in local time (should be shifted to start on a Monday)
 # Need PV profiles in local time, as below
 """
 #Get PV data

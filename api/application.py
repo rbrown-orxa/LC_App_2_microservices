@@ -110,6 +110,7 @@ def file_requirements():
         { "max_size_bytes": 5242880, "valid_extensions": [ ".csv" ] }"""
     return library._file_requirements()
 
+
 @app.route("/consumption")
 @auto.doc()
 def consumption():
