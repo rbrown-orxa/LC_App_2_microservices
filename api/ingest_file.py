@@ -602,14 +602,12 @@ def to_hour_of_year(df):
     end = end + dt.timedelta(days=1)
     desired_index = pd.date_range(start, end, freq='1H')
     
-    #apply new index, interpolate existing values to it
+    #apply new index, interpolate existing values to it. Trim excess rows.
     df=    ( df.reindex(
                 df.index.union(desired_index))
                 .interpolate()
                 .reindex(desired_index)
                 .dropna() )
-    
-    
     df = df[:old_len]
     
     # Convert index to hour of year    
@@ -618,20 +616,19 @@ def to_hour_of_year(df):
                     + times.dt.weekday * 24 
                     + times.dt.hour )
     
+    # Get midnight on Monday closest to 1st January, as hour of year
     df['hours'] = hours.values
-    
     midnights = df.between_time('00:00:00', '00:00:00')
     midnights = midnights.reset_index().rename(columns={'index':'timestamp'})
-
     mondays = midnights [ midnights.timestamp.dt.weekday == 0 ]
     mondays_ascending = mondays.sort_values('hours')
     first_monday_of_year_by_hour = mondays_ascending.hours.min()
+
+    # Shift index so the target Monday mignight is hour zero
     hours_with_first_monday_of_year_as_zero = \
         ( df.hours - first_monday_of_year_by_hour ) % len(df)
-    
     df['hours'] = hours_with_first_monday_of_year_as_zero
     df = df.sort_values('hours')
-    
     df = df.set_index('hours')
     
     return df
