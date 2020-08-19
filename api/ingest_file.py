@@ -635,8 +635,6 @@ if __name__ == '__main__':
 
     file = '../data/building_profiles.csv'
     consumption_kwh,building_type=2400,'domestic'
-    
-    get_consumption_profile(file,consumption_kwh,building_type)
 
 
 # EV profiles are in local time (should start on a Monday)

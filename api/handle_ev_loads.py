@@ -26,13 +26,13 @@ def get_ev_loads(building_type='domestic',ratio=0.2,start_date=None,charge_point
     start = pd.to_datetime(datetime.strptime(start_date, '%Y-%m-%d') - timedelta(days=offset))
     #Set end date to one year later
     end = start + pd.DateOffset(years=1)
-    #Multiple EV load by the number of charge points
+    #Multiply EV load by the number of charge points
     building_EV_load_one_year = df * charge_points
     #Generate datetime index of 1 hour frequency
     index = pd.date_range(start=start, end=end, freq='1h')
     #Assign the index to EV load
     building_EV_load_one_year.index = index[0:len(building_EV_load_one_year)]
     
-    return(building_EV_load_one_year)
+    return(building_EV_load_one_year.rename(columns={'domestic':'Kwh'},inplace=True))
 
 
