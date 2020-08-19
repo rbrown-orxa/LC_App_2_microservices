@@ -57,7 +57,7 @@ def _optimise(request):
     with open('my-schema.json', 'r') as schema_file:
         schema = json.load(schema_file)
     content = request.json
-    print(type(content))
+    assert isinstance(content, dict)
     try:
         jsonschema.validate(instance=content, schema=schema)
         return json.dumps( development_rv )
