@@ -22,7 +22,9 @@ def _upload(request):
         file.save(temp_file)
 
     fd, processed_path = tempfile.mkstemp(dir=current_app.config['UPLOAD_PATH'])
-    process_load_file(path_in=raw_path, lat=lat, lon=lon, path_out=processed_path)
+    df = process_load_file(path_in=raw_path, lat=lat, lon=lon)
+    
+    df.to_csv(processed_path)
 
     return ( {'handle':os.path.basename(processed_path)} )
 
@@ -55,6 +57,7 @@ def _optimise(request):
     with open('my-schema.json', 'r') as schema_file:
         schema = json.load(schema_file)
     content = request.json
+    print(type(content))
     try:
         jsonschema.validate(instance=content, schema=schema)
         return json.dumps( development_rv )
