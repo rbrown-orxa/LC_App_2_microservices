@@ -668,6 +668,7 @@ if __name__ == '__main__':
     # get_consumption_profile(file,consumption_kwh,building_type)
 
 
+
 # EV profiles are in local time (should start on a Monday)
 # Building profiles are in local time (should be shifted to start on a Monday)
 # Need PV profiles in local time, as below
