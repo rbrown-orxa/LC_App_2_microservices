@@ -24,7 +24,7 @@ def _upload(request):
     fd, processed_path = tempfile.mkstemp(dir=current_app.config['UPLOAD_PATH'])
     df = process_load_file(path_in=raw_path, lat=lat, lon=lon)
     
-    df.to_csv(processed_path)
+    df.to_csv(processed_path, index=False)
 
     return ( {'handle':os.path.basename(processed_path)} )
 
