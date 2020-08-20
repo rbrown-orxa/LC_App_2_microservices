@@ -64,7 +64,8 @@ def _optimise(request):
     except Exception as err:
         assert False, f'422 {err}'
 
-    buildings = handle_base_loads.list_buildings(query)
+    building_loads = handle_base_loads.list_buildings(query)
+    print(building_loads)
     
     dummy_rv = json.dumps( development_rv )
     return dummy_rv
