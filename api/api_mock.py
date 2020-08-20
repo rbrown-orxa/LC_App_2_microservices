@@ -1,9 +1,11 @@
 import json
+import werkzeug
 
 import library
 
 class DummyRequest():
 	pass
+
 
 valid_json = """
         {
@@ -15,7 +17,7 @@ valid_json = """
             "pv_life_yrs": 1,
             "battery_life_cycles": 1,
             "battery_cost_kwh": 1.0,
-            "load_profile_csv_optional": "handle_1",
+            "load_profile_csv_optional": "",
             "building_data": [
                 {
                     "name": "building 1",
@@ -25,7 +27,7 @@ valid_json = """
                     "pitch_deg": 1,
                     "num_ev_chargers": 1,
                     "pv_size_kwp_optional": 1.0,
-                    "load_profile_csv_optional": "handle_2",
+                    "load_profile_csv_optional": "../examples/tests/Factory_Heavy_loads_15min.csv",
                     "annual_kwh_consumption_optional": 1.0
                 },
                 {
@@ -36,7 +38,7 @@ valid_json = """
                     "pitch_deg": 1,
                     "num_ev_chargers": 1,
                     "pv_size_kwp_optional": 1.0,
-                    "load_profile_csv_optional": "handle_3",
+                    "load_profile_csv_optional": "",
                     "annual_kwh_consumption_optional": 1.0
                 }
             ]
@@ -47,12 +49,16 @@ dummy_request = DummyRequest()
 dummy_request.json = json.loads(valid_json)
 
 
+
 if __name__ == '__main__':
-	pass
-	# print(valid_json)
-	# print(json.loads(valid_json))
 	rv = library._optimise(dummy_request)
 	print(rv)
+
+
+	# pass
+	# # print(valid_json)
+	# # print(json.loads(valid_json))
+
 
 
 

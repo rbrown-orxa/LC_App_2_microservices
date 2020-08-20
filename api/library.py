@@ -6,6 +6,7 @@ import os
 
 import utils
 from ingest_file import process_load_file
+import handle_base_loads
 
 
 def _upload(request):
@@ -56,13 +57,17 @@ def _optimise(request):
     }
     with open('my-schema.json', 'r') as schema_file:
         schema = json.load(schema_file)
-    content = request.json
-    assert isinstance(content, dict)
+    query = request.json
+    assert isinstance(query, dict)
     try:
-        jsonschema.validate(instance=content, schema=schema)
-        return json.dumps( development_rv )
+        jsonschema.validate(instance=query, schema=schema)
     except Exception as err:
         assert False, f'422 {err}'
+
+    buildings = handle_base_loads.list_buildings(query)
+    
+    dummy_rv = json.dumps( development_rv )
+    return dummy_rv
 
 
 def _download(handle):
