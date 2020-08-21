@@ -1,7 +1,11 @@
+<<<<<<< HEAD
 from ingest_file import process_load_file
 from utils import get_fixed_fields,get_consumption_profile,get_variable_fields
 import os
 import config as cfg
+=======
+
+>>>>>>> 3a66c48bf832a3da065cffda53de1966c82deace
 
 def list_buildings(query):
     building_loads = {}
@@ -19,6 +23,7 @@ def list_buildings(query):
                     f" annual consumption in kWh: "
                     f"{building['annual_kwh_consumption_optional']}")
             # make a temporary file from get_consumption_profile()
+<<<<<<< HEAD
             building_loads[ building['name'] ] = building['annual_kwh_consumption_optional']
             # store it's handle in building_loads
     return building_loads
@@ -64,3 +69,9 @@ if __name__ == '__main__':
     from api_mock import *
     
     print(get_base_loads(request.json))
+=======
+
+            # store it's handle in building_loads
+    return building_loads
+
+>>>>>>> 3a66c48bf832a3da065cffda53de1966c82deace

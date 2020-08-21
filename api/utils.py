@@ -38,6 +38,7 @@ def _result_schema():
         schema = file.read()
     return schema
 
+<<<<<<< HEAD
 def get_fixed_fields(schema, fields=['lon', 'lat', 'cost_per_kWp', 
                                        'import_cost_kwh','export_price_kwh',
                                        'pv_cost_kwp', 'pv_life_yrs', 
@@ -74,6 +75,8 @@ def get_variable_fields(schema,fields=['roof_size_m2', 'azimuth_deg','pitch_deg'
             super_dict.setdefault(k, []).append(v)
     return ( {field : super_dict.get(field, None) for field in fields} )
 
+=======
+>>>>>>> 3a66c48bf832a3da065cffda53de1966c82deace
 
 def get_consumption_profile(file,consumption_kwh,building_type):
     

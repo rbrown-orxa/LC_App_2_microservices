@@ -15,7 +15,7 @@
             "pv_life_yrs": 1,
             "battery_life_cycles": 1,
             "battery_cost_kwh": 1.0,
-            "load_profile_csv_optional": "time,kw\n,12:00:00,3.0",
+            "load_profile_csv_optional": "handle_1",
             "building_data": [
                 {
                     "name": "building 1",
@@ -25,7 +25,7 @@
                     "pitch_deg": 1,
                     "num_ev_chargers": 1,
                     "pv_size_kwp_optional": 1.0,
-                    "load_profile_csv_optional": "time,kw\n,12:00:00,3.0",
+                    "load_profile_csv_optional": "handle_2",
                     "annual_kwh_consumption_optional": 1.0
                 },
                 {
@@ -36,7 +36,7 @@
                     "pitch_deg": 1,
                     "num_ev_chargers": 1,
                     "pv_size_kwp_optional": 1.0,
-                    "load_profile_csv_optional": "time,kw\n,12:00:00,3.0",
+                    "load_profile_csv_optional": "handle_3",
                     "annual_kwh_consumption_optional": 1.0
                 }
             ]
