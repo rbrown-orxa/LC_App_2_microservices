@@ -75,6 +75,21 @@ def schema():
         Body: json-schema definition
     """
     return utils._schema()
+
+
+@app.route("/result_schema")
+@auto.doc()
+def result_schema():
+    """Get api /optimise result json-schema definition
+
+    Request:
+        Body: none
+    Return:
+
+        Content-Type: application/json
+        Body: json-schema definition
+    """
+    return utils._result_schema()
         
 
 @app.route("/download/<handle>")

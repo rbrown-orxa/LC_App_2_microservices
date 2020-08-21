@@ -1,0 +1,311 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "title": "The root schema",
+    "description": "The root schema comprises the entire JSON document.",
+    "default": {},
+    "examples": [
+        {
+            "results": {
+                "site": {
+                    "success": true,
+                    "battery_size_kwh": 1.0,
+                    "annual_import_site_kwh": 1.0,
+                    "annual_import_ev_kwh": 1.0,
+                    "annual_import_total_kwh": 1.0,
+                    "annual_import_with_pv_kwh": 1.0,
+                    "annual_import_with_pv_and_battery_kwh": 1.0,
+                    "original_import_cost": 1.0,
+                    "with_ev_import_cost": 1.0,
+                    "optimised_import_cost": 1.0
+                },
+                "buildings": [
+                    {
+                        "name": "building_1",
+                        "pv_size_kw": 1.0,
+                        "num_chargers": 1
+                    },
+                    {
+                        "name": "building_2",
+                        "pv_size_kw": 1.0,
+                        "num_chargers": 1
+                    },
+                    {
+                        "name": "building_3",
+                        "pv_size_kw": 1.0,
+                        "num_chargers": 1
+                    }
+                ]
+            }
+        }
+    ],
+    "required": [
+        "results"
+    ],
+    "properties": {
+        "results": {
+            "$id": "#/properties/results",
+            "type": "object",
+            "title": "The results schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": {},
+            "examples": [
+                {
+                    "site": {
+                        "success": true,
+                        "battery_size_kwh": 1.0,
+                        "annual_import_site_kwh": 1.0,
+                        "annual_import_ev_kwh": 1.0,
+                        "annual_import_total_kwh": 1.0,
+                        "annual_import_with_pv_kwh": 1.0,
+                        "annual_import_with_pv_and_battery_kwh": 1.0,
+                        "original_import_cost": 1.0,
+                        "with_ev_import_cost": 1.0,
+                        "optimised_import_cost": 1.0
+                    },
+                    "buildings": [
+                        {
+                            "name": "building_1",
+                            "pv_size_kw": 1.0,
+                            "num_chargers": 1
+                        },
+                        {
+                            "name": "building_2",
+                            "pv_size_kw": 1.0,
+                            "num_chargers": 1
+                        },
+                        {
+                            "name": "building_3",
+                            "pv_size_kw": 1.0,
+                            "num_chargers": 1
+                        }
+                    ]
+                }
+            ],
+            "required": [
+                "site",
+                "buildings"
+            ],
+            "properties": {
+                "site": {
+                    "$id": "#/properties/results/properties/site",
+                    "type": "object",
+                    "title": "The site schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": {},
+                    "examples": [
+                        {
+                            "success": true,
+                            "battery_size_kwh": 1.0,
+                            "annual_import_site_kwh": 1.0,
+                            "annual_import_ev_kwh": 1.0,
+                            "annual_import_total_kwh": 1.0,
+                            "annual_import_with_pv_kwh": 1.0,
+                            "annual_import_with_pv_and_battery_kwh": 1.0,
+                            "original_import_cost": 1.0,
+                            "with_ev_import_cost": 1.0,
+                            "optimised_import_cost": 1.0
+                        }
+                    ],
+                    "required": [
+                        "success",
+                        "battery_size_kwh",
+                        "annual_import_site_kwh",
+                        "annual_import_ev_kwh",
+                        "annual_import_total_kwh",
+                        "annual_import_with_pv_kwh",
+                        "annual_import_with_pv_and_battery_kwh",
+                        "original_import_cost",
+                        "with_ev_import_cost",
+                        "optimised_import_cost"
+                    ],
+                    "properties": {
+                        "success": {
+                            "$id": "#/properties/results/properties/site/properties/success",
+                            "type": "boolean",
+                            "title": "The success schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": false,
+                            "examples": [
+                                true
+                            ]
+                        },
+                        "battery_size_kwh": {
+                            "$id": "#/properties/results/properties/site/properties/battery_size_kwh",
+                            "type": "number",
+                            "title": "The battery_size_kwh schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": 0.0,
+                            "examples": [
+                                1.0
+                            ]
+                        },
+                        "annual_import_site_kwh": {
+                            "$id": "#/properties/results/properties/site/properties/annual_import_site_kwh",
+                            "type": "number",
+                            "title": "The annual_import_site_kwh schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": 0.0,
+                            "examples": [
+                                1.0
+                            ]
+                        },
+                        "annual_import_ev_kwh": {
+                            "$id": "#/properties/results/properties/site/properties/annual_import_ev_kwh",
+                            "type": "number",
+                            "title": "The annual_import_ev_kwh schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": 0.0,
+                            "examples": [
+                                1.0
+                            ]
+                        },
+                        "annual_import_total_kwh": {
+                            "$id": "#/properties/results/properties/site/properties/annual_import_total_kwh",
+                            "type": "number",
+                            "title": "The annual_import_total_kwh schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": 0.0,
+                            "examples": [
+                                1.0
+                            ]
+                        },
+                        "annual_import_with_pv_kwh": {
+                            "$id": "#/properties/results/properties/site/properties/annual_import_with_pv_kwh",
+                            "type": "number",
+                            "title": "The annual_import_with_pv_kwh schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": 0.0,
+                            "examples": [
+                                1.0
+                            ]
+                        },
+                        "annual_import_with_pv_and_battery_kwh": {
+                            "$id": "#/properties/results/properties/site/properties/annual_import_with_pv_and_battery_kwh",
+                            "type": "number",
+                            "title": "The annual_import_with_pv_and_battery_kwh schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": 0.0,
+                            "examples": [
+                                1.0
+                            ]
+                        },
+                        "original_import_cost": {
+                            "$id": "#/properties/results/properties/site/properties/original_import_cost",
+                            "type": "number",
+                            "title": "The original_import_cost schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": 0.0,
+                            "examples": [
+                                1.0
+                            ]
+                        },
+                        "with_ev_import_cost": {
+                            "$id": "#/properties/results/properties/site/properties/with_ev_import_cost",
+                            "type": "number",
+                            "title": "The with_ev_import_cost schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": 0.0,
+                            "examples": [
+                                1.0
+                            ]
+                        },
+                        "optimised_import_cost": {
+                            "$id": "#/properties/results/properties/site/properties/optimised_import_cost",
+                            "type": "number",
+                            "title": "The optimised_import_cost schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": 0.0,
+                            "examples": [
+                                1.0
+                            ]
+                        }
+                    },
+                    "additionalProperties": true
+                },
+                "buildings": {
+                    "$id": "#/properties/results/properties/buildings",
+                    "type": "array",
+                    "title": "The buildings schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": [],
+                    "examples": [
+                        [
+                            {
+                                "name": "building_1",
+                                "pv_size_kw": 1.0,
+                                "num_chargers": 1
+                            },
+                            {
+                                "name": "building_2",
+                                "pv_size_kw": 1.0,
+                                "num_chargers": 1
+                            }
+                        ]
+                    ],
+                    "additionalItems": true,
+                    "items": {
+                        "$id": "#/properties/results/properties/buildings/items",
+                        "anyOf": [
+                            {
+                                "$id": "#/properties/results/properties/buildings/items/anyOf/0",
+                                "type": "object",
+                                "title": "The first anyOf schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": {},
+                                "examples": [
+                                    {
+                                        "name": "building_1",
+                                        "pv_size_kw": 1.0,
+                                        "num_chargers": 1
+                                    }
+                                ],
+                                "required": [
+                                    "name",
+                                    "pv_size_kw",
+                                    "num_chargers"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "$id": "#/properties/results/properties/buildings/items/anyOf/0/properties/name",
+                                        "type": "string",
+                                        "title": "The name schema",
+                                        "description": "An explanation about the purpose of this instance.",
+                                        "default": "",
+                                        "examples": [
+                                            "building_1"
+                                        ]
+                                    },
+                                    "pv_size_kw": {
+                                        "$id": "#/properties/results/properties/buildings/items/anyOf/0/properties/pv_size_kw",
+                                        "type": "number",
+                                        "title": "The pv_size_kw schema",
+                                        "description": "An explanation about the purpose of this instance.",
+                                        "default": 0.0,
+                                        "examples": [
+                                            1.0
+                                        ]
+                                    },
+                                    "num_chargers": {
+                                        "$id": "#/properties/results/properties/buildings/items/anyOf/0/properties/num_chargers",
+                                        "type": "integer",
+                                        "title": "The num_chargers schema",
+                                        "description": "An explanation about the purpose of this instance.",
+                                        "default": 0,
+                                        "examples": [
+                                            1
+                                        ]
+                                    }
+                                },
+                                "additionalProperties": true
+                            }
+                        ]
+                    }
+                }
+            },
+            "additionalProperties": true
+        }
+    },
+    "additionalProperties": true
+}

@@ -506,18 +506,18 @@ def is_tz_aware(load):
 
 
 def csv_file_import(path, lat, lon):
-    """Read csv, return df with naive local time and electrical unit"""
+    #Read csv, return df with naive local time and electrical unit
     
     df, schema = apply_schema(path)
     units = schema['units']
     print(f'Lat: {lat}, Lon: {lon}')
     
     if is_tz_aware(df):
-        return ( df.tz_localize(None,
-                    ambiguous='infer',
-                    nonexistent='shift_forward'),
-                units )
+        df = ( df.tz_localize(None,
+                ambiguous='infer',
+                nonexistent='shift_forward'))
     return df, units
+     
     
     
     # if not is_tz_aware(df):
@@ -585,13 +585,24 @@ def pad_missing_days(load):
 
 
 def to_hour_of_year(df):
-    # Put datetime index into hourly intervals
+    """
+    Put datetime index into hourly intervals, starting at zero, which
+    represents midnight on the Monday closest to 1st January.
+    """
+    warnings.warn('Todo: change start date to first Monday of January',
+                  RuntimeWarning)
+                  
+    #get length, start and end dates
     old_len = len(df)
     start = df.sort_index().index[0].date()
     end = df.sort_index().index[-1].date()
+    
+    #build desired index, +2d to account for date_range() starting at midnight
     start = start - dt.timedelta(days=1)
     end = end + dt.timedelta(days=1)
     desired_index = pd.date_range(start, end, freq='1H')
+    
+    #apply new index, interpolate existing values to it. Trim excess rows.
     df=    ( df.reindex(
                 df.index.union(desired_index))
                 .interpolate()
@@ -599,11 +610,27 @@ def to_hour_of_year(df):
                 .dropna() )
     df = df[:old_len]
     
-    # Convert index to hour of year
+    # Convert index to hour of year    
     times = df.index.to_series()
-    df.index = ( (times.dt.week-1) *7 * 24 
-                                 + times.dt.weekday * 24 
-                                 + times.dt.hour )
+    hours = ( (times.dt.week-1) *7 * 24 
+                    + times.dt.weekday * 24 
+                    + times.dt.hour )
+    
+    # Get midnight on Monday closest to 1st January, as hour of year
+    df['hours'] = hours.values
+    midnights = df.between_time('00:00:00', '00:00:00')
+    midnights = midnights.reset_index().rename(columns={'index':'timestamp'})
+    mondays = midnights [ midnights.timestamp.dt.weekday == 0 ]
+    mondays_ascending = mondays.sort_values('hours')
+    first_monday_of_year_by_hour = mondays_ascending.hours.min()
+
+    # Shift index so the target Monday mignight is hour zero
+    hours_with_first_monday_of_year_as_zero = \
+        ( df.hours - first_monday_of_year_by_hour ) % len(df)
+    df['hours'] = hours_with_first_monday_of_year_as_zero
+    df = df.sort_values('hours')
+    df = df.set_index('hours')
+    
     return df
 
 
@@ -611,17 +638,16 @@ def clip_to_year(load):
     return load[:24*7*52]
 
 
-def process_load_file(path_in, lat, lon, path_out):
-    warnings.warn('Need to shift hour of year to ensure we start on same day (e.g.) a Monday for EV, PV and building loads'
-                  , RuntimeWarning)
+def process_load_file(path_in, lat, lon):
     df, units = csv_file_import(path_in, lat, lon)
     df = units_to_kwh(df, units)
     df = resample_hourly(df, units)
     assert is_full_year(df)
-    df = to_hour_of_year(df)
-    df = df.sort_index()
     df = clip_to_year(df)
-    df.to_csv(path_out)
+    df = to_hour_of_year(df)
+
+    # df.to_csv(path_out)
+    return df
     
     
 if __name__ == '__main__':
@@ -631,10 +657,13 @@ if __name__ == '__main__':
     # New York
     # 40.720046, -73.869629
     
-    process_load_file(path, lat, lon, '../examples/tests/out.csv')
+    load = process_load_file(path, lat, lon)
 
-    file = '../data/building_profiles.csv'
-    consumption_kwh,building_type=2400,'domestic'
+    # file = '../data/building_profiles.csv'
+    # consumption_kwh,building_type=2400,'domestic'
+    
+    # get_consumption_profile(file,consumption_kwh,building_type)
+
 
 
 # EV profiles are in local time (should start on a Monday)
@@ -651,7 +680,7 @@ args = {
     'lat': 18.495858,
     'lon': 73.883544,
     'date_from': '2018-01-01',
-    'date_to': '2018-01-30',
+    'date_to': '2018-12-31',
     'dataset': 'merra2',
     'capacity': 1.0,
     'system_loss': 0.1,

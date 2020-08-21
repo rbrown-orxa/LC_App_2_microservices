@@ -6,6 +6,7 @@ import os
 
 import utils
 from ingest_file import process_load_file
+import handle_base_loads
 
 
 def _upload(request):
@@ -22,41 +23,52 @@ def _upload(request):
         file.save(temp_file)
 
     fd, processed_path = tempfile.mkstemp(dir=current_app.config['UPLOAD_PATH'])
-    process_load_file(path_in=raw_path, lat=lat, lon=lon, path_out=processed_path)
+    df = process_load_file(path_in=raw_path, lat=lat, lon=lon)
+    
+    df.to_csv(processed_path, index=False)
 
     return ( {'handle':os.path.basename(processed_path)} )
 
 
 def _optimise(request):
     development_rv = {
-        'results':
-        {
-            'success': True, 
-            'battery_size_kwh': 1.0,
-            'annual_import_site_kwh': 1.0, 
-            'annual_import_ev_kwh': 1.0,
-            'annual_import_total_kwh': 1.0,
-            'annual_import_with_pv_kwh': 1.0, 
-            'annual_import_with_pv_and_battery_kwh': 1.0,
-            'original_import_cost': 1.0, 
-            'with_ev_import_cost': 1.0,
-            'optimised_import_cost': 1.0,
-            'buildings':
-            [
+        'results': {
+
+            'site':{
+                'success': True, 
+                'battery_size_kwh': 1.0,
+                'annual_import_site_kwh': 1.0, 
+                'annual_import_ev_kwh': 1.0,
+                'annual_import_total_kwh': 1.0,
+                'annual_import_with_pv_kwh': 1.0, 
+                'annual_import_with_pv_and_battery_kwh': 1.0,
+                'original_import_cost': 1.0, 
+                'with_ev_import_cost': 1.0,
+                'optimised_import_cost': 1.0
+            },
+
+            'buildings': [
+                {'name':'building_1', 'pv_size_kw': 1.0, 'num_chargers':1},
                 {'name':'building_2', 'pv_size_kw': 1.0, 'num_chargers':1},
-                {'name':'building_2', 'pv_size_kw': 1.0, 'num_chargers':1},
-                {'name':'building_2', 'pv_size_kw': 1.0, 'num_chargers':1},
+                {'name':'building_3', 'pv_size_kw': 1.0, 'num_chargers':1},
+
             ]
         }
     }
     with open('my-schema.json', 'r') as schema_file:
         schema = json.load(schema_file)
-    content = request.json
+    query = request.json
+    assert isinstance(query, dict)
     try:
-        jsonschema.validate(instance=content, schema=schema)
-        return json.dumps( development_rv )
+        jsonschema.validate(instance=query, schema=schema)
     except Exception as err:
         assert False, f'422 {err}'
+
+    building_loads = handle_base_loads.list_buildings(query)
+    print(building_loads)
+    
+    dummy_rv = json.dumps( development_rv )
+    return dummy_rv
 
 
 def _download(handle):

@@ -90,6 +90,9 @@ def generation_1kw(lat=None, lon=None, load=None, roofpitch=None, start_date='',
     print(metadata)
     print(f"Generation for 1 kW: {generation['1kWp_generation_kw'].sum()}")
 #     print(generation.head())
+    generation.index=range(0,len(generation))
+    generation=generation[:8736]
+    
     return generation
 
 
@@ -106,8 +109,8 @@ def cost_saved_pa(generation_1kw, load_kwh, capacity_kWp, cost_per_kWp,
     generation_1kw = generation_1kw.rename(columns={generation_1kw.columns[0]:'1kWp_generation_kWh'})
     generation = generation_1kw * capacity_kWp
     df = generation.merge(load, how='inner', left_index=True, right_index=True)
-    days = (df.index[-1] - df.index[0]).days
-    confidence = days/365
+    #days = (df.index[-1] - df.index[0]).days
+    #confidence = days/365
     df['import_kWh'] = (df['load_kWh'] - df['1kWp_generation_kWh']).clip(lower=0)
     df['export_kWh'] = (df['load_kWh'] - df['1kWp_generation_kWh']).clip(upper=0)
     df = df.rename(columns={'1kWp_generation_kWh':f'{round(capacity_kWp,2)}_1kWp_generation_kWh'})
