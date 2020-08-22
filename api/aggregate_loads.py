@@ -7,7 +7,8 @@ Created on Wed Aug 19 11:42:25 2020
 
 from handle_base_loads import get_base_loads
 from handle_ev_loads import  get_ev_loads
-
+import pandas as pd
+import optimise_pv
 
 
 def get_aggregate_loads(schema):
@@ -22,13 +23,29 @@ def get_aggregate_loads(schema):
         sum_load = base_load.add(ev_load,fill_value=0)
         aggr_load.append(sum_load)
     
-    return(aggr_load)   
+    return(aggr_load)
 
-
-
+def get_aggregate_loads_site(schema):
+    
+    pv_size,aggr_load = optimise_pv.get_optimise_pv_size(schema)
+    
+    for load in aggr_load:
+        load.rename(columns={load.columns[0]:'gen_kwh'},inplace=True)
+    
+    #Initailise pandas dataframe
+    aggr_load_site = pd.DataFrame()
+    
+    for load in aggr_load:
+        aggr_load_site = load.add(aggr_load_site, fill_value=0)
+        
+    
+    
+    return(pv_size,aggr_load_site)
 
 if __name__ == '__main__':
     
     from api_mock import *
     
     print(get_aggregate_loads(request.json))
+    
+    print(get_aggregate_loads_site(request.json))

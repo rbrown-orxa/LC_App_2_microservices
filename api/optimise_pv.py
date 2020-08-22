@@ -5,17 +5,13 @@ Created on Wed Aug 19 12:33:24 2020
 @author: Sanjeev Kumar
 """
 
-
-
-import optimise
-from utils import get_fixed_fields
 from aggregate_loads import get_aggregate_loads
 from utils import get_form_data,get_generation_1kw,optimise_pv_size
 
 
 def get_optimise_pv_size(schema):
     
-    list_of_aggr_load = get_aggregate_loads(schema)
+    
     
     fixed_fields = ['lon', 'lat', 'cost_per_kWp', 'import_cost_kwh', 
               'export_price_kwh','pv_cost_kwp', 'pv_life_yrs', 
@@ -26,9 +22,13 @@ def get_optimise_pv_size(schema):
    
     form_data = get_form_data(schema,fixed_fields,variable_fields)
     
+    list_of_aggr_load = get_aggregate_loads(schema)
+    
     list_of_1kw_generation = get_generation_1kw(form_data)
     
-    return(optimise_pv_size(list_of_1kw_generation,list_of_aggr_load,form_data))
+    list_of_pv_size,list_of_df = optimise_pv_size(list_of_1kw_generation,list_of_aggr_load,form_data)  
+    
+    return(list_of_pv_size,list_of_df)
     
     
 

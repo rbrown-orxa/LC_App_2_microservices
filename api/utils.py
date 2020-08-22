@@ -1,6 +1,5 @@
 import os
 import functools
-import traceback
 import pandas as pd
 import config as cfg
 import optimise
@@ -38,7 +37,6 @@ def _result_schema():
         schema = file.read()
     return schema
 
-<<<<<<< HEAD
 def get_fixed_fields(schema, fields=['lon', 'lat', 'cost_per_kWp', 
                                        'import_cost_kwh','export_price_kwh',
                                        'pv_cost_kwp', 'pv_life_yrs', 
@@ -75,8 +73,7 @@ def get_variable_fields(schema,fields=['roof_size_m2', 'azimuth_deg','pitch_deg'
             super_dict.setdefault(k, []).append(v)
     return ( {field : super_dict.get(field, None) for field in fields} )
 
-=======
->>>>>>> 3a66c48bf832a3da065cffda53de1966c82deace
+
 
 def get_consumption_profile(file,consumption_kwh,building_type):
     
@@ -141,14 +138,14 @@ def optimise_pv_size(generation_1kw,aggr_load,form_data):
     
     roof_size_m2 = form_data['roof_size_m2'].copy()
 
-    optimal_size = []
+    list_of_optimal_size = []
 
     # for index in range(num):
-    for gen_1_kw, load_kw, roof_size_m2 in zip(
+    for gen_1_kw, load_kwh, roof_size_m2 in zip(
             generation_1kw, aggr_load, roof_size_m2):
         df_cost_curve = optimise.cost_curve(
                                 generation_1kw=gen_1_kw,
-                                load_kwh=load_kw,
+                                load_kwh=load_kwh,
                                 cost_per_kWp=cost_per_kWp,
                                 import_cost=import_cost,
                                 export_price=export_price,
@@ -156,9 +153,22 @@ def optimise_pv_size(generation_1kw,aggr_load,form_data):
                                 roof_size_kw=roof_size_m2 * panel_efficiency)
 
         tmp_opt_size, optimal_revenue = optimise.optimise(df_cost_curve) #float, float        
-        optimal_size.append(tmp_opt_size)  
+        list_of_optimal_size.append(tmp_opt_size) 
+     
+    list_of_df = []    
+    for gen_1_kw,load_kwh,size in zip(generation_1kw, aggr_load,list_of_optimal_size):  
+        tmp_df = optimise.cost_saved_pa(
+                                generation_1kw=gen_1_kw, 
+                                load_kwh=load_kwh,
+                                capacity_kWp = size,
+                                cost_per_kWp=cost_per_kWp, 
+                                import_cost=import_cost, 
+                                export_price=export_price,
+                                expected_life_yrs=expected_life_yrs,
+                      return_raw_data=True)
+        list_of_df.append(tmp_df)
     
-    return(optimal_size)
+    return(list_of_optimal_size,list_of_df)
 
 
 
