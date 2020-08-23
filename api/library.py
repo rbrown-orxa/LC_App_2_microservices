@@ -7,6 +7,7 @@ import os
 import utils
 from ingest_file import process_load_file
 import handle_base_loads
+from results import get_optimise_results
 
 
 def _upload(request):
@@ -31,6 +32,8 @@ def _upload(request):
 
 
 def _optimise(request):
+    
+    """
     development_rv = {
         'results': {
 
@@ -68,7 +71,12 @@ def _optimise(request):
     print(building_loads)
     
     dummy_rv = json.dumps( development_rv )
-    return dummy_rv
+    
+    """
+    
+    results = get_optimise_results(request.json)
+    
+    return results
 
 
 def _download(handle):

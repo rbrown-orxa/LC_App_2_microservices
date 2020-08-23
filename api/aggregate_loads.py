@@ -36,11 +36,11 @@ def get_aggregate_loads_site(schema):
     aggr_load_site = pd.DataFrame()
     
     for load in aggr_load:
-        aggr_load_site = load.add(aggr_load_site, fill_value=0)
-        
-    
+        aggr_load_site = load.add(aggr_load_site, fill_value=0)  
     
     return(pv_size,aggr_load_site)
+
+
 
 if __name__ == '__main__':
     

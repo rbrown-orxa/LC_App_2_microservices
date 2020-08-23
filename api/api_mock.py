@@ -11,11 +11,11 @@ valid_json = """
             "lat": 18.51,
             "lon": 73.85,
             "import_cost_kwh": 0.14,
-            "export_price_kwh": 0.04,
+            "export_price_kwh": 0.0,
             "pv_cost_kwp": 1840,
             "pv_life_yrs": 20,
-            "battery_life_cycles": 5000,
-            "battery_cost_kwh": 1000,
+            "battery_life_cycles": 6000,
+            "battery_cost_kwh": 407,
             "load_profile_csv_optional": "",
             "building_data": [
                 {
