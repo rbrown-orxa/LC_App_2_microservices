@@ -26,7 +26,7 @@ valid_json = """
                     "pitch_deg": 30,
                     "num_ev_chargers": 10,
                     "pv_size_kwp_optional": 3.0,
-                    "load_profile_csv_optional": "../examples/tests/Factory_Heavy_loads_15min.csv",
+                    "load_profile_csv_optional": "tmpvsgz75u3",
                     "annual_kwh_consumption_optional": 0.0
                 },
                 {
