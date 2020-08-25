@@ -8,6 +8,7 @@ import dateutil
 from datetime import timedelta
 import warnings
 import pytz
+import logging
 
 
 def columns_to_drop(filepath, skiprows):
@@ -514,7 +515,7 @@ def handle_units(load, units):
     if not units in multiplier:
         raise KeyError('Could not find units of power or energy')
     load = (load * multiplier[units]) / 10**3 # load now in kW
-    warnings.warn('Need to fix energy integration when resampling', RuntimeWarning)
+    logging.warning('Need to fix energy integration when resampling')
  
     return load.rename(columns={units:'kWh'})
     

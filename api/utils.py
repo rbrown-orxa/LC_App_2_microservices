@@ -3,6 +3,8 @@ import functools
 import pandas as pd
 import config as cfg
 import optimise
+import sys
+import logging
 
 def handle_exceptions(func):
         @functools.wraps(func)
@@ -10,6 +12,7 @@ def handle_exceptions(func):
             try:
                 return func(*args, **kwargs)
             except Exception as err:
+                logging.exception('handling an error')
                 # print(traceback.format_exc(err))
                 return handle(err)
         def handle(err):
@@ -19,6 +22,12 @@ def handle_exceptions(func):
                 return ( {'error':msg}, code )
             return ( {'error':msg}, 500 )
         return wrapper
+
+
+def call_trace():
+    parent = sys._getframe(2).f_code.co_name
+    child = sys._getframe(1).f_code.co_name
+    logging.info(f'{child} called by {parent}')
 
 
 def init_file_handler(upload_path):
@@ -109,9 +118,15 @@ def get_generation_1kw(form_data):
     roofpitch, azimuth = ( form_data['pitch_deg'].copy(),form_data['azimuth_deg'].copy() )
     generation_1kw = [] # list of df
     
-    for pitch, azim in zip(roofpitch, azimuth): 
+
+    # NOTE: API called once per building below
+    logging.info(str(len(  list(zip(roofpitch, azimuth))  )))
+    for pitch, azim in zip(roofpitch, azimuth):
+        logging.info('calling generation_1kw')
         tmp_gen = optimise.generation_1kw(lat=lat, lon=lon,start_date=start_date,
                                           roofpitch=pitch, azimuth=azimuth)
+        #TODO: Select start_date correctly
+
         generation_1kw.append(tmp_gen)
         
     return(generation_1kw)
@@ -183,6 +198,9 @@ if __name__ == '__main__':
     
     variable_fields = ['roof_size_m2', 'azimuth_deg','pitch_deg']
       
-    print(get_form_data(request.json,fixed_fields,variable_fields))
+    logging.info(str( get_form_data(request.json,fixed_fields,variable_fields ) ))
         
-    print(get_consumption_profile(cfg.PROFILES_BUILDING,1000,'domestic'))
+    logging.info(str( get_consumption_profile(cfg.PROFILES_BUILDING,1000,'domestic') ))
+
+
+

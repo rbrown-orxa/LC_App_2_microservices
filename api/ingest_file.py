@@ -10,6 +10,7 @@ import warnings
 import pytz
 from timezonefinder import TimezoneFinder
 import datetime as dt
+import logging
 
 
 def columns_to_drop(filepath, skiprows):
@@ -510,7 +511,7 @@ def csv_file_import(path, lat, lon):
     
     df, schema = apply_schema(path)
     units = schema['units']
-    print(f'Lat: {lat}, Lon: {lon}')
+    logging.info(f'Lat: {lat}, Lon: {lon}')
     
     if is_tz_aware(df):
         df = ( df.tz_localize(None,
@@ -558,7 +559,7 @@ def units_to_kwh(load, units):
     if not units in multiplier:
         raise KeyError('Could not find units of power or energy')
     load = (load * multiplier[units]) / 10**3 # load now in kW
-    warnings.warn('Need to fix energy integration when resampling', RuntimeWarning)
+    logging.warning('Need to fix energy integration when resampling')
  
     return load.rename(columns={units:'kWh'})
     
@@ -589,8 +590,7 @@ def to_hour_of_year(df):
     Put datetime index into hourly intervals, starting at zero, which
     represents midnight on the Monday closest to 1st January.
     """
-    warnings.warn('Todo: change start date to first Monday of January',
-                  RuntimeWarning)
+    logging.warning('Todo: change start date to first Monday of January')
                   
     #get length, start and end dates
     old_len = len(df)

@@ -11,6 +11,7 @@ import pandas as pd
 from dateutil import parser
 from dateutil.relativedelta import relativedelta
 from datetime import datetime
+import logging
 
 
 
@@ -48,11 +49,11 @@ def generation_1kw(lat=None, lon=None, load=None, roofpitch=None, start_date='',
     latest_end_date = parser.parse('2019-12-31').date()
     end = (start + relativedelta(years=1))
     while end >= latest_end_date:
-        print(f'Maximum permissible end date is {latest_end_date}. Date range will be adjusted accordingly')
+        logging.debug(f'Maximum permissible end date is {latest_end_date}. Date range will be adjusted accordingly')
         end = start
         start = (start - relativedelta(years=1))
         adjust_year += 1
-    print('Date range:', start, ' - ',  end)
+    logging.debug('Date range:' + str(start) + ' - ' + str(end))
     token = '38707fa2a8eb32d983c8fcf348fffd82fe2aa7aa'
     api_base = 'https://www.renewables.ninja/api/'
     s = requests.session()
@@ -72,10 +73,10 @@ def generation_1kw(lat=None, lon=None, load=None, roofpitch=None, start_date='',
         'format': 'json',
         'interpolate': False
     }
-    print(args)
+    logging.debug(str(args))
     r = s.get(url, params=args)
-    print (r.status_code)
-    print(r.reason)
+    logging.info(f'status code:{r.status_code}')
+    logging.debug(str(r.reason))
     assert r.status_code == 200
     parsed_response = json.loads(r.text)
     generation = pd.read_json(json.dumps(parsed_response['data']), orient='index')
@@ -86,9 +87,9 @@ def generation_1kw(lat=None, lon=None, load=None, roofpitch=None, start_date='',
         generation = generation.set_index('index')
     generation = generation.resample('1h').sum() # convert kW to kWh
     metadata = parsed_response['metadata']
-    print('Number of days in range: ', (end-start).days)
-    print(metadata)
-    print(f"Generation for 1 kW: {generation['1kWp_generation_kw'].sum()}")
+    logging.debug('Number of days in range: ' + str( (end-start).days) )
+    logging.debug(str(metadata))
+    logging.debug(f"Generation for 1 kW: {generation['1kWp_generation_kw'].sum()}")
 #     print(generation.head())
     generation.index=range(0,len(generation))
     generation=generation[:8736]
@@ -104,7 +105,7 @@ def cost_saved_pa(generation_1kw, load_kwh, capacity_kWp, cost_per_kWp,
     import pandas as pd
     load = load_kwh.rename(columns={load_kwh.columns[0]:'load_kWh'})
     if not isinstance(generation_1kw, pd.DataFrame):
-        print(type(generation_1kw))
+        logging.debug(str(type(generation_1kw)))
 #         input('Press any key')
     generation_1kw = generation_1kw.rename(columns={generation_1kw.columns[0]:'1kWp_generation_kWh'})
     generation = generation_1kw * capacity_kWp
@@ -184,7 +185,7 @@ def cost_curve(generation_1kw, load_kwh, cost_per_kWp,
         size_kw += step
         i += 1
     rv = pd.DataFrame(curve, columns=['Size_kWp', 'Profit_PA']).set_index('Size_kWp')
-    print('Iterations: ', i)
+    logging.info('Iterations: ' + str(i))
     return rv
 
 def optimise(cost_curve):
@@ -193,3 +194,7 @@ def optimise(cost_curve):
     optimal_revenue = float(cost_curve.max())
 #     print(optimal_size, optimal_revenue)
     return optimal_size, optimal_revenue
+
+
+
+

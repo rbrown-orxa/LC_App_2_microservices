@@ -2,17 +2,30 @@ from flask import Flask, request, send_from_directory
 from flask_cors import CORS
 from flask_selfdoc import Autodoc
 import os
+import logging
 
 import utils
 import library
 import config
 
+debugging_mode = False
+
+if debugging_mode:
+    log_level = logging.DEBUG
+else:
+    log_level = logging.INFO
+
+FORMAT = '%(asctime)-s\t%(levelname)-s\t%(filename)-s\t' +\
+         '%(funcName)-s\tLine:%(lineno)-s\t\t\'%(message)s\''
+logging.basicConfig(level=log_level, format=FORMAT)
 
 app = Flask(__name__)
 app.config.from_object(config)
 CORS(app)
 auto = Autodoc(app)
 utils.init_file_handler(app.config['UPLOAD_PATH'])
+
+logging.info('starting up')
 
 
 @app.route("/upload", methods=['POST'])
@@ -59,6 +72,7 @@ def optimise():
         Content-Type: application/json
         According to /result_schema
     """
+    logging.info('got an optimise request')
     return library._optimise(request)
 
 

@@ -3,6 +3,7 @@ import jsonschema
 import json
 import tempfile
 import os
+import logging
 
 import utils
 from ingest_file import process_load_file
@@ -11,6 +12,7 @@ from results import get_optimise_results
 
 
 def _upload(request):
+    logging.info('handling file upload request')
     file = request.files.get('file', None)
     lat, lon = ( request.form.get(num, None) for num in ['lat', 'lon'] )
 
@@ -73,6 +75,7 @@ def _optimise(request):
     dummy_rv = json.dumps( development_rv )
     
     """
+    logging.debug('starting optimisation')
     
     results = get_optimise_results(request.json)
     

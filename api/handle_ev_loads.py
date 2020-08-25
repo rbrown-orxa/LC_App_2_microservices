@@ -8,6 +8,8 @@ Created on Tue Aug 18 17:15:30 2020
 import pandas as pd
 from datetime import datetime, timedelta
 import config as cfg
+import logging
+
 from utils import get_variable_fields
 
 

@@ -8,10 +8,14 @@ Created on Wed Aug 19 11:42:25 2020
 from handle_base_loads import get_base_loads
 from handle_ev_loads import  get_ev_loads
 import pandas as pd
-import optimise_pv
+import sys
+import logging
 
+import optimise_pv
+import utils
 
 def get_aggregate_loads(schema):
+    # utils.call_trace()
     
     list_of_base_loads = get_base_loads(schema)
     list_of_ev_loads = get_ev_loads(schema)
@@ -26,8 +30,9 @@ def get_aggregate_loads(schema):
     return(aggr_load)
 
 def get_aggregate_loads_site(schema):
+
     
-    pv_size,aggr_load = optimise_pv.get_optimise_pv_size(schema)
+    pv_size,aggr_load = optimise_pv.get_optimise_pv_size(schema) # Call the API
     
     for load in aggr_load:
         load.rename(columns={load.columns[0]:'gen_kwh'},inplace=True)
@@ -49,3 +54,7 @@ if __name__ == '__main__':
     print(get_aggregate_loads(request.json))
     
     print(get_aggregate_loads_site(request.json))
+
+
+
+

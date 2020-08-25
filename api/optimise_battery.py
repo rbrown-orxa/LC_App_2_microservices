@@ -10,15 +10,16 @@ import pandas as pd
 import aggregate_loads as agg
 from utils import get_fixed_fields
 import matplotlib.pyplot as plt
+import logging
 
 def control(P_sun, P_load, E_sto, dt, E_rated):
-    """""
+    """
     P_sun: Generated power from PV (kW)
     P_load: Building load demand (kW)
     E_sto: Energy stored in the battery (kWh)
     dt: Derivate of time step (Hours)
     
-    """""
+    """
     P_nl = P_load - P_sun # Net load -> Power needed by building from grid or battery (or combination)
     # outputs:
     P_sto = 0. # The power flowing into the battery (kW)
@@ -54,7 +55,7 @@ def check_result(E_sto, E_rated, digits=3):
         assert round( E_sto, digits ) >= 0.0, 'Battery charge state is negative'
         assert round ( E_sto, digits ) <= round( E_rated, digits ), 'Battery charge state is greater than capacity'
     except(AssertionError):
-        print(f'E_sto: {E_sto}\tE_rated: {E_rated}')
+        logging.exception(f'E_sto: {E_sto}\tE_rated: {E_rated}')
         raise
 
 
@@ -181,7 +182,7 @@ def optimise_battery_size(schema):
     import_cost_kwh=dict['import_cost_kwh']
     export_price_kwh=dict['export_price_kwh']
 
-    pv_size,df = agg.get_aggregate_loads_site(schema)
+    pv_size,df = agg.get_aggregate_loads_site(schema) # seems to call the API needlessly
     
     curve = simulate_battery_perfomance(
     load = df['load_kWh'],

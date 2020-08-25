@@ -108,6 +108,8 @@ def get_optimise_results(schema):
      
      #Total load
      annual_import_total_kwh,cost=_get_annual_import_total_kwh(schema)
+     # TODO: Don't call get_ev_loads again
+     # TODO: check that inputs are in hour-of-year format
      
      #PV optimised load
      annual_import_with_pv_kwh,cost,pv_size=_get_annual_import_with_pv_kwh(schema)
