@@ -46,10 +46,6 @@ valid_json = """
         
 request = DummyRequest()
 request.json = json.loads(valid_json)
-
-if __name__ == '__main__':
-   rv = library._optimise(request)
-   print(rv)
    
 
 

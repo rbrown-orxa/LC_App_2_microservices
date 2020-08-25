@@ -45,7 +45,7 @@ def upload():
     return library._upload(request)
 
 
-@app.route("/optimise")
+@app.route("/optimise", methods=['GET','POST'])
 @auto.doc()
 @utils.handle_exceptions
 def optimise():
