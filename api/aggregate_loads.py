@@ -28,9 +28,14 @@ def get_aggregate_loads(schema):
         aggr_load.append(sum_load)
     
     return(aggr_load)
+    
 
-def get_aggregate_loads_site(schema):
+# <<<<<<< HEAD
+# def get_aggregate_loads_site(schema):
 
+# =======
+def get_aggregate_loads_site_pv_optimised(schema):
+# >>>>>>> master
     
     pv_size,aggr_load = optimise_pv.get_optimise_pv_size(schema) # Call the API
     
@@ -53,8 +58,12 @@ if __name__ == '__main__':
     
     print(get_aggregate_loads(request.json))
     
-    print(get_aggregate_loads_site(request.json))
+# <<<<<<< HEAD
+#     print(get_aggregate_loads_site(request.json))
 
 
 
 
+# =======
+    print(get_aggregate_loads_site_pv_optimised(request.json))
+# >>>>>>> master

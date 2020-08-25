@@ -7,7 +7,7 @@ Created on Wed Aug 19 12:35:17 2020
 
 import pandas as pd
 import json
-from aggregate_loads import get_aggregate_loads,get_aggregate_loads_site
+from aggregate_loads import get_aggregate_loads,get_aggregate_loads_site_pv_optimised
 from optimise_battery import optimise_battery_size
 from handle_base_loads import get_base_loads
 from handle_ev_loads import get_ev_loads
@@ -66,16 +66,9 @@ def _get_annual_import_total_kwh(schema):
          
      return(annual_cosumption_kwh,import_cost)
 
-def _get_annual_import_with_pv_kwh(schema):           
-    
-     pv_size,aggr_load = get_optimise_pv_size(schema) 
-     
-     sum_load = pd.DataFrame()
-     
-     #sum aggr_load loads
-     for load in aggr_load:
-         load=pd.DataFrame(load['import_kWh'])
-         sum_load = load.add(sum_load, fill_value=0)
+def _get_annual_import_with_pv_kwh(schema):
+       
+     pv_size,sum_load = get_aggregate_loads_site_pv_optimised(schema)   
          
      cost_kwh = get_fixed_fields(schema,fields=['import_cost_kwh'])
      
@@ -83,11 +76,11 @@ def _get_annual_import_with_pv_kwh(schema):
      
      import_cost = annual_cosumption_kwh*cost_kwh['import_cost_kwh']   
        
-     return(annual_cosumption_kwh,import_cost,pv_size)
+     return(annual_cosumption_kwh,import_cost,sum_load,pv_size)
  
-def _get_annual_import_with_pv_and_battery_kwh(schema):
+def _get_annual_import_with_pv_and_battery_kwh(schema,df,pv_size):
         
-        curve,size,results=optimise_battery_size(schema)
+        curve,size,results=optimise_battery_size(schema,df,pv_size)
         
         cost_kwh = get_fixed_fields(schema,fields=['import_cost_kwh'])
      
@@ -112,10 +105,10 @@ def get_optimise_results(schema):
      # TODO: check that inputs are in hour-of-year format
      
      #PV optimised load
-     annual_import_with_pv_kwh,cost,pv_size=_get_annual_import_with_pv_kwh(schema)
+     annual_import_with_pv_kwh,cost,df,pv_size = _get_annual_import_with_pv_kwh(schema)
      
      #PV and battery optimised load
-     battery_size,annual_import_with_pv_and_battery_kwh,optimised_import_cost = _get_annual_import_with_pv_and_battery_kwh(schema)
+     battery_size,annual_import_with_pv_and_battery_kwh,optimised_import_cost = _get_annual_import_with_pv_and_battery_kwh(schema,df,pv_size)
     
      #site results
      
@@ -157,5 +150,5 @@ if __name__ == '__main__':
     
     from api_mock import *
     
-    #print(get_optimise_results(request.json))
+    print(get_optimise_results(request.json))
     
