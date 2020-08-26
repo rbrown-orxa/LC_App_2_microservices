@@ -15,10 +15,13 @@ import logging
 import utils
 import datetime as dt
 
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
 
 
-
-def generation_1kw(lat=None, lon=None, load=None, roofpitch=None, start_date='', azimuth=None):
+def generation_1kw(lat=None,lon=None, load=None, 
+                    roofpitch=None, start_date='',
+                    azimuth=None):
     """
     Get the hourly solar generation timeseries for a grid location, up to one year from start date.
     Return hourly generation in kWh per kWp installed capacity.
@@ -32,8 +35,7 @@ def generation_1kw(lat=None, lon=None, load=None, roofpitch=None, start_date='',
 #     https://github.com/renewables-ninja/gsee >> trigon.py >> line 196
 #     azimuth : Deviation of the tilt direction from the meridian.
 #     0 = towards pole, going clockwise, 180 = towards equator.
-    for arg in [lat, lon, azimuth, roofpitch]:
-        assert arg is not None
+    assert all( [lat, lon, azimuth, roofpitch] )
 
 #Get PV data
     token = '38707fa2a8eb32d983c8fcf348fffd82fe2aa7aa'
@@ -60,7 +62,8 @@ def generation_1kw(lat=None, lon=None, load=None, roofpitch=None, start_date='',
     r = s.get(url, params=args)
     logging.info(f'status code: {r.status_code}')
     parsed_response = json.loads(r.text)
-    generation = pd.read_json(json.dumps(parsed_response['data']), orient='index')
+    generation = pd.read_json(
+        json.dumps(parsed_response['data']), orient='index')
     old_len = len(generation)
     generation = generation.set_index('local_time')
     generation = generation.tz_localize(None)
@@ -75,7 +78,7 @@ def generation_1kw(lat=None, lon=None, load=None, roofpitch=None, start_date='',
     start = start - dt.timedelta(days=1)
     end = end + dt.timedelta(days=1)
 
-    logging.warning(f'start: {start}, end:{end}')
+    logging.debug(f'start: {start}, end:{end}')
 
     # TODO: check lat/lon valid before calling API
     try: 
@@ -97,7 +100,7 @@ def generation_1kw(lat=None, lon=None, load=None, roofpitch=None, start_date='',
                                  + times.dt.weekday * 24 
                                  + times.dt.hour )
 
-    logging.info(f'Length of generation data: {len(generation)}')
+    logging.debug(f'Length of generation data: {len(generation)}')
 
     assert len(generation) >= (24*7*52)
 
@@ -109,21 +112,31 @@ def generation_1kw(lat=None, lon=None, load=None, roofpitch=None, start_date='',
 def cost_saved_pa(generation_1kw, load_kwh, capacity_kWp, cost_per_kWp, 
                   import_cost, export_price, expected_life_yrs,
                   verbose=False, return_raw_data=False):
-    """load must be a dataframe with 1 column, naive timestamp index in utc timzone
-    and sampled at 1 hour in kWh. Generation input should be hourly in kWh per kWp."""
+    """load must be a dataframe with 1 column,
+    naive timestamp index in utc timzone
+    and sampled at 1 hour in kWh. 
+    Generation input should be hourly in kWh per kWp."""
     import pandas as pd
     load = load_kwh.rename(columns={load_kwh.columns[0]:'load_kWh'})
     if not isinstance(generation_1kw, pd.DataFrame):
         logging.debug(str(type(generation_1kw)))
 #         input('Press any key')
-    generation_1kw = generation_1kw.rename(columns={generation_1kw.columns[0]:'1kWp_generation_kWh'})
+    generation_1kw = generation_1kw.rename(columns={
+        generation_1kw.columns[0]:'1kWp_generation_kWh'})
     generation = generation_1kw * capacity_kWp
-    df = generation.merge(load, how='inner', left_index=True, right_index=True)
+    df = generation.merge(load, 
+                            how='inner', 
+                            left_index=True, 
+                            right_index=True)
     #days = (df.index[-1] - df.index[0]).days
     #confidence = days/365
-    df['import_kWh'] = (df['load_kWh'] - df['1kWp_generation_kWh']).clip(lower=0)
-    df['export_kWh'] = (df['load_kWh'] - df['1kWp_generation_kWh']).clip(upper=0)
-    df = df.rename(columns={'1kWp_generation_kWh':f'{round(capacity_kWp,2)}_1kWp_generation_kWh'})
+    df['import_kWh'] = \
+        (df['load_kWh'] - df['1kWp_generation_kWh']).clip(lower=0)
+    df['export_kWh'] = \
+        (df['load_kWh'] - df['1kWp_generation_kWh']).clip(upper=0)
+    df = df.rename(columns={
+        '1kWp_generation_kWh':
+            f'{round(capacity_kWp,2)}_1kWp_generation_kWh'})
     if return_raw_data:
         return df
     df['export_kWh'] = df['export_kWh'].abs()
@@ -140,8 +153,10 @@ def cost_saved_pa(generation_1kw, load_kwh, capacity_kWp, cost_per_kWp,
     amortized_install_cost = install_cost / expected_life_yrs
     revenue_pa = import_cost_savings + export_revenue
     total_revenue = revenue_pa * expected_life_yrs
-    profit_pa = import_cost_savings + export_revenue - amortized_install_cost
-    total_profit = profit_pa * expected_life_yrs
+    profit_pa = import_cost_savings \
+                    + export_revenue \
+                    - amortized_install_cost
+    total_profit = ( profit_pa * expected_life_yrs )
     
     if verbose:
         ROI = 100 * (total_profit / install_cost)
@@ -193,8 +208,9 @@ def cost_curve(generation_1kw, load_kwh, cost_per_kWp,
         step = 1 / diff if diff > 1 else 1 #adaptive step size
         size_kw += step
         i += 1
-    rv = pd.DataFrame(curve, columns=['Size_kWp', 'Profit_PA']).set_index('Size_kWp')
-    logging.info('Iterations: ' + str(i))
+    rv = pd.DataFrame(curve, 
+        columns=['Size_kWp', 'Profit_PA']).set_index('Size_kWp')
+    logging.info(f'PV Optimiser Iterations: {i}')
     return rv
 
 def optimise(cost_curve):

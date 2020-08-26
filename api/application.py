@@ -25,8 +25,6 @@ CORS(app)
 auto = Autodoc(app)
 utils.init_file_handler(app.config['UPLOAD_PATH'])
 
-logging.info('starting up')
-
 
 @app.route("/upload", methods=['POST'])
 @auto.doc()
@@ -38,7 +36,8 @@ def upload():
     Request:
         Content-Type: multipart/form-data
 
-        Content-Disposition: form-data; name="file"; filename="Factory_Heavy_loads_15min.csv"
+        Content-Disposition: form-data; name="file"; 
+            filename="Factory_Heavy_loads_15min.csv"
         Content-Type: text/csv
         ProductDataStreamId,ReportedDateTime,RealPower1,RealPower2,RealPower3
         964352,2019-03-01_00:00:50,85.7043,100.6254,47.9806

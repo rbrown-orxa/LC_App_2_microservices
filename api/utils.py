@@ -46,11 +46,12 @@ def _result_schema():
         schema = file.read()
     return schema
 
-def get_fixed_fields(schema, fields=['lon', 'lat', 'cost_per_kWp', 
-                                       'import_cost_kwh','export_price_kwh',
-                                       'pv_cost_kwp', 'pv_life_yrs', 
-                                       'battery_life_cycles', 'battery_cost_kwh',
-                                       'load_profile_csv_optional']):
+def get_fixed_fields(schema, 
+    fields=['lon', 'lat', 'cost_per_kWp', 
+           'import_cost_kwh','export_price_kwh',
+           'pv_cost_kwp', 'pv_life_yrs', 
+           'battery_life_cycles', 'battery_cost_kwh',
+           'load_profile_csv_optional']):
     """
     Retrieve the constant values from LC app form fields.
     req: the dict-like request object passed by Flask
@@ -68,7 +69,8 @@ def get_form_data(schema,fixed_fields,variable_fields):
     return({**fixed_data,**variable_data})
 
 
-def get_variable_fields(schema,fields=['roof_size_m2', 'azimuth_deg','pitch_deg']):
+def get_variable_fields(schema,
+        fields=['roof_size_m2', 'azimuth_deg','pitch_deg']):
     """
     Retrieve the variable values form fields.
     req: the dict-like request object passed by Flask
@@ -114,14 +116,14 @@ def get_generation_1kw(form_data):
     
     
     #Get list of roof size, roof pitch, azimuth
-    roofpitch, azimuth = ( form_data['pitch_deg'].copy(),form_data['azimuth_deg'].copy() )
+    roofpitch, azimuth = ( 
+        form_data['pitch_deg'].copy(),
+        form_data['azimuth_deg'].copy() )
     generation_1kw = [] # list of df
     
 
     # NOTE: API called once per building below
-    logging.info(str(len(  list(zip(roofpitch, azimuth))  )))
     for pitch, azim in zip(roofpitch, azimuth):
-        logging.info('calling generation_1kw')
         tmp_gen = optimise.generation_1kw(lat=lat, lon=lon,
                                           roofpitch=pitch, azimuth=azimuth)
         #TODO: Select start_date correctly
@@ -148,7 +150,8 @@ def optimise_pv_size(generation_1kw,aggr_load,form_data):
     import_cost = float(form_data['import_cost_kwh'])
     export_price = float(form_data['export_price_kwh'])
     expected_life_yrs = float(form_data['pv_life_yrs'])
-    panel_efficiency = 0.18 # https://www.solar.com/learn/solar-panel-efficiency/
+    panel_efficiency = 0.18 
+    # https://www.solar.com/learn/solar-panel-efficiency/
     
     roof_size_m2 = form_data['roof_size_m2'].copy()
 
@@ -166,11 +169,14 @@ def optimise_pv_size(generation_1kw,aggr_load,form_data):
                                 expected_life_yrs=expected_life_yrs,
                                 roof_size_kw=roof_size_m2 * panel_efficiency)
 
-        tmp_opt_size, optimal_revenue = optimise.optimise(df_cost_curve) #float, float        
+        tmp_opt_size, optimal_revenue = optimise.optimise(df_cost_curve) 
         list_of_optimal_size.append(tmp_opt_size) 
      
     list_of_df = []    
-    for gen_1_kw,load_kwh,size in zip(generation_1kw, aggr_load,list_of_optimal_size):  
+    for gen_1_kw,load_kwh,size in zip(
+            generation_1kw,
+            aggr_load,
+            list_of_optimal_size):  
         tmp_df = optimise.cost_saved_pa(
                                 generation_1kw=gen_1_kw, 
                                 load_kwh=load_kwh,
@@ -197,9 +203,11 @@ if __name__ == '__main__':
     
     variable_fields = ['roof_size_m2', 'azimuth_deg','pitch_deg']
       
-    logging.info(str( get_form_data(request.json,fixed_fields,variable_fields ) ))
+    logging.info(str( get_form_data(
+        request.json,fixed_fields,variable_fields ) ))
         
-    logging.info(str( get_consumption_profile(cfg.PROFILES_BUILDING,1000,'domestic') ))
+    logging.info(str( get_consumption_profile(
+        cfg.PROFILES_BUILDING,1000,'domestic') ))
 
 
 

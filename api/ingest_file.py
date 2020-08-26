@@ -39,11 +39,14 @@ def columns_to_drop(filepath, skiprows):
         if df[column].dtype.name == 'int64':
             if df[column].nunique() in [12, 24, 48, 96, 24*60/5, 24*60]:
                 continue
-            elif df[column].diff().mean().is_integer(): # unlikely for meter reads
+            elif df[column].diff().mean().is_integer(): 
+                # unlikely for meter reads
                 drop.add(column)
                 
-            # normalise then check that what goes up comes down (true loads should be cyclical)
-            elif (df[column] / df[column].max()).diff().sum() > 0.5: # unlikely for a load profile
+            # normalise then check that what goes up comes down 
+            # true loads should be cyclical
+            elif (df[column] / df[column].max()).diff().sum() > 0.5: 
+                # unlikely for a load profile
                 drop.add(column)
 
     return list(drop)
@@ -104,7 +107,12 @@ def get_units(filepath):
     sub_patterns = [term for term in sub_terms]
     patterns = full_patterns + sub_patterns
     
-    converter = {'kw':'kW', 'kwh':'kWh', 'mw':'MW', 'mwh':'MWh', 'power':'W', 'w':'W'}
+    converter = {'kw':'kW',
+                'kwh':'kWh', 
+                'mw':'MW', 
+                'mwh':'MWh', 
+                'power':'W', 
+                'w':'W' }
     
     with open(filepath) as f:
         try:
@@ -142,10 +150,13 @@ def date_column(filepath, skiprows, skipcolumns):
         for column in df.columns:
             try:
                 date = dateutil.parser.parse(df[column].iloc[-1])
-                if date.time() == datetime.time(): # time is midnight or time not present / parsed
+                if date.time() == datetime.time(): 
+                # time is midnight or time not present / parsed
 #                     print('got here')
-                    date = dateutil.parser.parse(df[column].iloc[-2]) # try a different row
-                    if date.time() == datetime.time(): # we have a date column, not datetime column
+                    date = dateutil.parser.parse(df[column].iloc[-2]) 
+                    # try a different row
+                    if date.time() == datetime.time(): 
+                    # we have a date column, not datetime column
                         return column
             except:
                 continue
@@ -305,7 +316,11 @@ def time_periodic(df_or_file, skiprows, time_column):
     if isinstance(df_or_file, pd.core.frame.DataFrame):
         df = df_or_file
     else:
-        df = pd.read_csv(df_or_file, skiprows=skiprows, sep=None, engine='python')
+        df = pd.read_csv(
+            df_or_file, 
+            skiprows=skiprows, 
+            sep=None, 
+            engine='python')
     
     if time_column and isinstance(df[time_column][0], np.int64):
         return df[time_column].nunique()
@@ -317,8 +332,10 @@ def make_schema(path):
     s = {}
     s['skiprows'] = rows_to_skip(path)
     s['skipcolumns'] = columns_to_drop(path, s['skiprows'])
-    s['date_column'] = date_column(path, s['skiprows'], s['skipcolumns'])
-    s['datetime_column'] = datetime_column(path, s['skiprows'], s['skipcolumns'])
+    s['date_column'] = date_column(
+        path, s['skiprows'], s['skipcolumns'])
+    s['datetime_column'] = datetime_column(
+        path, s['skiprows'], s['skipcolumns'])
     s['file_format'] = get_format(path)
     s['units'] = get_units(path)
     s['header'] = has_header_row(path, s['skiprows'])
@@ -519,35 +536,6 @@ def csv_file_import(path, lat, lon):
                 nonexistent='shift_forward'))
     return df, units
      
-    
-    
-    # if not is_tz_aware(df):
-    #     tf = TimezoneFinder()
-    #     timezone_str = tf.timezone_at(lat=lat, lng=lon)
-    #     assert timezone_str
-    #     print(f'Timezone: {timezone_str}')
-        
-    #     # convert local time to UTC
-    #     df = (df.tz_localize(
-    #                     timezone_str,
-    #                     ambiguous='NaT',
-    #                     nonexistent='shift_forward') #add local offset
-    #     #add local offset
-    #                 # .tz_convert('UTC') #convert to UTC offset
-    #                 .tz_localize(
-    #                     tz=None,
-    #                     ambiguous='infer',
-    #                     nonexistent='shift_forward'
-    #                     )) #remove offset
-    #     return df, units
-    
-    # # df = df.tz_convert('UTC') #convert to UTC offset
-    # df = df.tz_localize(
-    #                     tz=None,
-    #                     ambiguous='infer',
-    #                     nonexistent='shift_forward'
-    #                     ) #remove offset
-    # return df, units
 
 
 def units_to_kwh(load, units):
