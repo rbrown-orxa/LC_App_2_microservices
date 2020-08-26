@@ -73,7 +73,9 @@ def optimise():
         According to /result_schema
     """
     logging.info('got an optimise request')
-    return library._optimise(request)
+    return (library._optimise(request),
+            200, 
+            {'Content-Type': 'application/json; charset=utf-8'})
 
 
 @app.route("/schema")
