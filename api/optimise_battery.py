@@ -181,11 +181,6 @@ def optimise_battery_size(schema,df,pv_size):
     battery_life_cycles=dict['battery_life_cycles']
     import_cost_kwh=dict['import_cost_kwh']
     export_price_kwh=dict['export_price_kwh']
-# <<<<<<< HEAD
-
-#     pv_size,df = agg.get_aggregate_loads_site(schema) # seems to call the API needlessly
-# =======
-# >>>>>>> master
     
     curve = simulate_battery_perfomance(
     load = df['load_kWh'],
@@ -211,8 +206,8 @@ if __name__ == '__main__':
     from api_mock import *
     
     print('With Scope factory loads')
-    #curve,size,results=optimise_battery_size(request.json)
-    #print(curve,size,results)
-    #plot_optimisation_curve(curve)
+    curve,size,results=optimise_battery_size(request.json)
+    print(curve,size,results)
+    plot_optimisation_curve(curve)
 
 

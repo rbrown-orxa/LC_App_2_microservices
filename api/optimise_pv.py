@@ -23,7 +23,6 @@ def get_optimise_pv_size(schema):
     form_data = get_form_data(schema,fixed_fields,variable_fields)
     
     list_of_aggr_load = aggregate_loads.get_aggregate_loads(schema)
-    #TODO: Don't call get_aggregate_loads again
     
     # Calls API once per building
     list_of_1kw_generation = get_generation_1kw(form_data)
