@@ -659,69 +659,6 @@ if __name__ == '__main__':
     
     load = process_load_file(path, lat, lon)
 
-    # file = '../data/building_profiles.csv'
-    # consumption_kwh,building_type=2400,'domestic'
-    
-    # get_consumption_profile(file,consumption_kwh,building_type)
-
-
-
-# EV profiles are in local time (should start on a Monday)
-# Building profiles are in local time (should be shifted to start on a Monday)
-# Need PV profiles in local time, as below
-"""
-#Get PV data
-token = '38707fa2a8eb32d983c8fcf348fffd82fe2aa7aa'
-api_base = 'https://www.renewables.ninja/api/'
-s = requests.session()
-s.headers = {'Authorization': 'Token ' + token}
-url = api_base + 'data/pv'
-args = {
-    'lat': 18.495858,
-    'lon': 73.883544,
-    'date_from': '2018-01-01',
-    'date_to': '2018-12-31',
-    'dataset': 'merra2',
-    'capacity': 1.0,
-    'system_loss': 0.1,
-    'tracking': 0,
-    'tilt': 30,
-    'azim': 180,
-    'format': 'json',
-    'interpolate': False, 
-    'local_time': True
-}
-r = s.get(url, params=args)
-print( r.status_code, r.reason )
-parsed_response = json.loads(r.text)
-generation = pd.read_json(json.dumps(parsed_response['data']), orient='index')
-old_len = len(generation)
-generation = generation.set_index('local_time')
-generation = generation.tz_localize(None)
-
-# Put datetime index into hourly intervals
-start = generation.sort_index().index[0].date()
-end = generation.sort_index().index[-1].date()
-start = start - dt.timedelta(days=1)
-end = end + dt.timedelta(days=1)
-desired_index = pd.date_range(start, end, freq='1H')
-generation=    ( generation.reindex(
-                    generation.index.union(desired_index))
-                    .interpolate()
-                    .reindex(desired_index)
-                    .dropna() )
-generation = generation[:old_len]
-
-# Convert index to hour of year
-times = generation.index.to_series()
-generation.index = ( (times.dt.week-1) *7 * 24 
-                             + times.dt.weekday * 24 
-                             + times.dt.hour )
-"""
-
-
-
-
 
 
 

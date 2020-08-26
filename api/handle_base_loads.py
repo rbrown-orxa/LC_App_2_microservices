@@ -5,8 +5,10 @@ import config as cfg
 import pandas as pd
 import logging
 
+import utils
 
 def list_buildings(query):
+    # utils.call_trace()
     building_loads = {}
     logging.info('number of buildings: ' + str(len(query['building_data'])) )
     for building in query['building_data']:

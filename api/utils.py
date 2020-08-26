@@ -27,7 +27,7 @@ def handle_exceptions(func):
 def call_trace():
     parent = sys._getframe(2).f_code.co_name
     child = sys._getframe(1).f_code.co_name
-    logging.info(f'{child} called by {parent}')
+    logging.warning(f'{child} called by {parent}')
 
 
 def init_file_handler(upload_path):
@@ -112,7 +112,6 @@ def get_generation_1kw(form_data):
     #Get lat/lon
     lat, lon = float(form_data['lat']), float(form_data['lon'])
     
-    start_date = '2018-12-31'
     
     #Get list of roof size, roof pitch, azimuth
     roofpitch, azimuth = ( form_data['pitch_deg'].copy(),form_data['azimuth_deg'].copy() )
@@ -123,7 +122,7 @@ def get_generation_1kw(form_data):
     logging.info(str(len(  list(zip(roofpitch, azimuth))  )))
     for pitch, azim in zip(roofpitch, azimuth):
         logging.info('calling generation_1kw')
-        tmp_gen = optimise.generation_1kw(lat=lat, lon=lon,start_date=start_date,
+        tmp_gen = optimise.generation_1kw(lat=lat, lon=lon,
                                           roofpitch=pitch, azimuth=azimuth)
         #TODO: Select start_date correctly
 

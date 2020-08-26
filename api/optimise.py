@@ -12,6 +12,9 @@ from dateutil import parser
 from dateutil.relativedelta import relativedelta
 from datetime import datetime
 import logging
+import utils
+import datetime as dt
+
 
 
 
@@ -23,37 +26,16 @@ def generation_1kw(lat=None, lon=None, load=None, roofpitch=None, start_date='',
 
     
     """
-
+    # utils.call_trace()
 #     adjust azimuth for hemisphere
 #     adapted from
 #     https://github.com/renewables-ninja/gsee >> trigon.py >> line 196
 #     azimuth : Deviation of the tilt direction from the meridian.
 #     0 = towards pole, going clockwise, 180 = towards equator.
-    assert lat is not None
-    assert azimuth is not None
-#     if lat < 0: # location is in southern hemisphere
-#         azimuth = (azimuth + 180) % 360 # rotate 180 deg clockwise and limit to (0, 360)
-    
-    adjust_year = 0
-#     if lat is None:
-#         print('Using default latitude of 0.0')
-#         lat = 0.0
-#     if lon is None:
-#         print('Using default longitude of 0.0')
-#         lon=0
-    assert load is not None or start_date, 'Either load dataframe or start date must be provided'
-    if load is not None:
-        start = load.sort_index(ascending=True).index[0].date()
-    else:
-        start = parser.parse(start_date).date()
-    latest_end_date = parser.parse('2019-12-31').date()
-    end = (start + relativedelta(years=1))
-    while end >= latest_end_date:
-        logging.debug(f'Maximum permissible end date is {latest_end_date}. Date range will be adjusted accordingly')
-        end = start
-        start = (start - relativedelta(years=1))
-        adjust_year += 1
-    logging.debug('Date range:' + str(start) + ' - ' + str(end))
+    for arg in [lat, lon, azimuth, roofpitch]:
+        assert arg is not None
+
+#Get PV data
     token = '38707fa2a8eb32d983c8fcf348fffd82fe2aa7aa'
     api_base = 'https://www.renewables.ninja/api/'
     s = requests.session()
@@ -62,8 +44,8 @@ def generation_1kw(lat=None, lon=None, load=None, roofpitch=None, start_date='',
     args = {
         'lat': lat,
         'lon': lon,
-        'date_from': datetime.strftime(start, format='%Y-%m-%d'),
-        'date_to': datetime.strftime(end, format='%Y-%m-%d'),
+        'date_from': '2018-01-01',
+        'date_to': '2018-12-31',
         'dataset': 'merra2',
         'capacity': 1.0,
         'system_loss': 0.1,
@@ -71,30 +53,57 @@ def generation_1kw(lat=None, lon=None, load=None, roofpitch=None, start_date='',
         'tilt': roofpitch,
         'azim': azimuth,
         'format': 'json',
-        'interpolate': False
+        'interpolate': False, 
+        'local_time': True
     }
-    logging.debug(str(args))
+    logging.info(f'Calling API with lat: {lat} and lon: {lon}')
     r = s.get(url, params=args)
-    logging.info(f'status code:{r.status_code}')
-    logging.debug(str(r.reason))
-    assert r.status_code == 200
+    logging.info(f'status code: {r.status_code}')
     parsed_response = json.loads(r.text)
     generation = pd.read_json(json.dumps(parsed_response['data']), orient='index')
-    generation = generation.rename(columns={'electricity':'1kWp_generation_kw'})
-    if adjust_year: #roll the year of index forward by 1
-        generation = generation.reset_index()
-        generation['index'] =  generation['index'] + pd.DateOffset(years=adjust_year)
-        generation = generation.set_index('index')
-    generation = generation.resample('1h').sum() # convert kW to kWh
-    metadata = parsed_response['metadata']
-    logging.debug('Number of days in range: ' + str( (end-start).days) )
-    logging.debug(str(metadata))
-    logging.debug(f"Generation for 1 kW: {generation['1kWp_generation_kw'].sum()}")
-#     print(generation.head())
-    generation.index=range(0,len(generation))
-    generation=generation[:8736]
-    
-    return generation
+    old_len = len(generation)
+    generation = generation.set_index('local_time')
+    generation = generation.tz_localize(None)
+
+    logging.debug(f'generation head: {generation.head()}')
+    # Put datetime index into hourly intervals
+    start = generation.sort_index().index[0].date()
+    end = generation.sort_index().index[-1].date()
+
+    logging.debug(f'start: {start}, end:{end}')
+
+    start = start - dt.timedelta(days=1)
+    end = end + dt.timedelta(days=1)
+
+    logging.warning(f'start: {start}, end:{end}')
+
+    # TODO: check lat/lon valid before calling API
+    try: 
+        desired_index = pd.date_range(start, end, freq='1H')
+    except(ValueError):
+        assert False, '422 API datetime error - ' \
+                        +'check if lat and lon values are valid'
+
+    generation=    ( generation.reindex(
+                        generation.index.union(desired_index))
+                        .interpolate()
+                        .reindex(desired_index)
+                        .dropna() )
+    generation = generation[:old_len]
+
+    # Convert index to hour of year
+    times = generation.index.to_series()
+    generation.index = ( (times.dt.week-1) *7 * 24 
+                                 + times.dt.weekday * 24 
+                                 + times.dt.hour )
+
+    logging.info(f'Length of generation data: {len(generation)}')
+
+    assert len(generation) >= (24*7*52)
+
+    return generation[:24*7*52] # clip to same length as building data
+
+
 
 
 def cost_saved_pa(generation_1kw, load_kwh, capacity_kWp, cost_per_kWp, 
@@ -194,6 +203,18 @@ def optimise(cost_curve):
     optimal_revenue = float(cost_curve.max())
 #     print(optimal_size, optimal_revenue)
     return optimal_size, optimal_revenue
+
+
+if __name__ == '__main__':
+
+    FORMAT = '%(asctime)-s\t%(levelname)-s\t%(filename)-s\t' +\
+             '%(funcName)-s\tLine:%(lineno)-s\t\t\'%(message)s\''
+    logging.basicConfig(level=logging.DEBUG, format=FORMAT)
+
+
+    gen = generation_1kw(lat=18.495858, lon=73.883544,
+                        azimuth=180, roofpitch=30)
+    print(gen.head())
 
 
 
