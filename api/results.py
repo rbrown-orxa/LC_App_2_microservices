@@ -95,13 +95,13 @@ def get_optimise_results(schema):
      ev_load,annual_import_ev_kwh,with_ev_import_cost=_get_annual_import_ev_kwh(schema)
      
      #Total load
-     aggr_load,annual_import_total_kwh,cost=_get_annual_import_total_kwh(schema,base_load,ev_load)
+     aggr_load,annual_import_total_kwh,total_cost=_get_annual_import_total_kwh(schema,base_load,ev_load)
      
      #PV optimised load
-     annual_import_with_pv_kwh,cost,df,pv_size = _get_annual_import_with_pv_kwh(schema)
+     annual_import_with_pv_kwh,pv_optimised_cost,df,pv_size = _get_annual_import_with_pv_kwh(schema)
      
      #PV and battery optimised load
-     battery_size,annual_import_with_pv_and_battery_kwh,optimised_import_cost = _get_annual_import_with_pv_and_battery_kwh(schema,df,pv_size)
+     battery_size,annual_import_with_pv_and_battery_kwh,battery_optimised_cost = _get_annual_import_with_pv_and_battery_kwh(schema,df,pv_size)
     
      #site results
      
@@ -114,8 +114,10 @@ def get_optimise_results(schema):
             'annual_import_with_pv_kwh': int(annual_import_with_pv_kwh),
             'annual_import_with_pv_and_battery_kwh': int(annual_import_with_pv_and_battery_kwh),
             'original_import_cost': int(original_import_cost),
-            'with_ev_import_cost': int(with_ev_import_cost), 
-            'optimised_import_cost': int(optimised_import_cost)
+            'with_ev_import_cost': int(with_ev_import_cost),
+            'total_import_cost': int(total_cost),
+            'with_pv_optimised_import_cost': int(pv_optimised_cost),
+            'with_battery_optimised_import_cost': int(battery_optimised_cost)
             }
      
      var = get_variable_fields(schema,fields=['name','num_ev_chargers'])
