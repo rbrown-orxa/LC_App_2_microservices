@@ -29,7 +29,7 @@ def _get_annual_import_site_kwh(schema):
          
      import_cost = annual_cosumption_kwh*cost_kwh['import_cost_kwh']
          
-     return(annual_cosumption_kwh,import_cost)      
+     return(base_load,annual_cosumption_kwh,import_cost)      
     
          
 def _get_annual_import_ev_kwh(schema):
@@ -47,24 +47,19 @@ def _get_annual_import_ev_kwh(schema):
      
      import_cost = annual_cosumption_kwh*cost_kwh['import_cost_kwh']
          
-     return(annual_cosumption_kwh,import_cost)
+     return(ev_load,annual_cosumption_kwh,import_cost)
 
-def _get_annual_import_total_kwh(schema):
+def _get_annual_import_total_kwh(schema,base_load,ev_load):
     
-     #get aggregate load
-     aggr_load = pd.DataFrame()
-     
-     #sum ev loads
-     for load in get_aggregate_loads(schema):
-         aggr_load = load.add(aggr_load, fill_value=0)
+     aggr_load = base_load + ev_load
          
      cost_kwh = get_fixed_fields(schema,fields=['import_cost_kwh'])
      
-     annual_cosumption_kwh =aggr_load['kWh'].sum()
+     annual_cosumption_kwh = aggr_load['kWh'].sum()
      
      import_cost = annual_cosumption_kwh*cost_kwh['import_cost_kwh']
          
-     return(annual_cosumption_kwh,import_cost)
+     return(aggr_load,annual_cosumption_kwh,import_cost)
 
 def _get_annual_import_with_pv_kwh(schema):
        
@@ -93,16 +88,14 @@ def _get_annual_import_with_pv_and_battery_kwh(schema,df,pv_size):
 
 def get_optimise_results(schema):    
     
-     #original load
-     annual_import_site_kwh,original_import_cost=_get_annual_import_site_kwh(schema)
+     #Base load
+     base_load,annual_import_site_kwh,original_import_cost=_get_annual_import_site_kwh(schema)
      
      #EV load
-     annual_import_ev_kwh,with_ev_import_cost=_get_annual_import_ev_kwh(schema)
+     ev_load,annual_import_ev_kwh,with_ev_import_cost=_get_annual_import_ev_kwh(schema)
      
      #Total load
-     annual_import_total_kwh,cost=_get_annual_import_total_kwh(schema)
-     # TODO: Don't call get_ev_loads again
-     # TODO: check that inputs are in hour-of-year format
+     aggr_load,annual_import_total_kwh,cost=_get_annual_import_total_kwh(schema,base_load,ev_load)
      
      #PV optimised load
      annual_import_with_pv_kwh,cost,df,pv_size = _get_annual_import_with_pv_kwh(schema)
