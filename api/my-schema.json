@@ -3,21 +3,21 @@ development_rv = {
 
             'site':{
                 'success': True, 
-                'battery_size_kwh': 1.0,       #curve,size,results=optimise_battery_size(request.json)
-                'annual_import_site_kwh': 1.0, #curve,size,results=optimise_battery_size(request.json) 
-                'annual_import_ev_kwh': 1.0,   #get_ev_loads(schema)
-                'annual_import_total_kwh': 1.0,# 
-                'annual_import_with_pv_kwh': 1.0, #get_aggregate_loads_site
-                'annual_import_with_pv_and_battery_kwh': 1.0, #curve,size,results=optimise_battery_size(request.json)
-                'original_import_cost': 1.0, #get_base_loads
-                'with_ev_import_cost': 1.0, #get_ev_loads
-                'optimised_import_cost': 1.0 #get_aggregate_loads_site
+                'battery_size_kwh': 1.0,       
+                'annual_import_site_kwh': 1.0, 
+                'annual_import_ev_kwh': 1.0,   
+                'annual_import_total_kwh': 1.0, 
+                'annual_import_with_pv_kwh': 1.0, 
+                'annual_import_with_pv_and_battery_kwh': 1.0, 
+                'original_import_cost': 1.0, 
+                'with_ev_import_cost': 1.0, 
+                'optimised_import_cost': 1.0 
             },
 
             'buildings': [
-                {'name':'building_1', 'pv_size_kw': 1.0, 'num_chargers':1},  #get_aggregate_loads_site
-                {'name':'building_2', 'pv_size_kw': 1.0, 'num_chargers':1},  #get_aggregate_loads_site
-                {'name':'building_3', 'pv_size_kw': 1.0, 'num_chargers':1},  #get_aggregate_loads_site
+                {'name':'building_1', 'pv_size_kw': 1.0, 'num_chargers':1},  
+                {'name':'building_2', 'pv_size_kw': 1.0, 'num_chargers':1},  
+                {'name':'building_3', 'pv_size_kw': 1.0, 'num_chargers':1},  
 
             ]
         }

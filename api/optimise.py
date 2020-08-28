@@ -14,6 +14,7 @@ from datetime import datetime
 import logging
 import utils
 import datetime as dt
+import re
 
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -66,8 +67,12 @@ def generation_1kw(lat=None,lon=None, load=None,
         json.dumps(parsed_response['data']), orient='index')
     old_len = len(generation)
     generation = generation.set_index('local_time')
-    generation = generation.tz_localize(None)
-
+    #generation = generation.tz_localize(None)
+    
+    #Replace the string with timezone offset with empty string
+    generation.index=[re.sub(r'([-+]\d{2}):(\d{2})(?:(\d{2}))?$', r'', str(x)) for x in generation.index]
+    #Convert into datetime format
+    generation.index=pd.to_datetime(generation.index)
     logging.debug(f'generation head: {generation.head()}')
     # Put datetime index into hourly intervals
     start = generation.sort_index().index[0].date()
@@ -77,6 +82,9 @@ def generation_1kw(lat=None,lon=None, load=None,
 
     start = start - dt.timedelta(days=1)
     end = end + dt.timedelta(days=1)
+    
+    #for index in generation.index:
+    #    pd.to_datetime(generation.index)
 
     logging.debug(f'start: {start}, end:{end}')
 
@@ -86,12 +94,16 @@ def generation_1kw(lat=None,lon=None, load=None,
     except(ValueError):
         assert False, '422 API datetime error - ' \
                         +'check if lat and lon values are valid'
-
-    generation=    ( generation.reindex(
-                        generation.index.union(desired_index))
-                        .interpolate()
-                        .reindex(desired_index)
-                        .dropna() )
+    #reindex only if the generation index and desired index is different
+    try: 
+        generation=    ( generation.reindex(
+                            generation.index.union(desired_index))
+                            .interpolate()
+                            .reindex(desired_index)
+                            .dropna() )
+    except(ValueError):
+        logging.info('cannot reindex from a duplicate axis')
+        
     generation = generation[:old_len]
 
     # Convert index to hour of year
@@ -99,10 +111,14 @@ def generation_1kw(lat=None,lon=None, load=None,
     generation.index = ( (times.dt.week-1) *7 * 24 
                                  + times.dt.weekday * 24 
                                  + times.dt.hour )
+    
+    #Sort the index in ascending order
+    generation=generation.sort_index()
+    
+    #remove any duplicated index
+    generation=generation[~generation.index.duplicated()]
 
     logging.debug(f'Length of generation data: {len(generation)}')
-
-    assert len(generation) >= (24*7*52)
 
     return generation[:24*7*52] # clip to same length as building data
 
@@ -228,9 +244,9 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG, format=FORMAT)
 
 
-    gen = generation_1kw(lat=18.495858, lon=73.883544,
+    gen = generation_1kw(lat=18.520430, lon=73.856743,
                         azimuth=180, roofpitch=30)
-    print(gen.head())
+    print(gen.head(24))
 
 
 
