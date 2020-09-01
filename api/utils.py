@@ -156,6 +156,7 @@ def optimise_pv_size(generation_1kw,aggr_load,form_data):
     roof_size_m2 = form_data['roof_size_m2'].copy()
 
     list_of_optimal_size = []
+    list_of_df_cost_curve = []
 
     # for index in range(num):
     for gen_1_kw, load_kwh, roof_size_m2 in zip(
@@ -168,7 +169,7 @@ def optimise_pv_size(generation_1kw,aggr_load,form_data):
                                 export_price=export_price,
                                 expected_life_yrs=expected_life_yrs,
                                 roof_size_kw=roof_size_m2 * panel_efficiency)
-
+        list_of_df_cost_curve.append(df_cost_curve)
         tmp_opt_size, optimal_revenue = optimise.optimise(df_cost_curve) 
         list_of_optimal_size.append(tmp_opt_size) 
      
@@ -188,7 +189,7 @@ def optimise_pv_size(generation_1kw,aggr_load,form_data):
                       return_raw_data=True)
         list_of_df.append(tmp_df)
     
-    return(list_of_optimal_size,list_of_df)
+    return(list_of_optimal_size,list_of_df,list_of_df_cost_curve)
 
 
 

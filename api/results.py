@@ -65,7 +65,7 @@ def _get_annual_import_total_kwh(schema,base_load,ev_load):
 
 def _get_annual_import_with_pv_kwh(schema):
        
-     pv_size,sum_load = get_aggregate_loads_site_pv_optimised(schema)   
+     pv_size,sum_load,df_cost_curve = get_aggregate_loads_site_pv_optimised(schema)   
          
      cost_kwh = get_fixed_fields(schema,fields=['import_cost_kwh'])
      
@@ -73,7 +73,7 @@ def _get_annual_import_with_pv_kwh(schema):
      
      import_cost = annual_cosumption_kwh*cost_kwh['import_cost_kwh']   
        
-     return(annual_cosumption_kwh,import_cost,sum_load,pv_size)
+     return(annual_cosumption_kwh,import_cost,sum_load,pv_size,df_cost_curve)
  
 def _get_annual_import_with_pv_and_battery_kwh(schema,df,pv_size):
         
@@ -85,7 +85,7 @@ def _get_annual_import_with_pv_and_battery_kwh(schema,df,pv_size):
      
         import_cost = annual_cosumption_kwh*cost_kwh['import_cost_kwh']
         
-        return(size,annual_cosumption_kwh,import_cost)
+        return(size,annual_cosumption_kwh,import_cost,curve,results)
     
 
 def get_optimise_results(schema):    
@@ -109,12 +109,13 @@ def get_optimise_results(schema):
      (annual_import_with_pv_kwh,
         pv_optimised_cost,
         df,
-        pv_size) = _get_annual_import_with_pv_kwh(schema)
+        pv_size,
+        pv_cost_curve) = _get_annual_import_with_pv_kwh(schema)
      
      #PV and battery optimised load
      (battery_size,
         annual_import_with_pv_and_battery_kwh,
-        battery_optimised_cost ) = \
+        battery_optimised_cost,battery_cost_curve,import_export_df ) = \
             _get_annual_import_with_pv_and_battery_kwh(
                 schema,df,pv_size)
     
@@ -163,11 +164,44 @@ def get_optimise_results(schema):
      
      buildings = {'buildings': buildings}
      
-     merge = {**site,** buildings}
+     merge_results = {**site,** buildings}
      
-     results = {'results':merge}
+     #Generate chart values
+     
+     #process battery cost curve
+     battery_cost_curve=battery_cost_curve.reset_index()
+     battery_cost_curve=battery_cost_curve[['batt_size', 'total_cost']]
+     
+     #process import/export dataframe
+     import_export_df.rename(columns = {'P_gen':'Generation',
+                                                           'P_load': 'Load',
+                                                           'P_grid':'Import',
+                                                           'P_curt':'export'}, 
+                                                inplace = True)
+     
+     site = {
+             'success': True,
+             'battery_cost_cure' :  battery_cost_curve.to_dict(orient='records'),
+             'import_export' : import_export_df.to_dict(orient='records')
+            }
+     
+        
+     #building results
+     buildings = []
+     for curve in pv_cost_curve:
+         curve = curve.reset_index()
+         buildings.append({
+             'pv_cost_curve':curve.to_dict(orient='records')
+             })
+         
+     site = {'site':site}
+     
+     buildings = {'buildings': buildings}
+     
+     merge_charts = {**site,** buildings}
     
-     return(json.dumps(results))
+     return(json.dumps( {'results':merge_results,'charts':merge_charts}))
+ 
      
     
 if __name__ == '__main__':

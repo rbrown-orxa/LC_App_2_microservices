@@ -32,7 +32,7 @@ def get_aggregate_loads(schema):
 
 def get_aggregate_loads_site_pv_optimised(schema):
     
-    pv_size,aggr_load = optimise_pv.get_optimise_pv_size(schema) # Call the API
+    pv_size,aggr_load,list_of_df_cost_curve = optimise_pv.get_optimise_pv_size(schema) # Call the API
     
     for load in aggr_load:
         load.rename(columns={load.columns[0]:'gen_kwh'},inplace=True)
@@ -43,7 +43,7 @@ def get_aggregate_loads_site_pv_optimised(schema):
     for load in aggr_load:
         aggr_load_site = load.add(aggr_load_site, fill_value=0)  
     
-    return(pv_size,aggr_load_site)
+    return(pv_size,aggr_load_site,list_of_df_cost_curve)
 
 
 

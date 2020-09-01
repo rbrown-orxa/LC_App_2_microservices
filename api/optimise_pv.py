@@ -28,12 +28,12 @@ def get_optimise_pv_size(schema):
     list_of_1kw_generation = get_generation_1kw(form_data)
     
     
-    list_of_pv_size,list_of_df = optimise_pv_size(
+    list_of_pv_size,list_of_df,list_of_df_cost_curve = optimise_pv_size(
       list_of_1kw_generation,
       list_of_aggr_load,
       form_data)  
     
-    return(list_of_pv_size,list_of_df)
+    return(list_of_pv_size,list_of_df,list_of_df_cost_curve)
     
     
 
