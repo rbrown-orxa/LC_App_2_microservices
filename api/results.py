@@ -181,19 +181,22 @@ def get_optimise_results(schema):
      
      site = {
              'success': True,
-             'battery_cost_cure' :  battery_cost_curve.to_dict(orient='records'),
-             'import_export' : import_export_df.to_dict(orient='records')
+             'battery_cost_curve' :  battery_cost_curve.to_dict(orient='list'),
+             'import_export' : import_export_df.to_dict(orient='list')
             }
      
         
      #building results
      buildings = []
-     for curve in pv_cost_curve:
+     for building_name, curve in zip(var['name'], pv_cost_curve):
          curve = curve.reset_index()
          buildings.append({
-             'pv_cost_curve':curve.to_dict(orient='records')
+             'name':building_name,
+             'pv_cost_curve':curve.to_dict(orient='list')
              })
          
+
+
      site = {'site':site}
      
      buildings = {'buildings': buildings}
