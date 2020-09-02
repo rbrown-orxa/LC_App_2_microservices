@@ -78,14 +78,6 @@ def optimise():
     rv = library._optimise(request)
     if app.config['PICKLE_RESULTS']:
         utils.pickle_results(rv, app.config['UPLOAD_PATH'])
-        # filename = 'results_' + str(int(time.time() * 1000)) + '.pkl'
-        # logging.warning(f'Pickling results to file: {filename}')
-        # path = os.path.join( app.config['UPLOAD_PATH'], 'results')
-        # Path(path).mkdir(parents=True, exist_ok=True)
-        # filepath = os.path.join( path, filename)
-        # with open(filepath, 'wb') as file:
-        #     pickle.dump(rv, file, protocol=4)
-
 
     return (rv,
             200, 
