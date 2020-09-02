@@ -1,0 +1,27 @@
+
+1. API authentication (Sanjeev)
+	* Frontend needs user authentication
+	* Backend needs API caller authentication
+	* Update optimise and upload schema files to include user_id and optional subscription_id
+	* Apply usage limits for users without subscription_ID by checking query table
+	* e.g. https://journeyofthegeek.com/2020/06/22/python-sample-web-app-and-api-for-azure-ad-b2c/
+
+2. Keep record of app usage (Robert):
+	
+	Query table
+	* Query unique id (primary key integer auto increment not null)
+	* Result success (boolean not null)
+	* User ID / email (varchar not null)
+	* Subscription ID (uuid not null)
+	* Timestamp (timestamp not null)
+
+	Billing table
+	* Subscription ID (uuid not null)
+	* Count of successful queries (int not null)
+
+3. Billing service
+	* Submit billing infomation on regular basis to cloud provider
+	* Use cloud provider's API to submit the requests
+	* https://docs.microsoft.com/en-us/azure/marketplace/partner-center-portal/marketplace-metering-service-apis
+	* Send a copy to app owner
+
