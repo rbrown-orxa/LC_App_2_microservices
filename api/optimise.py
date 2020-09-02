@@ -138,10 +138,9 @@ def generation_1kw(lat=None,lon=None, load=None,
     #remove any duplicated index
     generation=generation[~generation.index.duplicated()]
 
-    logging.debug(f'Length of generation data: {len(generation)}')
+    logging.info(f'Length of generation data: {len(generation)}')
 
-
-    assert len(generation) >= (24*7*52)
+    assert len(generation) >= (24*7*52 - 1)
 
     logging.debug(f'{generation.head(10)}')
 
