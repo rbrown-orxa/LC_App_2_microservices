@@ -64,15 +64,31 @@ def generation_1kw(lat=None,lon=None, load=None,
     logging.info(f'status code: {r.status_code}')
     parsed_response = json.loads(r.text)
     generation = pd.read_json(
-        json.dumps(parsed_response['data']), orient='index')
+        json.dumps(parsed_response['data']),
+        orient='index',
+        convert_dates=False)
+
     old_len = len(generation)
+
+    # generation['local_time'] = generation['local_time'].str.split('+').str[0]
+    # generation['local_time'] = generation['local_time'].str.split('-').str[0]
+    generation['local_time'] = generation['local_time'].str[:19]
+
+    logging.debug(f"{generation['local_time'].head()}")
+
+    generation['local_time'] = pd.to_datetime(generation['local_time'])
+
     generation = generation.set_index('local_time')
-    #generation = generation.tz_localize(None)
-    
-    #Replace the string with timezone offset with empty string
-    generation.index=[re.sub(r'([-+]\d{2}):(\d{2})(?:(\d{2}))?$', r'', str(x)) for x in generation.index]
-    #Convert into datetime format
-    generation.index=pd.to_datetime(generation.index)
+
+
+    logging.debug(f'{generation.head()}')
+    logging.debug(f'Index type: {type(generation.index)}')
+    logging.debug(f'Index element type: {type(generation.index[0])}')
+
+    # Strip TZ info - only want localtime
+    # generation = generation.tz_localize(None) 
+
+
     logging.debug(f'generation head: {generation.head()}')
     # Put datetime index into hourly intervals
     start = generation.sort_index().index[0].date()
@@ -94,16 +110,20 @@ def generation_1kw(lat=None,lon=None, load=None,
     except(ValueError):
         assert False, '422 API datetime error - ' \
                         +'check if lat and lon values are valid'
-    #reindex only if the generation index and desired index is different
-    try: 
+
+
+    
+    try:
+
         generation=    ( generation.reindex(
                             generation.index.union(desired_index))
                             .interpolate()
                             .reindex(desired_index)
                             .dropna() )
-    except(ValueError):
-        logging.info('cannot reindex from a duplicate axis')
-        
+
+    except(ValueError): # Only need this if local time is offset by 30 mins
+        pass
+
     generation = generation[:old_len]
 
     # Convert index to hour of year
@@ -119,6 +139,12 @@ def generation_1kw(lat=None,lon=None, load=None,
     generation=generation[~generation.index.duplicated()]
 
     logging.debug(f'Length of generation data: {len(generation)}')
+
+
+    assert len(generation) >= (24*7*52)
+
+    logging.debug(f'{generation.head(10)}')
+
 
     return generation[:24*7*52] # clip to same length as building data
 
