@@ -6,7 +6,8 @@ PROFILES_BUILDING = './profiles/building_profiles.csv'
 PROFILES_EV = './profiles/profiles_for_production_use.csv'
 PICKLE_RESULTS = False
 REQUIRE_ACCESS_TOKEN = False
-BILLING_DB_CONN_STR = 'localhost:5432'
+BILLING_DB_CONN_STR = 'postgres://postgres:password@localhost:5432/postgres'
 MAX_FREE_CALLS = 10
+
 
 
