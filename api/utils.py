@@ -5,6 +5,22 @@ import config as cfg
 import optimise
 import sys
 import logging
+import time
+from pathlib import Path
+import pickle
+
+
+def pickle_results(results, path):
+    filename = 'results_' + str(int(time.time() * 1000)) + '.pkl'
+    logging.info(f'Pickling results to file: {filename}')
+    
+    path = os.path.join( path, 'results')
+    Path(path).mkdir(parents=True, exist_ok=True)
+    filepath = os.path.join( path, filename)
+
+    with open(filepath, 'wb') as file:
+        pickle.dump(results, file, protocol=4)
+
 
 def handle_exceptions(func):
         @functools.wraps(func)

@@ -1,0 +1,1 @@
+import osimport pickleimport jsonpath = os.path.join('.', 'tmp', 'results')files = sorted(os.listdir(path), reverse=True)load_path = os.path.join( path, files[0] )with open(load_path, 'rb') as file:    latest_results = json.loads( pickle.load(file) )    

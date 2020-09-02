@@ -3,6 +3,9 @@ from flask_cors import CORS
 from flask_selfdoc import Autodoc
 import os
 import logging
+import time
+from pathlib import Path
+import pickle
 
 import utils
 import library
@@ -72,7 +75,19 @@ def optimise():
         According to /result_schema
     """
     logging.info('got an optimise request')
-    return (library._optimise(request),
+    rv = library._optimise(request)
+    if app.config['PICKLE_RESULTS']:
+        utils.pickle_results(rv, app.config['UPLOAD_PATH'])
+        # filename = 'results_' + str(int(time.time() * 1000)) + '.pkl'
+        # logging.warning(f'Pickling results to file: {filename}')
+        # path = os.path.join( app.config['UPLOAD_PATH'], 'results')
+        # Path(path).mkdir(parents=True, exist_ok=True)
+        # filepath = os.path.join( path, filename)
+        # with open(filepath, 'wb') as file:
+        #     pickle.dump(rv, file, protocol=4)
+
+
+    return (rv,
             200, 
             {'Content-Type': 'application/json; charset=utf-8'})
 

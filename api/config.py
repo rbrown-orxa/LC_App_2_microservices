@@ -4,3 +4,4 @@ UPLOAD_EXTENSIONS = ['.csv', ]
 UPLOAD_PATH = 'tmp'
 PROFILES_BUILDING = './profiles/building_profiles.csv'
 PROFILES_EV = './profiles/profiles_for_production_use.csv'
+PICKLE_RESULTS = True
