@@ -70,8 +70,7 @@ def generation_1kw(lat=None,lon=None, load=None,
 
     old_len = len(generation)
 
-    # generation['local_time'] = generation['local_time'].str.split('+').str[0]
-    # generation['local_time'] = generation['local_time'].str.split('-').str[0]
+    # Remove timezone info from end of datetime string
     generation['local_time'] = generation['local_time'].str[:19]
 
     logging.debug(f"{generation['local_time'].head()}")
