@@ -10,6 +10,7 @@ import pickle
 import utils
 import library
 import config
+import billing
 
 debugging_mode = False
 
@@ -27,6 +28,9 @@ app.config.from_object(config)
 CORS(app)
 auto = Autodoc(app)
 utils.init_file_handler(app.config['UPLOAD_PATH'])
+
+if app.config['APPLY_BILLING']:
+    billing.make_tables(app.config['BILLING_DB_CONN_STR'])
 
 
 @app.route("/upload", methods=['POST'])
@@ -74,10 +78,33 @@ def optimise():
         Content-Type: application/json
         According to /result_schema
     """
+
+    # Replace these with actual values sent from frontend
+    email = 'user@orxa.io'
+    subscription_id = None #'8307CBA6-CA74-450F-9528-386E0CF07F33'
+
     logging.info('got an optimise request')
+
+
+    if app.config['APPLY_BILLING'] and not subscription_id:
+        print('got here')
+        assert email, '401 Either email or subscription_id must be provided '
+        free_queries_so_far =  billing.get_unbillable_queries(
+                                app.config['BILLING_DB_CONN_STR'],
+                                email = email)
+        logging.info('Free queries used so far: ' + str(free_queries_so_far))
+        assert free_queries_so_far < app.config['MAX_FREE_CALLS'], \
+            '402 Free quota query limits exceeded for user'
+
+
     rv = library._optimise(request)
+
     if app.config['PICKLE_RESULTS']:
         utils.pickle_results(rv, app.config['UPLOAD_PATH'])
+    if app.config['APPLY_BILLING']:
+        billing.register_query( app.config['BILLING_DB_CONN_STR'],
+                                email=email,
+                                subscription_id=subscription_id)
 
     return (rv,
             200, 
