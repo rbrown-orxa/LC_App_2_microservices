@@ -1,0 +1,2 @@
+1. there is an error in the function call generation_1kw() when lat/lon values are EU zone e.g with lat = 48.135124, lon= 11.581981. The error shows when exetuting this statment generation = generation.tz_localize(None) the error is TypeError: index is not a valid DatetimeIndex or PeriodIndex. The same function does not show error when pune co-ordinates.
+
