@@ -55,7 +55,10 @@ def make_tables(conn_str):
                         IF NOT EXISTS billing (
                             subscription_id UUID PRIMARY KEY,
                             total_successful_queries INT NOT NULL DEFAULT 1,
-                            total_billed_queries INT NOT NULL DEFAULT 0 ) ;
+                            total_billed_queries INT NOT NULL DEFAULT 0,
+                            billing_failed_queries INT NOT NULL DEFAULT 0,
+                            last_bill_date TIMESTAMPTZ,
+                            last_bill_qty INT) ;
                         """
 
                 cur = conn.cursor()
@@ -77,11 +80,11 @@ def get_billing_quantities(conn_str):
     SQL =   """
             SELECT
             subscription_id,
-            total_successful_queries - total_billed_queries
+            total_successful_queries - total_billed_queries - billing_failed_queries
                 AS queries_to_bill
             FROM billing
             WHERE
-            (total_successful_queries - total_billed_queries) > 0
+            (total_successful_queries - total_billed_queries - billing_failed_queries) > 0
             GROUP BY subscription_id ;
             """
 
@@ -206,34 +209,41 @@ def register_query_successful(query_id):
 
 
 if __name__ == '__main__':
+    class CurrentApp():
+        pass
+
+    current_app = CurrentApp
+    current_app.config = {}
+
     logging.basicConfig(level=logging.DEBUG)
+    
+    current_app.config['APPLY_BILLING'] = True
+    current_app.config['BILLING_DB_CONN_STR'] = \
+        'postgres://postgres:password@localhost:5432/postgres'
+
+    make_tables(current_app.config['BILLING_DB_CONN_STR'])
+
+    id1 = register_query_started(email='foo@foo.com')
+    time.sleep(random.random())
+    register_query_successful(id1)
+
+    id2 = register_query_started(
+            subscription_id='CEF06856-837B-4661-A627-6B20FD268A5C')
+    time.sleep(random.random())
+    register_query_successful(id2)
+
+    id3 = register_query_started(email='foo1@foo2.com',
+            subscription_id='61337278-AE07-4EF9-95D0-2791243E2283')
+    time.sleep(random.random())
 
 
-    CONN_STR = 'postgres://postgres:password@localhost:5432/postgres'
 
-    make_tables(CONN_STR)
-
-    # id1 = register_query_started(CONN_STR, email='foo@foo.com')
-    # time.sleep(random.random())
-    # register_query_successful(CONN_STR, id1)
-
-    # id2 = register_query_started(CONN_STR,
-    #         subscription_id='CEF06856-837B-4661-A627-6B20FD268A5C')
-    # time.sleep(random.random())
-    # register_query_successful(CONN_STR, id2)
-
-    # id3 = register_query_started(CONN_STR, email='foo1@foo2.com',
-    #         subscription_id='61337278-AE07-4EF9-95D0-2791243E2283')
-    # time.sleep(random.random())
-
-
-
-    bill = get_billing_quantities(CONN_STR)
+    bill = get_billing_quantities(current_app.config['BILLING_DB_CONN_STR'])
     print(f'Unbilled units: {bill}')
 
     time.sleep(random.random()) # simulate API billing request being sent
 
-    register_billed_quantities(CONN_STR, bill)
+    register_billed_quantities(current_app.config['BILLING_DB_CONN_STR'], bill)
 
 
 
