@@ -64,6 +64,10 @@ def upload():
     return library._upload(request)
 
 
+
+
+
+
 @app.route("/optimise", methods=['GET','POST'])
 @auto.doc()
 @utils.handle_exceptions
@@ -82,29 +86,19 @@ def optimise():
     # Replace these with actual values sent from frontend
     email = app.config['EMAIL']
     subscription_id = app.config['SUBSCRIPTION_ID']
+    subscription_id = subscription_id if subscription_id else None # pg NULL
 
     logging.info('got an optimise request')
 
-
-    if app.config['APPLY_BILLING'] and not subscription_id:
-        print('got here')
-        assert email, '401 Either email or subscription_id must be provided '
-        free_queries_so_far =  billing.get_unbillable_queries(
-                                app.config['BILLING_DB_CONN_STR'],
-                                email = email)
-        logging.info('Free queries used so far: ' + str(free_queries_so_far))
-        assert free_queries_so_far < app.config['MAX_FREE_CALLS'], \
-            '402 Free quota query limits exceeded for user'
-
+    billing.check_free_quota(email, subscription_id)
+    query_id = billing.register_query_started(email, subscription_id)
 
     rv = library._optimise(request)
 
     if app.config['PICKLE_RESULTS']:
         utils.pickle_results(rv, app.config['UPLOAD_PATH'])
-    if app.config['APPLY_BILLING']:
-        billing.register_query( app.config['BILLING_DB_CONN_STR'],
-                                email=email,
-                                subscription_id=subscription_id)
+    
+    billing.register_query_successful(query_id)
 
     return (rv,
             200, 

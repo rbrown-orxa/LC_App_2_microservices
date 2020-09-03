@@ -1,6 +1,25 @@
 import psycopg2
 import logging
 import time
+import random
+from flask import current_app
+
+
+
+def check_free_quota(email, subscription_id):
+    if not current_app.config['APPLY_BILLING']:
+        return
+    if subscription_id:
+        return # TODO: Check subscription_id is valid
+    assert email, '401 Either email or subscription_id must be provided '
+
+    free_queries_so_far =  get_unbillable_queries(
+        current_app.config['BILLING_DB_CONN_STR'],
+        email = email)
+    logging.info('Free queries used so far: ' + str(free_queries_so_far))
+
+    assert free_queries_so_far < current_app.config['MAX_FREE_CALLS'], \
+        '402 Free quota query limits exceeded for user'
 
 
 def make_tables(conn_str):
@@ -16,10 +35,11 @@ def make_tables(conn_str):
                         CREATE TABLE
                         IF NOT EXISTS queries (
                             id SERIAL PRIMARY KEY,
-                            created TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-                            success BOOLEAN NOT NULL,
+                            started TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                            success BOOLEAN NOT NULL DEFAULT FALSE,
                             email citext,
                             subscription_id UUID,
+                            completed TIMESTAMPTZ
                         CHECK (
                             email IS NOT NULL
                             OR subscription_id IS NOT NULL)
@@ -45,36 +65,6 @@ def make_tables(conn_str):
                 time.sleep(5)
 
 
-def register_query(conn_str, email='', subscription_id=None, success=True):
-
-    logging.info('Registering query for billing')
-    if (not email) and (not subscription_id):
-        raise ValueError('email or subscription_id field must be not null')
-    
-    SQL1 =  """
-            INSERT INTO queries
-            (email, subscription_id, success)
-            VALUES (%s, %s, %s) ;
-            """
-
-
-    SQL2 =  """
-            INSERT INTO billing (subscription_id)
-            VALUES (%s)
-            ON CONFLICT (subscription_id) DO
-            UPDATE SET
-            total_successful_queries = 1 + billing.total_successful_queries
-            ;
-            """
-
-
-    with psycopg2.connect(conn_str) as conn:
-        cur = conn.cursor()
-        cur.execute( SQL1, (email, subscription_id, success) )
-        if success and subscription_id:
-            cur.execute( SQL2, (subscription_id, ) )
-        conn.commit()
-        cur.close()
 
 
 def get_billing_quantities(conn_str):
@@ -136,6 +126,76 @@ def get_unbillable_queries(conn_str, email=''):
         return rv
 
 
+def register_query_started(email='', subscription_id=None):
+    
+    if not current_app.config['APPLY_BILLING']:
+        return None
+
+    conn_str = current_app.config['BILLING_DB_CONN_STR']
+    logging.info('Registering query started')
+    
+    SQL =  """
+            INSERT INTO queries
+            (email, subscription_id)
+            VALUES (%s, %s) 
+            RETURNING id;
+            """
+
+    with psycopg2.connect(conn_str) as conn:
+        cur = conn.cursor()
+        cur.execute( SQL, (email, subscription_id) )
+        conn.commit()
+        id = cur.fetchone()[0]
+        cur.close()
+
+    logging.info(f'Got query id: {id}')
+
+    return id
+
+
+def register_query_successful(query_id):
+
+    if not current_app.config['APPLY_BILLING']:
+        return
+
+    conn_str = current_app.config['BILLING_DB_CONN_STR']
+    logging.info('Registering successful query')
+    
+    SQL1 =  """
+            UPDATE queries
+            SET 
+            success = true,
+            completed = NOW()
+            WHERE id = %s 
+            RETURNING subscription_id ;
+            """
+
+
+    SQL2 =  """
+            INSERT INTO billing (subscription_id)
+            VALUES (%s)
+            ON CONFLICT (subscription_id) DO
+            UPDATE SET
+            total_successful_queries = 1 + billing.total_successful_queries
+            ;
+            """
+
+
+    with psycopg2.connect(conn_str) as conn:
+        cur = conn.cursor()
+        cur.execute( SQL1, (query_id, ) )
+        conn.commit()
+        subscription_id = cur.fetchone()[0]
+
+        if subscription_id:
+            logging.info(   f'Registering query: {query_id} ' \
+                            + f'for billing: {subscription_id}')
+            cur.execute( SQL2, (subscription_id, ) )
+            conn.commit()
+        cur.close()
+
+
+
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
@@ -143,11 +203,20 @@ if __name__ == '__main__':
 
     make_tables(CONN_STR)
 
-    register_query(CONN_STR, email='foo@foo.com')
-    register_query(CONN_STR, email='foo1@foo2.com', success=False)
-    register_query(CONN_STR, subscription_id='CEF06856-837B-4661-A627-6B20FD268A5C')
-    register_query(CONN_STR, subscription_id='61337278-AE07-4EF9-95D0-2791243E2283')
-    register_query(CONN_STR, subscription_id='61337278-AE07-4EF9-95D0-2791243E2283')
+    id1 = register_query_started(CONN_STR, email='foo@foo.com')
+    time.sleep(random.random())
+    register_query_successful(CONN_STR, id1)
+
+    id2 = register_query_started(CONN_STR,
+            subscription_id='CEF06856-837B-4661-A627-6B20FD268A5C')
+    time.sleep(random.random())
+    register_query_successful(CONN_STR, id2)
+
+    id3 = register_query_started(CONN_STR, email='foo1@foo2.com',
+            subscription_id='61337278-AE07-4EF9-95D0-2791243E2283')
+    time.sleep(random.random())
+
+
 
     bill = get_billing_quantities(CONN_STR)
     print(f'Unbilled units: {bill}')
