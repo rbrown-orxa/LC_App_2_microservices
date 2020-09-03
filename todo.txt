@@ -27,5 +27,9 @@
 	* Use cloud provider's API to submit the requests
 	* https://docs.microsoft.com/en-us/azure/marketplace/partner-center-portal/marketplace-metering-service-apis
 	* Send a copy to app owner
+	* Ensure billed values are commited to the database, even if db or billing API is down, to prevent duplicate billing
+	* Make table of submitted bills
+
+
 
 

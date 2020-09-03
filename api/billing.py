@@ -76,25 +76,7 @@ def make_tables(conn_str):
 
 
 
-def get_billing_quantities(conn_str):
-    SQL =   """
-            SELECT
-            subscription_id,
-            total_successful_queries - total_billed_queries - billing_failed_queries
-                AS queries_to_bill
-            FROM billing
-            WHERE
-            (total_successful_queries - total_billed_queries - billing_failed_queries) > 0
-            GROUP BY subscription_id ;
-            """
 
-    with psycopg2.connect(conn_str) as conn:
-        cur = conn.cursor()
-        cur.execute( SQL )
-        rv = cur.fetchall()
-        cur.close()
-    
-    return dict(rv)
 
 
 def register_billed_quantities(conn_str, units_billed):
@@ -232,18 +214,27 @@ if __name__ == '__main__':
     time.sleep(random.random())
     register_query_successful(id2)
 
+    id2 = register_query_started(
+            subscription_id='CEF06856-837B-4661-A627-6B20FD268A5C')
+    time.sleep(random.random())
+    register_query_successful(id2)
+
     id3 = register_query_started(email='foo1@foo2.com',
             subscription_id='61337278-AE07-4EF9-95D0-2791243E2283')
     time.sleep(random.random())
 
+    id4 = register_query_started(
+            subscription_id='2EF06856-837B-4661-A627-6B20FD268A5B')
+    time.sleep(random.random())
+    register_query_successful(id4)
 
 
-    bill = get_billing_quantities(current_app.config['BILLING_DB_CONN_STR'])
-    print(f'Unbilled units: {bill}')
+    # bill = get_billing_quantities(current_app.config['BILLING_DB_CONN_STR'])
+    # print(f'Unbilled units: {bill}')
 
-    time.sleep(random.random()) # simulate API billing request being sent
+    # time.sleep(random.random()) # simulate API billing request being sent
 
-    register_billed_quantities(current_app.config['BILLING_DB_CONN_STR'], bill)
+    # register_billed_quantities(current_app.config['BILLING_DB_CONN_STR'], bill)
 
 
 
