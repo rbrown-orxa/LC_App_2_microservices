@@ -80,8 +80,8 @@ def optimise():
     """
 
     # Replace these with actual values sent from frontend
-    email = 'user@orxa.io'
-    subscription_id = None #'8307CBA6-CA74-450F-9528-386E0CF07F33'
+    email = app.config['EMAIL']
+    subscription_id = app.config['SUBSCRIPTION_ID']
 
     logging.info('got an optimise request')
 

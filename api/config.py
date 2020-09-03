@@ -11,5 +11,8 @@ REQUIRE_ACCESS_TOKEN = False
 APPLY_BILLING = False
 BILLING_DB_CONN_STR = 'postgres://postgres:password@localhost:5432/postgres'
 MAX_FREE_CALLS = 10
+# Replace these with actual values sent from frontend. Used by billing module.
+EMAIL = 'user@orxa.io'
+SUBSCRIPTION_ID = '8307CBA6-CA74-450F-9528-386E0CF07F33' #None 
 
 PICKLE_RESULTS = False
