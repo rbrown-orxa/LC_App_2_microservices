@@ -39,10 +39,18 @@ def _upload(request):
 def _optimise(request):
 
     logging.debug('starting optimisation')
-    
-    results = get_optimise_results(request.json)
-    
-    return results
+    content = request.json
+
+    with open('my-schema.json', 'r') as schema_file:
+        schema = json.load(schema_file)
+    try:
+        jsonschema.validate(instance=content, schema=schema)
+    except Exception as err:
+        assert False, f'422 {err}'
+
+    results = get_optimise_results(content)
+    return results        
+
 
 
 def _download(handle):
