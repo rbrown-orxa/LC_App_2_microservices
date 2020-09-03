@@ -90,7 +90,8 @@ def optimise():
 
     logging.info('got an optimise request')
 
-    billing.check_free_quota(email, subscription_id)
+    billing.check_subscription(email, subscription_id)
+
     query_id = billing.register_query_started(email, subscription_id)
 
     rv = library._optimise(request)

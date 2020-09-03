@@ -6,20 +6,26 @@ from flask import current_app
 
 
 
-def check_free_quota(email, subscription_id):
+def check_subscription(email, subscription_id):
     if not current_app.config['APPLY_BILLING']:
-        return
+        return # Check has passed
     if subscription_id:
-        return # TODO: Check subscription_id is valid
+        if not current_app.config['SUBSCRIPTION_VALID']:
+            assert False, '402 Subscription not valid'
+        return # Check has passed
     assert email, '401 Either email or subscription_id must be provided '
 
     free_queries_so_far =  get_unbillable_queries(
         current_app.config['BILLING_DB_CONN_STR'],
         email = email)
-    logging.info('Free queries used so far: ' + str(free_queries_so_far))
+    logging.info('Free queries used so far: ' + str(free_queries_so_far) + \
+        ' by user: ' + str(email))
 
     assert free_queries_so_far < current_app.config['MAX_FREE_CALLS'], \
         '402 Free quota query limits exceeded for user'
+
+    logging.info('Subscription check passed')
+    return
 
 
 def make_tables(conn_str):
@@ -74,6 +80,8 @@ def get_billing_quantities(conn_str):
             total_successful_queries - total_billed_queries
                 AS queries_to_bill
             FROM billing
+            WHERE
+            (total_successful_queries - total_billed_queries) > 0
             GROUP BY subscription_id ;
             """
 
@@ -201,30 +209,32 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     CONN_STR = 'postgres://postgres:password@localhost:5432/postgres'
 
-    make_tables(CONN_STR)
+    # make_tables(CONN_STR)
 
-    id1 = register_query_started(CONN_STR, email='foo@foo.com')
-    time.sleep(random.random())
-    register_query_successful(CONN_STR, id1)
+    # id1 = register_query_started(CONN_STR, email='foo@foo.com')
+    # time.sleep(random.random())
+    # register_query_successful(CONN_STR, id1)
 
-    id2 = register_query_started(CONN_STR,
-            subscription_id='CEF06856-837B-4661-A627-6B20FD268A5C')
-    time.sleep(random.random())
-    register_query_successful(CONN_STR, id2)
+    # id2 = register_query_started(CONN_STR,
+    #         subscription_id='CEF06856-837B-4661-A627-6B20FD268A5C')
+    # time.sleep(random.random())
+    # register_query_successful(CONN_STR, id2)
 
-    id3 = register_query_started(CONN_STR, email='foo1@foo2.com',
-            subscription_id='61337278-AE07-4EF9-95D0-2791243E2283')
-    time.sleep(random.random())
+    # id3 = register_query_started(CONN_STR, email='foo1@foo2.com',
+    #         subscription_id='61337278-AE07-4EF9-95D0-2791243E2283')
+    # time.sleep(random.random())
 
 
 
     bill = get_billing_quantities(CONN_STR)
     print(f'Unbilled units: {bill}')
 
+    time.sleep(random.random()) # simulate API billing request being sent
+
     register_billed_quantities(CONN_STR, bill)
 
-    unbillable_single = get_unbillable_queries(CONN_STR, 'foo@foo.com')
-    print(f'Unbillable units for foo@foo.com: {unbillable_single}')
+    # unbillable_single = get_unbillable_queries(CONN_STR, 'foo@foo.com')
+    # print(f'Unbillable units for foo@foo.com: {unbillable_single}')
 
 
 
