@@ -8,8 +8,14 @@ PROFILES_EV = './profiles/profiles_for_production_use.csv'
 
 REQUIRE_ACCESS_TOKEN = False
 
-APPLY_BILLING = False # Queries will not be registered in billing database
-BILLING_DB_CONN_STR = 'postgres://postgres:password@localhost:5432/postgres'
+APPLY_BILLING = True # Queries will not be registered in billing database
+# BILLING_DB_CONN_STR = 'postgres://postgres:password@localhost:5432/postgres'
+BILLING_DB_CONN_STR = "host=lcapppostgreserver.postgres.database.azure.com "\
+					+ "user=lcapp@lcapppostgreserver "\
+					+ "dbname=postgres "\
+					+ "password=SANorxagrid12 "\
+					+ "sslmode=require"
+
 MAX_FREE_CALLS = 5
 # Replace these with actual values sent from frontend. Used by billing module.
 EMAIL = 'user2@orxa.io'

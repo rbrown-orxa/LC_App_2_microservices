@@ -207,9 +207,11 @@ def register_query_successful(query_id):
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
+
+
     CONN_STR = 'postgres://postgres:password@localhost:5432/postgres'
 
-    # make_tables(CONN_STR)
+    make_tables(CONN_STR)
 
     # id1 = register_query_started(CONN_STR, email='foo@foo.com')
     # time.sleep(random.random())
@@ -232,11 +234,6 @@ if __name__ == '__main__':
     time.sleep(random.random()) # simulate API billing request being sent
 
     register_billed_quantities(CONN_STR, bill)
-
-    # unbillable_single = get_unbillable_queries(CONN_STR, 'foo@foo.com')
-    # print(f'Unbillable units for foo@foo.com: {unbillable_single}')
-
-
 
 
 
