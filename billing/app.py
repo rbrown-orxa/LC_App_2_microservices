@@ -83,13 +83,13 @@ def process_bills():
         logging.debug(f'subscription_id: {subscription_id}, units: {qty}')
         try:
             post_bill(subscription_id, qty)
-            n_successful += 1
         except:
             # logging.exception(f'Error while processing bill: {uuid}')
             logging.warning(f'Error while processing bill: {subscription_id}')
             # Todo: rollback db transaction started in get_users_to_bill()
         else:
             # Todo: commit db transaction started in get_users_to_bill()
+            n_successful += 1
             logging.info('Bill posted successfully: {subscription_id}')
     failed = num_bills - n_successful
     logging.info(f'Processed {num_bills} bills, with {failed} failures')

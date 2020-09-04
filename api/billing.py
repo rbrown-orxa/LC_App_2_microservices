@@ -51,17 +51,18 @@ def make_tables(conn_str):
                         CHECK (
                             email IS NOT NULL
                             OR subscription_id IS NOT NULL)
-                        );
-
-                        CREATE TABLE
-                        IF NOT EXISTS billing (
-                            subscription_id UUID PRIMARY KEY,
-                            total_successful_queries INT NOT NULL DEFAULT 1,
-                            total_billed_queries INT NOT NULL DEFAULT 0,
-                            billing_failed_queries INT NOT NULL DEFAULT 0,
-                            last_bill_date TIMESTAMPTZ,
-                            last_bill_qty INT) ;
+                        ) ;
                         """
+
+                        # CREATE TABLE
+                        # IF NOT EXISTS billing (
+                        #     subscription_id UUID PRIMARY KEY,
+                        #     total_successful_queries INT NOT NULL DEFAULT 1,
+                        #     total_billed_queries INT NOT NULL DEFAULT 0,
+                        #     billing_failed_queries INT NOT NULL DEFAULT 0,
+                        #     last_bill_date TIMESTAMPTZ,
+                        #     last_bill_qty INT) ;
+                        # """
 
                 cur = conn.cursor()
                 cur.execute(SQL)
@@ -81,44 +82,44 @@ def make_tables(conn_str):
 
 
 
-def register_billed_quantities(conn_str, units_billed):
-    """
-    Example units_billed dict:
+# def register_billed_quantities(conn_str, units_billed):
+#     """
+#     Example units_billed dict:
 
-    { 'cef06856-837b-4661-a627-6b20fd268a5c': 4,
-      '61337278-ae07-4ef9-95d0-2791243e2283': 8 }
-    """
+#     { 'cef06856-837b-4661-a627-6b20fd268a5c': 4,
+#       '61337278-ae07-4ef9-95d0-2791243e2283': 8 }
+#     """
 
-    SQL =   """
-            UPDATE billing
-            SET total_billed_queries = total_billed_queries + %s
-            WHERE subscription_id = %s
-            """
+#     SQL =   """
+#             UPDATE billing
+#             SET total_billed_queries = total_billed_queries + %s
+#             WHERE subscription_id = %s
+#             """
 
-    with psycopg2.connect(conn_str) as conn:
-        cur = conn.cursor()
-        for subscription_id, units in units_billed.items():
-            cur.execute( SQL, (units, subscription_id) )
-            conn.commit()
-        cur.close()
+#     with psycopg2.connect(conn_str) as conn:
+#         cur = conn.cursor()
+#         for subscription_id, units in units_billed.items():
+#             cur.execute( SQL, (units, subscription_id) )
+#             conn.commit()
+#         cur.close()
 
 
-def get_unbillable_queries(conn_str, email=''):
+# def get_unbillable_queries(conn_str, email=''):
 
-    if email:
-        SQL =   """
-                SELECT count(*) 
-                FROM queries 
-                WHERE email = %s 
-                AND success = True 
-                AND subscription_id IS NULL;
-                """
-        with psycopg2.connect(conn_str) as conn:
-            cur = conn.cursor()
-            cur.execute( SQL, (email, ) )
-            rv = cur.fetchone()[0]
-            cur.close()
-        return rv
+#     if email:
+#         SQL =   """
+#                 SELECT count(*) 
+#                 FROM queries 
+#                 WHERE email = %s 
+#                 AND success = True 
+#                 AND subscription_id IS NULL;
+#                 """
+#         with psycopg2.connect(conn_str) as conn:
+#             cur = conn.cursor()
+#             cur.execute( SQL, (email, ) )
+#             rv = cur.fetchone()[0]
+#             cur.close()
+#         return rv
 
 
 def register_query_started(email='', subscription_id=None):
@@ -162,31 +163,32 @@ def register_query_successful(query_id):
             success = true,
             completed = NOW()
             WHERE id = %s 
-            RETURNING subscription_id ;
-            """
-
-
-    SQL2 =  """
-            INSERT INTO billing (subscription_id)
-            VALUES (%s)
-            ON CONFLICT (subscription_id) DO
-            UPDATE SET
-            total_successful_queries = 1 + billing.total_successful_queries
+            -- RETURNING subscription_id 
             ;
             """
+
+
+    # SQL2 =  """
+    #         INSERT INTO billing (subscription_id)
+    #         VALUES (%s)
+    #         ON CONFLICT (subscription_id) DO
+    #         UPDATE SET
+    #         total_successful_queries = 1 + billing.total_successful_queries
+    #         ;
+    #         """
 
 
     with psycopg2.connect(conn_str) as conn:
         cur = conn.cursor()
         cur.execute( SQL1, (query_id, ) )
         conn.commit()
-        subscription_id = cur.fetchone()[0]
+        # subscription_id = cur.fetchone()[0]
 
-        if subscription_id:
-            logging.info(   f'Registering query: {query_id} ' \
-                            + f'for billing: {subscription_id}')
-            cur.execute( SQL2, (subscription_id, ) )
-            conn.commit()
+        # if subscription_id:
+        #     logging.info(   f'Registering query: {query_id} ' \
+        #                     + f'for billing: {subscription_id}')
+        #     cur.execute( SQL2, (subscription_id, ) )
+        #     conn.commit()
         cur.close()
 
 
@@ -208,26 +210,26 @@ if __name__ == '__main__':
     make_tables(current_app.config['BILLING_DB_CONN_STR'])
 
     id1 = register_query_started(email='foo@foo.com')
-    time.sleep(random.random())
+    time.sleep(random.random()/2)
     register_query_successful(id1)
 
     id2 = register_query_started(
             subscription_id='CEF06856-837B-4661-A627-6B20FD268A5C')
-    time.sleep(random.random())
+    time.sleep(random.random()/2)
     register_query_successful(id2)
 
     id2 = register_query_started(
             subscription_id='CEF06856-837B-4661-A627-6B20FD268A5C')
-    time.sleep(random.random())
+    time.sleep(random.random()/2)
     register_query_successful(id2)
 
     id3 = register_query_started(email='foo1@foo2.com',
             subscription_id='61337278-AE07-4EF9-95D0-2791243E2283')
-    time.sleep(random.random())
+    time.sleep(random.random()/2)
 
     id4 = register_query_started(
             subscription_id='2EF06856-837B-4661-A627-6B20FD268A5B')
-    time.sleep(random.random())
+    time.sleep(random.random()/2)
     register_query_successful(id4)
 
 
