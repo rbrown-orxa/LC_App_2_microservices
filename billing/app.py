@@ -46,11 +46,9 @@ def get_users_to_bill():
     return [uuid[0] for uuid in uuids]
 
 
+def get_billing_qty(db_cursor, subscription_id):
 
-def process_bills():
-    """Use two stage transaction to post bills"""
-
-    SQL =   """
+    SQL1 =   """
             update queries
             set 
                 billed = True, 
@@ -64,39 +62,65 @@ def process_bills():
                 id ;
             """
 
+    SQL2 =  """
+            insert into bills
+                (subscription_id, units)
+            values
+                (%s, %s)
+            ;
+            """
 
+    db_cursor.execute( SQL1, (
+        subscription_id, config['BILLING']['billing_horizon'] ) )
+    query_ids = db_cursor.fetchall()
+    
+    qty = len(query_ids)
+    assert qty > 0
+    logging.debug(f'subscription_id: {subscription_id}, units: {qty}')
+    
+    db_cursor.execute( SQL2, (subscription_id, qty) )
+
+    return qty
+
+
+def process_single_bill(subscription_id):
+    """Use two stage DB transaction to process bills"""
+    try:
+        conn = psycopg2.connect(CONN_STR)
+        conn.autocommit = False
+        cur = conn.cursor()
+        
+        post_bill_to_API(
+            subscription_id, get_billing_qty(cur, subscription_id))
+
+        conn.commit()
+        logging.debug(f'Bill posted successfully: {subscription_id}')
+    except:
+        conn.rollback()
+        raise RuntimeError(f'Error while processing bill: {subscription_id}')
+    finally:
+        if conn:
+            cur.close()
+            conn.close()
+
+
+def process_bills():
     users_to_bill = get_users_to_bill() 
-    num_bills = len(users_to_bill)
-    n_successful = 0
+    num_bills, n_successful = len(users_to_bill), 0
     logging.info(f'Processing {num_bills} bills')
+    
     for subscription_id in users_to_bill:
         try:
-            conn = psycopg2.connect(CONN_STR)
-            conn.autocommit = False
-            cur = conn.cursor()
-            cur.execute( SQL, (subscription_id, config['BILLING']['billing_horizon'] ) )
-            query_ids = cur.fetchall()
-            qty = len(query_ids)
-            assert qty > 0
-            logging.debug(f'subscription_id: {subscription_id}, units: {qty}')
-            post_bill(subscription_id, qty)
-            conn.commit()
+            process_single_bill(subscription_id)
             n_successful += 1
-            logging.debug(f'Bill posted successfully: {subscription_id}')
         except:
-            conn.rollback()
-            # logging.exception(f'Error while processing bill: {uuid}')
             logging.warning(f'Error while processing bill: {subscription_id}')
-        finally:
-            if conn:
-                cur.close()
-                conn.close()
 
-    failed = num_bills - n_successful
-    logging.info(f'Processed {num_bills} bills, with {failed} failures')
+    logging.info(
+        f'Processed {num_bills} bills, with {num_bills - n_successful} failures')
 
 
-def post_bill(uuid, qty):
+def post_bill_to_API(uuid, qty):
         r = requests.post(
                 config['BILLING']['baseURL'],
                 data=make_body(uuid, qty),

@@ -52,17 +52,16 @@ def make_tables(conn_str):
                             email IS NOT NULL
                             OR subscription_id IS NOT NULL)
                         ) ;
+                        
+                        CREATE TABLE
+                        IF NOT EXISTS bills (
+                            id SERIAL PRIMARY KEY,
+                            subscription_id UUID NOT NULL,
+                            units INT NOT NULL,
+                            created TIMESTAMPTZ NOT NULL DEFAULT NOW()
+                        ) ;
                         """
-
-                        # CREATE TABLE
-                        # IF NOT EXISTS billing (
-                        #     subscription_id UUID PRIMARY KEY,
-                        #     total_successful_queries INT NOT NULL DEFAULT 1,
-                        #     total_billed_queries INT NOT NULL DEFAULT 0,
-                        #     billing_failed_queries INT NOT NULL DEFAULT 0,
-                        #     last_bill_date TIMESTAMPTZ,
-                        #     last_bill_qty INT) ;
-                        # """
+                        
 
                 cur = conn.cursor()
                 cur.execute(SQL)
