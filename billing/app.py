@@ -33,64 +33,65 @@ def get_users_to_bill():
                 subscription_id is not null
                 and success = true 
                 and billed = false 
-                and completed >= now() - interval '24 hours';
+                and completed >= now() - interval %s
+            ;
             """
 
     with psycopg2.connect(CONN_STR) as conn:
         cur = conn.cursor()
-        cur.execute( SQL )
+        cur.execute( SQL, (config['BILLING']['billing_horizon'], ) )
         uuids = cur.fetchall()
         cur.close()
     
     return [uuid[0] for uuid in uuids]
 
 
-def get_units_to_bill(subscription_id):
-    # Todo: make this a 2-stage transaction
-
-    SQL = """
-    update queries
-    set 
-        billed = True, 
-        date_billed = now() 
-    where 
-        subscription_id = %s 
-        and success = true 
-        and billed = false 
-        and completed >= now() - interval '24 hours'
-    returning 
-        id;
-    """
-    
-    with psycopg2.connect(CONN_STR) as conn:
-        cur = conn.cursor()
-        cur.execute( SQL, (subscription_id, ) )
-        query_ids = cur.fetchall()
-        cur.close()
-    
-    return len(query_ids)
-
 
 def process_bills():
+    """Use two stage transaction to post bills"""
+
+    SQL =   """
+            update queries
+            set 
+                billed = True, 
+                date_billed = now() 
+            where 
+                subscription_id = %s 
+                and success = true 
+                and billed = false 
+                and completed >= now() - interval %s
+            returning 
+                id ;
+            """
+
+
     users_to_bill = get_users_to_bill() 
     num_bills = len(users_to_bill)
     n_successful = 0
     logging.info(f'Processing {num_bills} bills')
     for subscription_id in users_to_bill:
-        qty = get_units_to_bill(subscription_id) 
-        # Todo: make this a 2-stage transaction
-        # Todo: handle case where qty is zero
-        logging.debug(f'subscription_id: {subscription_id}, units: {qty}')
         try:
+            conn = psycopg2.connect(CONN_STR)
+            conn.autocommit = False
+            cur = conn.cursor()
+            cur.execute( SQL, (subscription_id, config['BILLING']['billing_horizon'] ) )
+            query_ids = cur.fetchall()
+            qty = len(query_ids)
+            assert qty > 0
+            logging.debug(f'subscription_id: {subscription_id}, units: {qty}')
             post_bill(subscription_id, qty)
+            conn.commit()
+            n_successful += 1
+            logging.debug(f'Bill posted successfully: {subscription_id}')
         except:
+            conn.rollback()
             # logging.exception(f'Error while processing bill: {uuid}')
             logging.warning(f'Error while processing bill: {subscription_id}')
-            # Todo: rollback db transaction started in get_users_to_bill()
-        else:
-            # Todo: commit db transaction started in get_users_to_bill()
-            n_successful += 1
-            logging.info('Bill posted successfully: {subscription_id}')
+        finally:
+            if conn:
+                cur.close()
+                conn.close()
+
     failed = num_bills - n_successful
     logging.info(f'Processed {num_bills} bills, with {failed} failures')
 
@@ -137,9 +138,9 @@ def make_headers(uuid):
 if __name__ == "__main__":
     logging.info('Starting billing service')
 
-    if config['DEBUG']['enable']:
+    if config['DEBUG']['enable_fast_query']:
         schedule.every(
-            config['DEBUG'].getint('query_interval_s')).seconds.do(job)
+            config['DEBUG'].getint('fast_query_interval_s')).seconds.do(job)
     else:
         schedule.every(
             config['BILLING'].getint('query_interval_hrs')).hours.do(job)
