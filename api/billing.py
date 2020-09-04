@@ -45,7 +45,9 @@ def make_tables(conn_str):
                             success BOOLEAN NOT NULL DEFAULT FALSE,
                             email citext,
                             subscription_id UUID,
-                            completed TIMESTAMPTZ
+                            completed TIMESTAMPTZ,
+                            billed BOOLEAN NOT NULL DEFAULT FALSE,
+                            date_billed TIMESTAMPTZ
                         CHECK (
                             email IS NOT NULL
                             OR subscription_id IS NOT NULL)
