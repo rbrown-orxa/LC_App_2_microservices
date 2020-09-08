@@ -188,5 +188,9 @@ if __name__ == "__main__":
 """
 
 
+# https://www.getpostman.com/collections/8aa190ce9bb7da1e85d8
+
+# https://docs.microsoft.com/en-us/azure/marketplace/partner-center-portal/saas-metered-billing
+
 
 
