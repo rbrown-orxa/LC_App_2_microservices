@@ -45,18 +45,23 @@ def make_tables(conn_str):
                             success BOOLEAN NOT NULL DEFAULT FALSE,
                             email citext,
                             subscription_id UUID,
-                            completed TIMESTAMPTZ
+                            completed TIMESTAMPTZ,
+                            billed BOOLEAN NOT NULL DEFAULT FALSE,
+                            date_billed TIMESTAMPTZ
                         CHECK (
                             email IS NOT NULL
                             OR subscription_id IS NOT NULL)
-                        );
-
+                        ) ;
+                        
                         CREATE TABLE
-                        IF NOT EXISTS billing (
-                            subscription_id UUID PRIMARY KEY,
-                            total_successful_queries INT NOT NULL DEFAULT 1,
-                            total_billed_queries INT NOT NULL DEFAULT 0 ) ;
+                        IF NOT EXISTS bills (
+                            id SERIAL PRIMARY KEY,
+                            subscription_id UUID NOT NULL,
+                            units INT NOT NULL,
+                            created TIMESTAMPTZ NOT NULL DEFAULT NOW()
+                        ) ;
                         """
+                        
 
                 cur = conn.cursor()
                 cur.execute(SQL)
@@ -73,65 +78,47 @@ def make_tables(conn_str):
 
 
 
-def get_billing_quantities(conn_str):
-    SQL =   """
-            SELECT
-            subscription_id,
-            total_successful_queries - total_billed_queries
-                AS queries_to_bill
-            FROM billing
-            WHERE
-            (total_successful_queries - total_billed_queries) > 0
-            GROUP BY subscription_id ;
-            """
-
-    with psycopg2.connect(conn_str) as conn:
-        cur = conn.cursor()
-        cur.execute( SQL )
-        rv = cur.fetchall()
-        cur.close()
-    
-    return dict(rv)
 
 
-def register_billed_quantities(conn_str, units_billed):
-    """
-    Example units_billed dict:
 
-    { 'cef06856-837b-4661-a627-6b20fd268a5c': 4,
-      '61337278-ae07-4ef9-95d0-2791243e2283': 8 }
-    """
+# def register_billed_quantities(conn_str, units_billed):
+#     """
+#     Example units_billed dict:
 
-    SQL =   """
-            UPDATE billing
-            SET total_billed_queries = total_billed_queries + %s
-            WHERE subscription_id = %s
-            """
+#     { 'cef06856-837b-4661-a627-6b20fd268a5c': 4,
+#       '61337278-ae07-4ef9-95d0-2791243e2283': 8 }
+#     """
 
-    with psycopg2.connect(conn_str) as conn:
-        cur = conn.cursor()
-        for subscription_id, units in units_billed.items():
-            cur.execute( SQL, (units, subscription_id) )
-            conn.commit()
-        cur.close()
+#     SQL =   """
+#             UPDATE billing
+#             SET total_billed_queries = total_billed_queries + %s
+#             WHERE subscription_id = %s
+#             """
+
+#     with psycopg2.connect(conn_str) as conn:
+#         cur = conn.cursor()
+#         for subscription_id, units in units_billed.items():
+#             cur.execute( SQL, (units, subscription_id) )
+#             conn.commit()
+#         cur.close()
 
 
-def get_unbillable_queries(conn_str, email=''):
+# def get_unbillable_queries(conn_str, email=''):
 
-    if email:
-        SQL =   """
-                SELECT count(*) 
-                FROM queries 
-                WHERE email = %s 
-                AND success = True 
-                AND subscription_id IS NULL;
-                """
-        with psycopg2.connect(conn_str) as conn:
-            cur = conn.cursor()
-            cur.execute( SQL, (email, ) )
-            rv = cur.fetchone()[0]
-            cur.close()
-        return rv
+#     if email:
+#         SQL =   """
+#                 SELECT count(*) 
+#                 FROM queries 
+#                 WHERE email = %s 
+#                 AND success = True 
+#                 AND subscription_id IS NULL;
+#                 """
+#         with psycopg2.connect(conn_str) as conn:
+#             cur = conn.cursor()
+#             cur.execute( SQL, (email, ) )
+#             rv = cur.fetchone()[0]
+#             cur.close()
+#         return rv
 
 
 def register_query_started(email='', subscription_id=None):
@@ -175,65 +162,82 @@ def register_query_successful(query_id):
             success = true,
             completed = NOW()
             WHERE id = %s 
-            RETURNING subscription_id ;
-            """
-
-
-    SQL2 =  """
-            INSERT INTO billing (subscription_id)
-            VALUES (%s)
-            ON CONFLICT (subscription_id) DO
-            UPDATE SET
-            total_successful_queries = 1 + billing.total_successful_queries
+            -- RETURNING subscription_id 
             ;
             """
+
+
+    # SQL2 =  """
+    #         INSERT INTO billing (subscription_id)
+    #         VALUES (%s)
+    #         ON CONFLICT (subscription_id) DO
+    #         UPDATE SET
+    #         total_successful_queries = 1 + billing.total_successful_queries
+    #         ;
+    #         """
 
 
     with psycopg2.connect(conn_str) as conn:
         cur = conn.cursor()
         cur.execute( SQL1, (query_id, ) )
         conn.commit()
-        subscription_id = cur.fetchone()[0]
+        # subscription_id = cur.fetchone()[0]
 
-        if subscription_id:
-            logging.info(   f'Registering query: {query_id} ' \
-                            + f'for billing: {subscription_id}')
-            cur.execute( SQL2, (subscription_id, ) )
-            conn.commit()
+        # if subscription_id:
+        #     logging.info(   f'Registering query: {query_id} ' \
+        #                     + f'for billing: {subscription_id}')
+        #     cur.execute( SQL2, (subscription_id, ) )
+        #     conn.commit()
         cur.close()
 
 
 
 
 if __name__ == '__main__':
+    class CurrentApp():
+        pass
+
+    current_app = CurrentApp
+    current_app.config = {}
+
     logging.basicConfig(level=logging.DEBUG)
+    
+    current_app.config['APPLY_BILLING'] = True
+    current_app.config['BILLING_DB_CONN_STR'] = \
+        'postgres://postgres:password@localhost:5432/postgres'
+
+    make_tables(current_app.config['BILLING_DB_CONN_STR'])
+
+    id1 = register_query_started(email='foo@foo.com')
+    time.sleep(random.random()/2)
+    register_query_successful(id1)
+
+    id2 = register_query_started(
+            subscription_id='CEF06856-837B-4661-A627-6B20FD268A5C')
+    time.sleep(random.random()/2)
+    register_query_successful(id2)
+
+    id2 = register_query_started(
+            subscription_id='CEF06856-837B-4661-A627-6B20FD268A5C')
+    time.sleep(random.random()/2)
+    register_query_successful(id2)
+
+    id3 = register_query_started(email='foo1@foo2.com',
+            subscription_id='61337278-AE07-4EF9-95D0-2791243E2283')
+    time.sleep(random.random()/2)
+
+    id4 = register_query_started(
+            subscription_id='2EF06856-837B-4661-A627-6B20FD268A5B')
+    time.sleep(random.random()/2)
+    register_query_successful(id4)
 
 
-    CONN_STR = 'postgres://postgres:password@localhost:5432/postgres'
+    # bill = get_billing_quantities(current_app.config['BILLING_DB_CONN_STR'])
+    # print(f'Unbilled units: {bill}')
 
-    make_tables(CONN_STR)
+    # time.sleep(random.random()) # simulate API billing request being sent
 
-    # id1 = register_query_started(CONN_STR, email='foo@foo.com')
-    # time.sleep(random.random())
-    # register_query_successful(CONN_STR, id1)
-
-    # id2 = register_query_started(CONN_STR,
-    #         subscription_id='CEF06856-837B-4661-A627-6B20FD268A5C')
-    # time.sleep(random.random())
-    # register_query_successful(CONN_STR, id2)
-
-    # id3 = register_query_started(CONN_STR, email='foo1@foo2.com',
-    #         subscription_id='61337278-AE07-4EF9-95D0-2791243E2283')
-    # time.sleep(random.random())
-
-
-
-    bill = get_billing_quantities(CONN_STR)
-    print(f'Unbilled units: {bill}')
-
-    time.sleep(random.random()) # simulate API billing request being sent
-
-    register_billed_quantities(CONN_STR, bill)
+    # register_billed_quantities(current_app.config['BILLING_DB_CONN_STR'], bill)
 
 
 
