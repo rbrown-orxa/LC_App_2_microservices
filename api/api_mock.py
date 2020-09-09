@@ -24,10 +24,10 @@ valid_json = """
                     "roof_size_m2": 250,
                     "azimuth_deg": 180,
                     "pitch_deg": 30,
-                    "num_ev_chargers": 5,
+                    "num_ev_chargers": 15,
                     "pv_size_kwp_optional": 3.0,
                     "load_profile_csv_optional": "",
-                    "annual_kwh_consumption_optional": 6000
+                    "annual_kwh_consumption_optional": 8000
                 },
                 {
                     "name": "building 2",
@@ -35,7 +35,7 @@ valid_json = """
                     "roof_size_m2": 250,
                     "azimuth_deg": 150,
                     "pitch_deg": 15,
-                    "num_ev_chargers": 3,
+                    "num_ev_chargers": 10,
                     "pv_size_kwp_optional": 5.0,
                     "load_profile_csv_optional": "",
                     "annual_kwh_consumption_optional": 12000
