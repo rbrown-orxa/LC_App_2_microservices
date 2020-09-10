@@ -9,7 +9,6 @@
         {   
             "username":"xyz",
             "emailid":"xyz@gmail.com",
-            "accesstoken":"asbsg12779000003xw",
             "lat": 1.0,
             "lon": 1.0,
             "import_cost_kwh": 1.0,
@@ -48,7 +47,6 @@
     "required": [
         "username",
         "emailid",
-        "accesstoken",
         "lat",
         "lon",
         "import_cost_kwh",
@@ -79,16 +77,6 @@
             "default": [],
             "examples": [
                 "xyz@gmail.com"
-            ]
-        },
-        "accesstoken": {
-            "$id": "#/properties/accesstoken",
-            "type": "string",
-            "title": "The accesstoken schema",
-            "description": "An explanation about the purpose of this instance.",
-            "default": [],
-            "examples": [
-                "asssdd7766@@@77555%%%"
             ]
         },
         "lat": {
