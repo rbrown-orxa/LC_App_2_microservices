@@ -30,6 +30,9 @@
 	* Ensure billed values are commited to the database, even if db or billing API is down, to prevent duplicate billing
 	* Make table of submitted bills
 
-
+4. Battery Algorithm
+	* Handle battery end-of-life when maximum cycles reached
+	* Include battery charging and discharging efficiency
+	
 
 
