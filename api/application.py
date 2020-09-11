@@ -1,5 +1,5 @@
 from flask import Flask, request, send_from_directory
-from flask_cors import CORS
+from flask_cors import CORS,cross_origin
 from flask_selfdoc import Autodoc
 import os
 import logging
@@ -36,6 +36,8 @@ if app.config['APPLY_BILLING']:
 @app.route("/upload", methods=['POST'])
 @auto.doc()
 @utils.handle_exceptions
+@cross_origin(allow_headers=['Content-Type', 'Authorization'])
+@utils.requires_auth
 def upload():
     """Upload a file for later use
     File properties must comply with /file_requirements
@@ -71,6 +73,8 @@ def upload():
 @app.route("/optimise", methods=['GET','POST'])
 @auto.doc()
 @utils.handle_exceptions
+@cross_origin(allow_headers=['Content-Type', 'Authorization'])
+@utils.requires_auth
 def optimise():
     """Optimise a solar and battery system size
 

@@ -30,3 +30,4 @@ timezonefinder==4.4.1
 urllib3==1.25.10
 Werkzeug==1.0.1
 zipp==3.1.0
+python-jose==3.1.0
