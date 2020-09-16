@@ -192,5 +192,5 @@ if __name__ == "__main__":
 
 # https://docs.microsoft.com/en-us/azure/marketplace/partner-center-portal/saas-metered-billing
 
-
+# https://docs.microsoft.com/en-us/azure/marketplace/partner-center-portal/pc-saas-fulfillment-api-v2
 
