@@ -24,4 +24,10 @@ SUBSCRIPTION_VALID = True
 
 PICKLE_RESULTS = False
 
+# Provide the B2C Tenant name, specify the non-MFA B2C Policy name, and the API client id
+TENANT_NAME = "derapp"
+TENANT_ID = "6b0c9fa6-80f1-4706-87fe-39b5b846ab67"
+B2C_POLICY = "B2C_1_sign_up_sign_in"
+CLIENT_ID = "b249bf9e-9569-4c14-b12a-46b2563b2090"
+
 
