@@ -47,3 +47,21 @@ if __name__ == '__main__':
 #    status = check_SaaS_subscription(unsubscribed_subscription_id, token)
 
 
+
+
+"""
+Metering service APIs - Microsoft commercial marketplace | Microsoft Docs
+https://docs.microsoft.com/en-us/azure/marketplace/partner-center-portal/marketplace-metering-service-apis
+
+Register a SaaS application - Azure Marketplace | Microsoft Docs
+https://docs.microsoft.com/en-us/azure/marketplace/partner-center-portal/pc-saas-registration#get-the-token-with-an-http-post
+
+Microsoft identity platform ID tokens - Microsoft identity platform | Microsoft Docs
+https://docs.microsoft.com/en-us/azure/active-directory/develop/id-tokens#using-claims-to-reliably-identify-a-user-subject-and-object-id
+
+Microsoft identity platform access tokens - Microsoft identity platform | Microsoft Docs
+https://docs.microsoft.com/en-us/azure/active-directory/develop/access-tokens
+
+SaaS fulfillment APIs v2 in Microsoft commercial marketplace | Microsoft Docs
+https://docs.microsoft.com/en-us/azure/marketplace/partner-center-portal/pc-saas-fulfillment-api-v2#get-subscription
+"""
