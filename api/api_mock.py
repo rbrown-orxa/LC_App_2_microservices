@@ -8,8 +8,9 @@ class DummyRequest():
 
 valid_json = """
         {
-            "username":"xyz",
             "emailid":"xyz@gmail.com",
+            "sub":"abc-xyz-234",
+            "oid":"123-gty-pqr",
             "lat": 18.51,
             "lon": 73.85,
             "import_cost_kwh": 0.14,

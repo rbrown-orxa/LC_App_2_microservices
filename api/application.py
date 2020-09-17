@@ -36,8 +36,6 @@ if app.config['APPLY_BILLING']:
 @app.route("/upload", methods=['POST'])
 @auto.doc()
 @utils.handle_exceptions
-@cross_origin(allow_headers=['Content-Type', 'Authorization'])
-@utils.requires_auth
 def upload():
     """Upload a file for later use
     File properties must comply with /file_requirements
