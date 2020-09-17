@@ -33,6 +33,18 @@ if app.config['APPLY_BILLING']:
     billing.make_tables(app.config['BILLING_DB_CONN_STR'])
 
 
+# @app.route("/register_plan_purchase/<plan_token>", methods=['POST'])
+# @auto.doc()
+# @utils.handle_exceptions
+# @cross_origin(allow_headers=['Content-Type', 'Authorization'])
+# @utils.requires_auth
+# def register_plan_purchase(plan_token):
+#     SSO_token = utils.get_token_auth_header()
+    
+
+
+
+
 @app.route("/upload", methods=['POST'])
 @auto.doc()
 @utils.handle_exceptions
