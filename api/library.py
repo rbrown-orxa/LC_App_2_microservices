@@ -92,7 +92,7 @@ def _consumption(request):
 
 def _activate(request):
     
-   file = os.path.abspath('tmp') + '\data.json'
+   file = './tmp/data.json'
     
    with open(file, "w") as f:
        json.dump(request.json, f)
