@@ -64,7 +64,23 @@ def upload():
     return library._upload(request)
 
 
+@app.route("/activate", methods=['POST'])
+@auto.doc()
+@utils.handle_exceptions
+def activate():
+   """Activate new subscription using Azure Market place SaaS fullfillment
+     API when the user submits for our offer
 
+    Request:
+        Content-Type: application/json
+        Body: According to /activate
+
+    Return:
+        Content-Type: application/json
+        Response code
+    """
+     
+   return library._activate(request)
 
 
 

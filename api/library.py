@@ -88,5 +88,15 @@ def _consumption(request):
             building_type )
         
     return rv.to_json()
+ 
+
+def _activate(request):
+    
+   file = os.path.abspath('tmp') + '\data.json'
+    
+   with open(file, "w") as f:
+       json.dump(request.json, f)
+        
+   return ( {'handle':os.path.basename(file)} )
         
 
