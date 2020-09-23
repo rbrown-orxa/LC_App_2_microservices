@@ -4,11 +4,12 @@ import json
 import tempfile
 import os
 import logging
-
+import requests
 import utils
 from ingest_file import process_load_file
 import handle_base_loads
 from results import get_optimise_results
+from utils import get_fixed_fields
 
 
 def _upload(request):
@@ -88,6 +89,19 @@ def _consumption(request):
             building_type )
         
     return rv.to_json()
+
+def _get_authorization_token():
+    headers = {'Content-type': 'application/x-www-form-urlencoded'}
+    body = {'grant_type': 'client_credentials',
+            'client_id': current_app.config['CLIENT_ID_AD'],
+            'client_secret': current_app.config['CLIENT_SECRET'],
+            'resource':current_app.config['RESOURCE']}
+    r = requests.get(current_app.config['END_POINT'],
+                     data = body,
+                     headers=headers)
+    assert r.status_code == 200
+    res = json.loads(r.content.decode())
+    return(res['access_token'])
  
 
 def _activate(request):
@@ -96,6 +110,13 @@ def _activate(request):
     
    with open(file, "w") as f:
        json.dump(request.json, f)
+       
+   dict = get_fixed_fields(request.json,fields=['SubscriptionId','PlanId','Quantity'])
+   
+   subscriptionid = dict['SubscriptionId']
+   planid=dict['PlanId']
+   quantity=dict['Quantity']
+   
         
    return ( {'handle':os.path.basename(file)} )
         
