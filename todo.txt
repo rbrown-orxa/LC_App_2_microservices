@@ -32,4 +32,8 @@
 
 
 
+4. Battery algorithm
+	* Consider battery charging / discharging efficiencies
+	* Handle battery end of life (maximum cycles reached)
+
 
