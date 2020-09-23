@@ -87,6 +87,40 @@ def _get_annual_import_with_pv_and_battery_kwh(schema,df,pv_size):
         
         return(size,annual_cosumption_kwh,import_cost,curve,results)
     
+def _get_lifetimeprofit_roi_payback_period(schema,df,battery_size,pv_size):
+    
+        discharge_cycles_per_day = 1
+        days_per_year = 365
+        cycles_per_year = discharge_cycles_per_day * days_per_year
+        
+        dict = get_fixed_fields(schema,fields=['import_cost_kwh',
+                                           'export_price_kwh',
+                                           'pv_cost_kwp',
+                                           'pv_life_yrs',
+                                           'battery_life_cycles',
+                                           'battery_cost_kwh'])
+        
+        old_import_cost = (df['P_load'].sum()) * dict['import_cost_kwh']
+        new_import_cost = (df['P_grid'].sum())*dict['import_cost_kwh']
+        import_cost_savings = old_import_cost - new_import_cost
+        export_revenue = (df['P_curt'].abs().sum()) *  dict['export_price_kwh']
+        install_cost_battery = dict['battery_cost_kwh'] * battery_size
+        install_cost_pv = dict['pv_cost_kwp']*sum(pv_size)
+        install_cost = install_cost_battery + install_cost_pv
+        expected_life_yrs_battery = dict['battery_life_cycles']/cycles_per_year
+        expected_life_yrs_pv = dict['pv_life_yrs']
+        amortized_install_cost_battery = install_cost_battery / expected_life_yrs_battery
+        amortized_install_cost_pv = install_cost_pv/expected_life_yrs_pv
+        amortized_install_cost =  amortized_install_cost_battery + amortized_install_cost_pv
+        revenue_pa = import_cost_savings + export_revenue
+        expected_life_yrs = (expected_life_yrs_battery + expected_life_yrs_pv)/2 
+        profit_pa = import_cost_savings + export_revenue - amortized_install_cost
+        total_profit = profit_pa * expected_life_yrs  
+        ROI = 100 * (total_profit / install_cost)
+        payback_yrs = install_cost / revenue_pa
+        
+        return(total_profit,ROI,payback_yrs)
+    
 
 def get_optimise_results(schema):    
     
@@ -115,9 +149,16 @@ def get_optimise_results(schema):
      #PV and battery optimised load
      (battery_size,
         annual_import_with_pv_and_battery_kwh,
-        battery_optimised_cost,battery_cost_curve,import_export_df ) = \
+        battery_optimised_cost,battery_cost_curve,import_export_df) = \
             _get_annual_import_with_pv_and_battery_kwh(
                 schema,df,pv_size)
+            
+    #Get lifetime profit, ROI, payback period in years
+     lifetime_profit,ROI,payback_period = \
+       _get_lifetimeprofit_roi_payback_period(schema,import_export_df,
+                                              battery_size,pv_size)
+    
+    
     
      #site results
      
@@ -144,7 +185,13 @@ def get_optimise_results(schema):
             'with_pv_optimised_import_cost': 
                 int(pv_optimised_cost),
             'with_battery_optimised_import_cost': 
-                int(battery_optimised_cost)
+                int(battery_optimised_cost),
+            'lifetime_profit': 
+                int(lifetime_profit),
+            'roi':
+                int(ROI),
+            'payback_period': 
+                int(payback_period),
             }
      
      var = get_variable_fields(schema,fields=['name','num_ev_chargers'])

@@ -153,8 +153,23 @@ def make_headers(uuid):
     headers = {'Content-type': 'application/json',
                 'x-ms-requestid': uuid,
                 'x-ms-correlationid': 'orxagrid_lcapp2',
-                'authorization': f"Bearer {config['BILLING']['access_token']}"}
+                'authorization': get_authorization_token()}
     return headers
+
+def get_authorization_token():
+    headers = {'Content-type': 'application/x-www-form-urlencoded'}
+    body = {'grant_type': 'client_credentials',
+            'client_id': config['TOKEN']['client_id'],
+            'client_secret': config['TOKEN']['client_secret'],
+            'resource':config['TOKEN']['resource']}
+    r = requests.get(config['TOKEN']['end_point'],
+                     data = body,
+                     headers=headers)
+    assert r.status_code == 200
+    res = json.loads(r.content.decode())
+    return(res['access_token'])
+    
+    
 
 
 
@@ -192,5 +207,5 @@ if __name__ == "__main__":
 
 # https://docs.microsoft.com/en-us/azure/marketplace/partner-center-portal/saas-metered-billing
 
-
+# https://docs.microsoft.com/en-us/azure/marketplace/partner-center-portal/pc-saas-fulfillment-api-v2
 

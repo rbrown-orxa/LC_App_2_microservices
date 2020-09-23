@@ -1,5 +1,5 @@
 from flask import Flask, request, send_from_directory
-from flask_cors import CORS
+from flask_cors import CORS,cross_origin
 from flask_selfdoc import Autodoc
 import os
 import logging
@@ -33,6 +33,18 @@ if app.config['APPLY_BILLING']:
     billing.make_tables(app.config['BILLING_DB_CONN_STR'])
 
 
+# @app.route("/register_plan_purchase/<plan_token>", methods=['POST'])
+# @auto.doc()
+# @utils.handle_exceptions
+# @cross_origin(allow_headers=['Content-Type', 'Authorization'])
+# @utils.requires_auth
+# def register_plan_purchase(plan_token):
+#     SSO_token = utils.get_token_auth_header()
+    
+
+
+
+
 @app.route("/upload", methods=['POST'])
 @auto.doc()
 @utils.handle_exceptions
@@ -64,13 +76,31 @@ def upload():
     return library._upload(request)
 
 
+@app.route("/activate", methods=['POST'])
+@auto.doc()
+@utils.handle_exceptions
+def activate():
+   """Activate new subscription using Azure Market place SaaS fullfillment
+     API when the user submits for our offer
 
+    Request:
+        Content-Type: application/json
+        Body: According to /activate
+
+    Return:
+        Content-Type: application/json
+        Response code
+    """
+     
+   return library._activate(request)
 
 
 
 @app.route("/optimise", methods=['GET','POST'])
 @auto.doc()
 @utils.handle_exceptions
+@cross_origin(allow_headers=['Content-Type', 'Authorization'])
+@utils.requires_auth
 def optimise():
     """Optimise a solar and battery system size
 
