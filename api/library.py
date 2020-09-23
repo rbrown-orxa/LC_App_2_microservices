@@ -10,6 +10,7 @@ from ingest_file import process_load_file
 import handle_base_loads
 from results import get_optimise_results
 from utils import get_fixed_fields
+import config as cfg
 
 
 def _upload(request):
@@ -90,13 +91,26 @@ def _consumption(request):
         
     return rv.to_json()
 
+def _make_body(planid, qty):
+    body = {'quantity': qty,
+            'planId': planid}
+    return json.dumps(body)
+
+
+def _make_headers(uuid):
+    headers = {'Content-type': 'application/json',
+                'x-ms-requestid': '',
+                'x-ms-correlationid': '',
+                'authorization': 'Bearer ' + _get_authorization_token()}
+    return headers
+
 def _get_authorization_token():
     headers = {'Content-type': 'application/x-www-form-urlencoded'}
     body = {'grant_type': 'client_credentials',
-            'client_id': current_app.config['CLIENT_ID_AD'],
-            'client_secret': current_app.config['CLIENT_SECRET'],
-            'resource':current_app.config['RESOURCE']}
-    r = requests.get(current_app.config['END_POINT'],
+            'client_id': cfg.CLIENT_ID_AD,
+            'client_secret': cfg.CLIENT_SECRET,
+            'resource':cfg.RESOURCE}
+    r = requests.get(cfg.END_POINT,
                      data = body,
                      headers=headers)
     assert r.status_code == 200
@@ -106,18 +120,14 @@ def _get_authorization_token():
 
 def _activate(request):
     
-   file = './tmp/data.json'
-    
-   with open(file, "w") as f:
-       json.dump(request.json, f)
-       
    dict = get_fixed_fields(request.json,fields=['SubscriptionId','PlanId','Quantity'])
+   sid = dict['SubscriptionId']
    
-   subscriptionid = dict['SubscriptionId']
-   planid=dict['PlanId']
-   quantity=dict['Quantity']
-   
-        
-   return ( {'handle':os.path.basename(file)} )
+   r = requests.post(
+                cfg.FULLFILLMENT_URI + sid + '/activate',
+                data=_make_body(dict['PlanId'], dict['Quantity']),
+                params={'api-version': '2018-08-31'},
+                headers=_make_headers(sid))
+   return ( "OK" if r.status_code == 200 else "NOK")
         
 
