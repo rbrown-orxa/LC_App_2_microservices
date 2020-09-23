@@ -65,3 +65,27 @@ https://docs.microsoft.com/en-us/azure/active-directory/develop/access-tokens
 SaaS fulfillment APIs v2 in Microsoft commercial marketplace | Microsoft Docs
 https://docs.microsoft.com/en-us/azure/marketplace/partner-center-portal/pc-saas-fulfillment-api-v2#get-subscription
 """
+
+"""
+CREATE TABLE public.subscriptiondetails
+(
+    id integer NOT NULL DEFAULT nextval('subscriptiondetails_id_seq'::regclass),
+    objectid character varying(100) COLLATE pg_catalog."default",
+    subscriptionid character varying(100) COLLATE pg_catalog."default",
+    subscriptionname character varying(100) COLLATE pg_catalog."default",
+    offerid character varying(100) COLLATE pg_catalog."default",
+    planid character varying(50) COLLATE pg_catalog."default",
+    purchasertenantid character varying(100) COLLATE pg_catalog."default",
+    "timestamp" character varying(50) COLLATE pg_catalog."default",
+    CONSTRAINT subscriptiondetails_pkey PRIMARY KEY (id)
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ 
+
+ALTER TABLE public.subscriptiondetails
+    OWNER to lcapp;
+"""
