@@ -48,8 +48,6 @@ if app.config['APPLY_BILLING']:
 @app.route("/upload", methods=['POST'])
 @auto.doc()
 @utils.handle_exceptions
-@cross_origin(allow_headers=['Content-Type', 'Authorization'])
-@utils.requires_auth
 def upload():
     """Upload a file for later use
     File properties must comply with /file_requirements
@@ -78,7 +76,23 @@ def upload():
     return library._upload(request)
 
 
+@app.route("/activate", methods=['POST'])
+@auto.doc()
+@utils.handle_exceptions
+def activate():
+   """Activate new subscription using Azure Market place SaaS fullfillment
+     API when the user submits for our offer
 
+    Request:
+        Content-Type: application/json
+        Body: According to /activate
+
+    Return:
+        Content-Type: application/json
+        Response code
+    """
+     
+   return library._activate(request)
 
 
 
