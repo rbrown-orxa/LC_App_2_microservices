@@ -4,6 +4,7 @@ import logging
 import uuid
 
 
+
 AAD_tenantId = 'f0e8a3c1-f57f-446b-b105-37b6d1ee94cc'
 AAD_client_id = 'c6c8b5c0-7a93-4743-8823-3b83431de29b'
 AAD_client_secret = 'utFQ4~yygj-Zz2nq~2-bLq-~~lz1rynZEh'
@@ -25,6 +26,8 @@ PRODUCTION_DBNAME = 'Azuresubscriptiondb'
 
 def check_user_subscribed(object_id):
     logging.info(f'Checking subscriptions for {object_id}')
+    if not current_app.config['APPLY_BILLING']:
+        return # Check has passed
 
     for sid in get_subscription_ids(object_id):
         logging.info(sid)
@@ -58,7 +61,7 @@ def get_AAD_token():
     url = f'https://login.microsoftonline.com/{AAD_tenantId}/oauth2/token'
 
     try:
-        r = requests.post(url, timeout=1, data={
+        r = requests.post(url, timeout=2, data={
                 'resource': AAD_resource, 
                 'client_id': AAD_client_id,
                 'client_secret': AAD_client_secret,
@@ -76,7 +79,7 @@ def subscription_is_valid(subscription_id, token):
             f'{subscription_id}'
 
     try:
-        r = requests.get(url, timeout=1,
+        r = requests.get(url, timeout=2,
                         params = {'api-version': SaaS_api_version},
                         headers = {'content-type': 'application/json',
                                    'authorization': f'Bearer {token}' })
@@ -144,7 +147,7 @@ if __name__ == '__main__':
     create_test_table()
 
     # should pass
-    print('\nTest 1')
+    print('\nTest 1 - this should pass')
     oid = '5995EBF0-D3D8-4C3F-8921-DC59DB7E5280'
     sid_1 = '6b71cfa4-fa75-3540-fc41-b72fd8ef2555' #valid
     sid_2 = 'ea3c3199-253d-14c3-be36-7e5118102b75' #valid
@@ -153,7 +156,7 @@ if __name__ == '__main__':
     check_user_subscribed(oid)
 
     # should pass
-    print('\nTest 2')
+    print('\nTest 2 - this test should pass')
     oid = '9320C4D7-5B8A-45E6-98F8-4E36B47C0618'
     sid_1 = 'd673ba79-5854-a957-96b5-9c5eafc4079d' #valid
     sid_2_bad = '009E9534-4961-456D-AF46-0CB03FEB23D7' # invalid
@@ -162,7 +165,7 @@ if __name__ == '__main__':
     check_user_subscribed(oid)
 
     # should fail
-    print('\nTest 3')
+    print('\nTest 3 - this should raise an assertion error with code 402')
     oid = '975040DE-D354-4D1D-9802-B20D2AE54572'
     sid_1_bad = '1031BCA9-DB8C-4805-A751-FC99D90B0F51' # invalid
     insert_dummy_data(oid, sid_1_bad)

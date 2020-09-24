@@ -12,10 +12,12 @@ from functools import wraps
 from six.moves.urllib.request import urlopen
 import json
 from jose import jwt
-from flask import request,_request_ctx_stack
+from flask import request, g, _request_ctx_stack
 
-def pickle_results(results, path):
-    filename = 'results_' + str(int(time.time() * 1000)) + '.pkl'
+
+def pickle_results(results, subscription_id, path):
+    filename = 'results_' + subscription_id + '_' + \
+                str(int(time.time() * 1000)) + '.pkl'
     logging.info(f'Pickling results to file: {filename}')
     
     path = os.path.join( path, 'results')
@@ -300,6 +302,9 @@ def requires_auth(f):
                                  "Unable to parse authentication"
                                  " token."}, 401)
             _request_ctx_stack.top.current_user = payload
+
+            g.oid = payload['oid']
+            
             return f(*args, **kwargs)
         raise AuthError({"code": "invalid_header",
                          "description": "Unable to find appropriate key"}, 401)

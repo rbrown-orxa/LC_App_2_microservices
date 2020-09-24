@@ -1,4 +1,4 @@
-from flask import Flask, request, send_from_directory
+from flask import Flask, request, g, send_from_directory
 from flask_cors import CORS,cross_origin
 from flask_selfdoc import Autodoc
 import os
@@ -11,6 +11,7 @@ import utils
 import library
 import config
 import billing
+import subscription
 
 debugging_mode = False
 
@@ -114,20 +115,25 @@ def optimise():
     """
 
     # Replace these with actual values sent from frontend
-    email = app.config['EMAIL']
-    subscription_id = app.config['SUBSCRIPTION_ID']
-    subscription_id = subscription_id if subscription_id else None # pg NULL
+    # email = app.config['EMAIL']
+    # subscription_id = app.config['SUBSCRIPTION_ID']
+    # subscription_id = billing.check_user_subscribed()
 
     logging.info('got an optimise request')
 
-    billing.check_subscription(email, subscription_id)
+    # object_id = request.json['oid'] # get oid from request.json
+    object_id = g.oid # get oid from JWT claim instead of request.json
 
-    query_id = billing.register_query_started(email, subscription_id)
+
+    logging.info(f'got oid: {object_id}')
+    subscription_id = billing.check_subscription(object_id)
+
+    query_id = billing.register_query_started(subscription_id)
 
     rv = library._optimise(request)
 
     if app.config['PICKLE_RESULTS']:
-        utils.pickle_results(rv, app.config['UPLOAD_PATH'])
+        utils.pickle_results(rv, subscription_id, app.config['UPLOAD_PATH'])
     
     billing.register_query_successful(query_id)
 
