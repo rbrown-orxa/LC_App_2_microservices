@@ -128,14 +128,14 @@ def optimise():
     logging.info(f'got oid: {object_id}')
     subscription_id = billing.check_subscription(object_id)
 
-    query_id = billing.register_query_started(subscription_id)
+    query_id = billing.query_started(subscription_id)
 
     rv = library._optimise(request)
 
     if app.config['PICKLE_RESULTS']:
         utils.pickle_results(rv, subscription_id, app.config['UPLOAD_PATH'])
     
-    billing.register_query_successful(query_id)
+    billing.query_successful(query_id)
 
     return (rv,
             200, 
@@ -237,5 +237,3 @@ if __name__ == '__main__':
     app.run(host='localhost', port=5000, debug=True)
 
 app.secret_key = os.urandom(12)
-
-

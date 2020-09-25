@@ -3,30 +3,16 @@ import psycopg2
 import logging
 import uuid
 
+import config as cfg
 
 
-AAD_tenantId = 'f0e8a3c1-f57f-446b-b105-37b6d1ee94cc'
-AAD_client_id = 'c6c8b5c0-7a93-4743-8823-3b83431de29b'
-AAD_client_secret = 'utFQ4~yygj-Zz2nq~2-bLq-~~lz1rynZEh'
-AAD_resource = '20e940b3-4c77-4b0b-9a53-9e16a1b010a7'
-AAD_grant_type = 'client_credentials'
-
-SaaS_api_version = '2018-08-31'
-
-#Todo: change this to subscription db credentials
-CONN_STR = f"host=localhost " \
-        + f"user=postgres " \
-        + f"dbname=postgres " \
-        + f"password=password " \
-        + f"sslmode=allow"
-
-PRODUCTION_DBNAME = 'Azuresubscriptiondb'
-
+CONN_STR = cfg.SUBSCRIPTION_DB_CONN_STR
 
 
 def check_user_subscribed(object_id):
     logging.info(f'Checking subscriptions for {object_id}')
-    if not current_app.config['APPLY_BILLING']:
+    if not cfg.APPLY_BILLING:
+        logging.warning('Billing is switched off. Skipping subscription check.')
         return # Check has passed
 
     for sid in get_subscription_ids(object_id):
@@ -58,14 +44,14 @@ def get_subscription_ids(object_id):
 def get_AAD_token():
     #Todo: add a cache, and a check to reuse token if still valid
     #https://docs.microsoft.com/en-us/azure/marketplace/partner-center-portal/pc-AAD-registration#http-method
-    url = f'https://login.microsoftonline.com/{AAD_tenantId}/oauth2/token'
+    url = f'https://login.microsoftonline.com/{cfg.TENANT_ID_AD}/oauth2/token'
 
     try:
         r = requests.post(url, timeout=2, data={
-                'resource': AAD_resource, 
-                'client_id': AAD_client_id,
-                'client_secret': AAD_client_secret,
-                'grant_type': AAD_grant_type
+                'resource': cfg.RESOURCE, 
+                'client_id': cfg.CLIENT_ID_AD,
+                'client_secret': cfg.CLIENT_SECRET,
+                'grant_type': 'client_credentials'
                 })
 
         return r.json()['access_token']
@@ -74,13 +60,14 @@ def get_AAD_token():
 
 
 def subscription_is_valid(subscription_id, token):
+    #Todo: add a cache, with expire time per entry for invalidation
     #https://docs.microsoft.com/en-us/azure/marketplace/partner-center-portal/pc-saas-fulfillment-api-v2#get-subscription
     url =   f'https://marketplaceapi.microsoft.com/api/saas/subscriptions/' + \
             f'{subscription_id}'
 
     try:
         r = requests.get(url, timeout=2,
-                        params = {'api-version': SaaS_api_version},
+                        params = {'api-version': cfg.SAAS_API_VERSION},
                         headers = {'content-type': 'application/json',
                                    'authorization': f'Bearer {token}' })
     except:
@@ -170,31 +157,3 @@ if __name__ == '__main__':
     sid_1_bad = '1031BCA9-DB8C-4805-A751-FC99D90B0F51' # invalid
     insert_dummy_data(oid, sid_1_bad)
     check_user_subscribed(oid)
-
-
-
-
-    """
-    Microsoft Documentation
-
-    Metering service APIs - Microsoft commercial marketplace | Microsoft Docs
-    https://docs.microsoft.com/en-us/azure/marketplace/partner-center-portal/marketplace-metering-service-apis
-
-    Register a SaaS application - Azure Marketplace | Microsoft Docs
-    https://docs.microsoft.com/en-us/azure/marketplace/partner-center-portal/pc-saas-registration#get-the-token-with-an-http-post
-
-    Microsoft identity platform ID tokens - Microsoft identity platform | Microsoft Docs
-    https://docs.microsoft.com/en-us/azure/active-directory/develop/id-tokens#using-claims-to-reliably-identify-a-user-subject-and-object-id
-
-    Microsoft identity platform access tokens - Microsoft identity platform | Microsoft Docs
-    https://docs.microsoft.com/en-us/azure/active-directory/develop/access-tokens
-
-    SaaS fulfillment APIs v2 in Microsoft commercial marketplace | Microsoft Docs
-    https://docs.microsoft.com/en-us/azure/marketplace/partner-center-portal/pc-saas-fulfillment-api-v2#get-subscription
-    """
-
-
-
-
-
-

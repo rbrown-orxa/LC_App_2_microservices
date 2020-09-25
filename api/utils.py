@@ -257,12 +257,29 @@ def requires_auth(f):
     def decorated(*args, **kwargs):
         try:
             token = get_token_auth_header()
-            jsonurl = urlopen("https://" + \
+            jsonurl_b2c = urlopen("https://" + \
                               cfg.TENANT_NAME + ".b2clogin.com/" + \
                               cfg.TENANT_NAME + ".onmicrosoft.com/" + \
                               cfg.B2C_POLICY + "/discovery/v2.0/keys")
-            jwks = json.loads(jsonurl.read())
+                
+            jsonurl_ad = urlopen("https://" + "login.microsoftonline.com/" + \
+                              "common" + "/discovery/v2.0/keys")
+                
+            #get unverified header from accesstoken
             unverified_header = jwt.get_unverified_header(token)
+            #get unverified claims from accesstoken
+            unverified_claims = jwt.get_unverified_claims(token)
+            #get iss key value
+            val = unverified_claims['iss'].find('b2clogin')
+            #get public keys
+            jwks = json.loads(jsonurl_b2c.read()) if val > 0 else json.loads(jsonurl_ad.read()) 
+            #select audience
+            aud = cfg.CLIENT_ID if val > 0 else cfg.CLIENT_ID_AD_MULT
+            #select issuer
+            iss = "https://" + cfg.TENANT_NAME + \
+                    ".b2clogin.com/" + cfg.TENANT_ID + "/v2.0/" if val > 0 else \
+                    "https://login.microsoftonline.com/" + cfg.TENANT_ID_AD + "/v2.0" 
+            #store key values in dictionary
             rsa_key = {}
             for key in jwks["keys"]:
                 if key["kid"] == unverified_header["kid"]:
@@ -284,10 +301,10 @@ def requires_auth(f):
                     token,
                     rsa_key,
                     algorithms=["RS256"],
-                    audience=cfg.CLIENT_ID,
-                    issuer="https://" + cfg.TENANT_NAME + \
-                    ".b2clogin.com/" + cfg.TENANT_ID + "/v2.0/"
+                    audience=aud,
+                    issuer=iss
                 )
+                
             except jwt.ExpiredSignatureError:
                 raise AuthError({"code": "token_expired",
                                  "description": "token is expired"}, 401)

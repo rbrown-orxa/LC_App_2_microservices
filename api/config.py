@@ -1,4 +1,3 @@
-
 MAX_CONTENT_LENGTH = 1024 * 1024 * 5 # limit file upload size to 5 MB
 UPLOAD_EXTENSIONS = ['.csv', ]
 UPLOAD_PATH = 'tmp'
@@ -6,21 +5,38 @@ UPLOAD_PATH = 'tmp'
 PROFILES_BUILDING = './profiles/building_profiles.csv'
 PROFILES_EV = './profiles/profiles_for_production_use.csv'
 
-REQUIRE_ACCESS_TOKEN = False
+# REQUIRE_ACCESS_TOKEN = False # Commenting as not used currently 
 
-APPLY_BILLING = False # Queries will not be registered in billing database
-# BILLING_DB_CONN_STR = 'postgres://postgres:password@localhost:5432/postgres'
+APPLY_BILLING = True 
 BILLING_DB_CONN_STR = "host=lcapppostgreserver.postgres.database.azure.com "\
-					+ "user=lcapp@lcapppostgreserver "\
-					+ "dbname=postgres "\
-					+ "password=SANorxagrid12 "\
-					+ "sslmode=require"
+                    + "user=lcapp@lcapppostgreserver "\
+                    + "dbname=postgres "\
+                    + "password=SANorxagrid12 "\
+                    + "sslmode=require"
 
-MAX_FREE_CALLS = 5
-# Replace these with actual values sent from frontend. Used by billing module.
-EMAIL = 'user2@orxa.io'
-SUBSCRIPTION_ID = '8307CBA6-CA74-450F-9528-386E0CF07F34'
-SUBSCRIPTION_VALID = True
+#Use this for local testing
+#SUBSCRIPTION_DB_CONN_STR = "host=localhost "\
+#                        + "user=postgres "\
+#                        + "dbname=postgres "\
+#                        + "password=password "\
+#                        + "sslmode=allow"         
+
+#Use this for production
+SUBSCRIPTION_DB_CONN_STR = "host=lcapppostgreserver.postgres.database.azure.com "\
+                         + "user=lcapp@lcapppostgreserver "\
+                         + "dbname=Azuresubscriptiondb "\
+                         + "password=SANorxagrid12 "\
+                         + "sslmode=require"         
+
+# Not used any more, since we validate subscription from oid JWT claim
+# MAX_FREE_CALLS = 5
+# # Replace these with actual values sent from frontend. Used by billing module.
+# EMAIL = 'user2@orxa.io'
+# SUBSCRIPTION_ID = '8307CBA6-CA74-450F-9528-386E0CF07F34'
+# SUBSCRIPTION_VALID = True
+
+#Dummy uuid for b2c/free users
+DUMMY_UUID = "dd7a9e38-ff3f-11ea-adc1-0242ac120002"
 
 PICKLE_RESULTS = False
 
@@ -37,4 +53,5 @@ RESOURCE = "20e940b3-4c77-4b0b-9a53-9e16a1b010a7"
 TENANT_ID_AD = "f0e8a3c1-f57f-446b-b105-37b6d1ee94cc"
 END_POINT = "https://login.microsoftonline.com/f0e8a3c1-f57f-446b-b105-37b6d1ee94cc/oauth2/token"
 FULLFILLMENT_URI = "https://marketplaceapi.microsoft.com/api/saas/subscriptions/"
-
+SAAS_API_VERSION = '2018-08-31'
+CLIENT_ID_AD_MULT = "454f560c-4e04-46dc-bb7d-a74f753f3952"

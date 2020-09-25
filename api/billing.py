@@ -3,6 +3,7 @@ import logging
 import time
 import random
 from flask import current_app
+import config as cfg
 
 import subscription
 
@@ -30,6 +31,7 @@ def make_tables(conn_str):
                             started TIMESTAMPTZ NOT NULL DEFAULT NOW(),
                             success BOOLEAN NOT NULL DEFAULT FALSE,
                             subscription_id UUID,
+                            object_id UUID,
                             completed TIMESTAMPTZ,
                             billed BOOLEAN NOT NULL DEFAULT FALSE,
                             date_billed TIMESTAMPTZ 
@@ -58,11 +60,11 @@ def make_tables(conn_str):
                 time.sleep(5)
 
 
-def register_query_started(subscription_id):
+def query_started(subscription_id):
     
     if not current_app.config['APPLY_BILLING']:
         # return None
-        pass
+        pass # log the query in DB even though subscription_id will be empty
 
     conn_str = current_app.config['BILLING_DB_CONN_STR']
     logging.info('Registering query started')
@@ -86,7 +88,7 @@ def register_query_started(subscription_id):
     return id
 
 
-def register_query_successful(query_id):
+def query_successful(query_id):
 
     if not current_app.config['APPLY_BILLING']:
         return
@@ -128,20 +130,20 @@ if __name__ == '__main__':
     make_tables(current_app.config['BILLING_DB_CONN_STR'])
 
 
-    id2 = register_query_started(
+    id2 = query_started(
             subscription_id='CEF06856-837B-4661-A627-6B20FD268A5C')
     time.sleep(random.random()/2)
-    register_query_successful(id2)
+    query_successful(id2)
 
-    id2 = register_query_started(
+    id2 = query_started(
             subscription_id='CEF06856-837B-4661-A627-6B20FD268A5C')
     time.sleep(random.random()/2)
-    register_query_successful(id2)
+    query_successful(id2)
 
-    id4 = register_query_started(
+    id4 = query_started(
             subscription_id='2EF06856-837B-4661-A627-6B20FD268A5B')
     time.sleep(random.random()/2)
-    register_query_successful(id4)
+    query_successful(id4)
 
 
     # bill = get_billing_quantities(current_app.config['BILLING_DB_CONN_STR'])
@@ -150,6 +152,3 @@ if __name__ == '__main__':
     # time.sleep(random.random()) # simulate API billing request being sent
 
     # register_billed_quantities(current_app.config['BILLING_DB_CONN_STR'], bill)
-
-
-
