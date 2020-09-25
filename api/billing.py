@@ -62,7 +62,7 @@ def register_query_started(subscription_id):
     
     if not current_app.config['APPLY_BILLING']:
         # return None
-        pass
+        pass # log the query in DB even though subscription_id will be empty
 
     conn_str = current_app.config['BILLING_DB_CONN_STR']
     logging.info('Registering query started')

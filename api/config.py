@@ -6,15 +6,29 @@ UPLOAD_PATH = 'tmp'
 PROFILES_BUILDING = './profiles/building_profiles.csv'
 PROFILES_EV = './profiles/profiles_for_production_use.csv'
 
-REQUIRE_ACCESS_TOKEN = False
+# REQUIRE_ACCESS_TOKEN = False # Commenting as not used currently
 
-APPLY_BILLING = False # Queries will not be registered in billing database
-# BILLING_DB_CONN_STR = 'postgres://postgres:password@localhost:5432/postgres'
+APPLY_BILLING = True # Queries will not be registered in billing database
 BILLING_DB_CONN_STR = "host=lcapppostgreserver.postgres.database.azure.com "\
-					+ "user=lcapp@lcapppostgreserver "\
-					+ "dbname=postgres "\
-					+ "password=SANorxagrid12 "\
-					+ "sslmode=require"
+                    + "user=lcapp@lcapppostgreserver "\
+                    + "dbname=postgres "\
+                    + "password=SANorxagrid12 "\
+                    + "sslmode=require"
+
+#Use this for local testing
+SUBSCRIPTION_DB_CONN_STR = "host=localhost "\
+                        + "user=postgres "\
+                        + "dbname=postgres "\
+                        + "password=password "\
+                        + "sslmode=allow"         
+
+#Use this for production
+# SUBSCRIPTION_DB_CONN_STR = "host=lcapppostgreserver.postgres.database.azure.com "\
+#                         + "user=lcapp@lcapppostgreserver "\
+#                         + "dbname=Azuresubscriptiondb "\
+#                         + "password=SANorxagrid12 "\
+#                         + "sslmode=require"         
+
 
 MAX_FREE_CALLS = 5
 # Replace these with actual values sent from frontend. Used by billing module.
@@ -37,4 +51,5 @@ RESOURCE = "20e940b3-4c77-4b0b-9a53-9e16a1b010a7"
 TENANT_ID_AD = "f0e8a3c1-f57f-446b-b105-37b6d1ee94cc"
 END_POINT = "https://login.microsoftonline.com/f0e8a3c1-f57f-446b-b105-37b6d1ee94cc/oauth2/token"
 FULLFILLMENT_URI = "https://marketplaceapi.microsoft.com/api/saas/subscriptions/"
+SAAS_API_VERSION = '2018-08-31'
 
