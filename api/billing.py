@@ -58,7 +58,7 @@ def make_tables(conn_str):
                 time.sleep(5)
 
 
-def register_query_started(subscription_id):
+def query_started(subscription_id):
     
     if not current_app.config['APPLY_BILLING']:
         # return None
@@ -86,7 +86,7 @@ def register_query_started(subscription_id):
     return id
 
 
-def register_query_successful(query_id):
+def query_successful(query_id):
 
     if not current_app.config['APPLY_BILLING']:
         return

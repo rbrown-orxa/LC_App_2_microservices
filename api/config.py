@@ -29,12 +29,12 @@ SUBSCRIPTION_DB_CONN_STR = "host=localhost "\
 #                         + "password=SANorxagrid12 "\
 #                         + "sslmode=require"         
 
-
-MAX_FREE_CALLS = 5
-# Replace these with actual values sent from frontend. Used by billing module.
-EMAIL = 'user2@orxa.io'
-SUBSCRIPTION_ID = '8307CBA6-CA74-450F-9528-386E0CF07F34'
-SUBSCRIPTION_VALID = True
+# Not used any more, since we validate subscription from oid JWT claim
+# MAX_FREE_CALLS = 5
+# # Replace these with actual values sent from frontend. Used by billing module.
+# EMAIL = 'user2@orxa.io'
+# SUBSCRIPTION_ID = '8307CBA6-CA74-450F-9528-386E0CF07F34'
+# SUBSCRIPTION_VALID = True
 
 PICKLE_RESULTS = False
 
