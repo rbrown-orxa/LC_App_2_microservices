@@ -174,7 +174,7 @@ def make_headers(uuid):
     headers = {'Content-type': 'application/json',
                 'x-ms-requestid': uuid,
                 'x-ms-correlationid': 'orxagrid_lcapp2',
-                'authorization': get_authorization_token()}
+                'authorization': 'Bearer ' + get_authorization_token()}
     return headers
 
 def get_authorization_token():
