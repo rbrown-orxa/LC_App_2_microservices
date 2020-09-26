@@ -44,7 +44,7 @@ def get_AAD_token():
     url = f'https://login.microsoftonline.com/{cfg.TENANT_ID_AD}/oauth2/token'
 
     try:
-        r = requests.post(url, timeout=2, data={
+        r = requests.post(url, timeout=5, data={
                 'resource': cfg.RESOURCE, 
                 'client_id': cfg.CLIENT_ID_AD,
                 'client_secret': cfg.CLIENT_SECRET,
@@ -63,7 +63,7 @@ def subscription_is_valid(subscription_id, token):
             f'{subscription_id}'
 
     try:
-        r = requests.get(url, timeout=2,
+        r = requests.get(url, timeout=5,
                         params = {'api-version': cfg.SAAS_API_VERSION},
                         headers = {'content-type': 'application/json',
                                    'authorization': f'Bearer {token}' })

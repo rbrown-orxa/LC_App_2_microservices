@@ -21,6 +21,12 @@ CONN_STR = f"host={config['DB']['host']} " \
         + f"dbname={config['DB']['dbname']} " \
         + f"password={config['DB']['password']} " \
         + f"sslmode={config['DB']['sslmode']}"
+        
+CONN_STR_SUB = f"host={config['DB']['host']} " \
+            + f"user={config['DB']['user']} " \
+            + f"dbname={config['DB']['dbnamesub']} " \
+            + f"password={config['DB']['password']} " \
+            + f"sslmode={config['DB']['sslmode']}"
 
 
 def get_users_to_bill():
@@ -124,7 +130,7 @@ def post_bill_to_API(uuid, qty):
         r = requests.post(
                 config['BILLING']['baseURL'],
                 data=make_body(uuid, qty),
-                params={'ApiVersion': '2018-08-31'},
+                params={'api-version': '2018-08-31'},
                 headers=make_headers(uuid),
                 timeout=config['BILLING'].getint('timeout_s'))
         logging.debug(f'Status code: {r.status_code} for UUID: {uuid}')
@@ -137,6 +143,21 @@ def job():
         process_bills()
     except:
         logging.exception('Error while running batch billing job')
+        
+def get_plan_id(uuid):
+    SQL3 =   """
+            SELECT distinct planid from subscriptiondetails
+            where subscriptionid = %s;
+            """
+
+    with psycopg2.connect(CONN_STR_SUB) as conn:
+        cur = conn.cursor()
+        cur.execute( SQL3, (uuid, ) )
+        pids = cur.fetchall()
+        cur.close()
+        
+    return([pid[0] for pid in pids])
+    
 
 def make_body(uuid, qty):
     now = datetime.datetime.utcnow()
@@ -145,7 +166,7 @@ def make_body(uuid, qty):
             'quantity': qty,
             'dimension': config['BILLING']['dimension'],
             'effectiveStartTime': effectiveStartTime,
-            'planId': config['BILLING']['planId']}
+            'planId': get_plan_id(uuid)[0]}
     return json.dumps(body)
 
 
