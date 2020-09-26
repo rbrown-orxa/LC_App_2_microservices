@@ -272,7 +272,9 @@ def requires_auth(f):
             #get iss key value
             val = unverified_claims['iss'].find('b2clogin')
             #get public keys
-            jwks = json.loads(jsonurl_b2c.read()) if val > 0 else json.loads(jsonurl_ad.read()) 
+            jwks = json.loads(jsonurl_b2c.read()) if val > 0 else json.loads(jsonurl_ad.read())
+            #assign tenent name directory
+            tenant = 'b2c' if val > 0 else 'ad'
             #select audience
             aud = cfg.CLIENT_ID if val > 0 else cfg.CLIENT_ID_AD_MULT
             #select issuer
@@ -321,6 +323,7 @@ def requires_auth(f):
             _request_ctx_stack.top.current_user = payload
 
             g.oid = payload['oid']
+            g.tenant = tenant
             
             return f(*args, **kwargs)
         raise AuthError({"code": "invalid_header",

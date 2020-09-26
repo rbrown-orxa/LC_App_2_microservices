@@ -7,7 +7,9 @@ PROFILES_EV = './profiles/profiles_for_production_use.csv'
 
 # REQUIRE_ACCESS_TOKEN = False # Commenting as not used currently 
 
-APPLY_BILLING = True 
+APPLY_BILLING = True
+MAX_FREE_CALLS = 5
+ 
 BILLING_DB_CONN_STR = "host=lcapppostgreserver.postgres.database.azure.com "\
                     + "user=lcapp@lcapppostgreserver "\
                     + "dbname=postgres "\
@@ -29,7 +31,7 @@ SUBSCRIPTION_DB_CONN_STR = "host=lcapppostgreserver.postgres.database.azure.com 
                          + "sslmode=require"         
 
 # Not used any more, since we validate subscription from oid JWT claim
-# MAX_FREE_CALLS = 5
+
 # # Replace these with actual values sent from frontend. Used by billing module.
 # EMAIL = 'user2@orxa.io'
 # SUBSCRIPTION_ID = '8307CBA6-CA74-450F-9528-386E0CF07F34'

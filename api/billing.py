@@ -9,10 +9,21 @@ import subscription
 
 
 
-def check_subscription(object_id):
+def check_subscription(object_id,ten):
+    
+    if not ten == 'ad' or not current_app.config['APPLY_BILLING']:
+        
+        free_queries_so_far =  get_unbillable_queries(
+        current_app.config['BILLING_DB_CONN_STR'],
+        object_id)
+        logging.info('Free queries used so far: ' + str(free_queries_so_far) + \
+        ' by user: ' + str(object_id))
 
-    if not current_app.config['APPLY_BILLING']:
-        return '' # Check has passed, but no subscription_id
+        assert free_queries_so_far < current_app.config['MAX_FREE_CALLS'], \
+        '402 Free quota query limits exceeded for user'
+        
+        return cfg.DUMMY_UUID # Check has passed, but no valid subscription_id
+    
     assert object_id, '401 User object id required'
     return subscription.check_user_subscribed(object_id)
 
@@ -60,7 +71,7 @@ def make_tables(conn_str):
                 time.sleep(5)
 
 
-def query_started(subscription_id):
+def query_started(subscription_id,oid):
     
     if not current_app.config['APPLY_BILLING']:
         # return None
@@ -71,14 +82,14 @@ def query_started(subscription_id):
     
     SQL =  """
             INSERT INTO queries
-            (subscription_id)
-            VALUES (%s) 
+            (subscription_id,object_id)
+            VALUES (%s,%s) 
             RETURNING id;
             """
 
     with psycopg2.connect(conn_str) as conn:
         cur = conn.cursor()
-        cur.execute( SQL, (subscription_id, ) )
+        cur.execute( SQL, (subscription_id,oid,) )
         conn.commit()
         id = cur.fetchone()[0]
         cur.close()
@@ -112,7 +123,21 @@ def query_successful(query_id):
         conn.commit()
         cur.close()
 
+def get_unbillable_queries(conn_str, oid=''):
 
+     if oid:
+         SQL =   """
+                 SELECT count(*) 
+                 FROM queries 
+                 WHERE object_id = %s 
+                 AND success = True;
+                 """
+         with psycopg2.connect(conn_str) as conn:
+             cur = conn.cursor()
+             cur.execute( SQL, (oid, ) )
+             rv = cur.fetchone()[0]
+             cur.close()
+         return rv
 
 if __name__ == '__main__':
     class CurrentApp():
