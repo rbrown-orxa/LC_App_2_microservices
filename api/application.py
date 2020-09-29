@@ -123,12 +123,13 @@ def optimise():
 
     # object_id = request.json['oid'] # get oid from request.json
     object_id = g.oid # get oid from JWT claim instead of request.json
-
+    tenant = g.tenant
 
     logging.info(f'got oid: {object_id}')
-    subscription_id = billing.check_subscription(object_id)
+    subscription_id = billing.check_subscription(object_id,tenant)
 
-    query_id = billing.query_started(subscription_id)
+
+    query_id = billing.query_started(subscription_id,object_id)
 
     rv = library._optimise(request)
 
@@ -237,5 +238,3 @@ if __name__ == '__main__':
     app.run(host='localhost', port=5000, debug=True)
 
 app.secret_key = os.urandom(12)
-
-

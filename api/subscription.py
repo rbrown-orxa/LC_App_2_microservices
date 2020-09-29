@@ -15,6 +15,7 @@ def check_user_subscribed(object_id):
         logging.warning('Billing is switched off. Skipping subscription check.')
         return # Check has passed
 
+
     for sid in get_subscription_ids(object_id):
         logging.info(sid)
         if subscription_is_valid( sid, get_AAD_token() ):
@@ -47,7 +48,8 @@ def get_AAD_token():
     url = f'https://login.microsoftonline.com/{cfg.TENANT_ID_AD}/oauth2/token'
 
     try:
-        r = requests.post(url, timeout=2, data={
+
+        r = requests.post(url, timeout=5, data={
                 'resource': cfg.RESOURCE, 
                 'client_id': cfg.CLIENT_ID_AD,
                 'client_secret': cfg.CLIENT_SECRET,
@@ -66,7 +68,8 @@ def subscription_is_valid(subscription_id, token):
             f'{subscription_id}'
 
     try:
-        r = requests.get(url, timeout=2,
+
+        r = requests.get(url, timeout=5,
                         params = {'api-version': cfg.SAAS_API_VERSION},
                         headers = {'content-type': 'application/json',
                                    'authorization': f'Bearer {token}' })
@@ -157,31 +160,3 @@ if __name__ == '__main__':
     sid_1_bad = '1031BCA9-DB8C-4805-A751-FC99D90B0F51' # invalid
     insert_dummy_data(oid, sid_1_bad)
     check_user_subscribed(oid)
-
-
-
-
-    """
-    Microsoft Documentation
-
-    Metering service APIs - Microsoft commercial marketplace | Microsoft Docs
-    https://docs.microsoft.com/en-us/azure/marketplace/partner-center-portal/marketplace-metering-service-apis
-
-    Register a SaaS application - Azure Marketplace | Microsoft Docs
-    https://docs.microsoft.com/en-us/azure/marketplace/partner-center-portal/pc-saas-registration#get-the-token-with-an-http-post
-
-    Microsoft identity platform ID tokens - Microsoft identity platform | Microsoft Docs
-    https://docs.microsoft.com/en-us/azure/active-directory/develop/id-tokens#using-claims-to-reliably-identify-a-user-subject-and-object-id
-
-    Microsoft identity platform access tokens - Microsoft identity platform | Microsoft Docs
-    https://docs.microsoft.com/en-us/azure/active-directory/develop/access-tokens
-
-    SaaS fulfillment APIs v2 in Microsoft commercial marketplace | Microsoft Docs
-    https://docs.microsoft.com/en-us/azure/marketplace/partner-center-portal/pc-saas-fulfillment-api-v2#get-subscription
-    """
-
-
-
-
-
-

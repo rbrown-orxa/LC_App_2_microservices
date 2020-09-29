@@ -7,7 +7,6 @@
     "default": {},
     "examples": [
         {   
-            "emailid":"xyz@gmail.com",
             "sub": "1f75f128-e047-4b3f-ae1a-cdc4961b59e3",
             "oid": "1f75f128-e047-4b3f-ae1a-cdc4961b59e3",
             "lat": 1.0,
@@ -46,7 +45,6 @@
         }
     ],
     "required": [
-        "emailid",
         "sub",
         "oid",
         "lat",
@@ -61,16 +59,6 @@
         "building_data"
     ],
     "properties": {
-         "emailid": {
-            "$id": "#/properties/emailid",
-            "type": "string",
-            "title": "The emailid schema",
-            "description": "An explanation about the purpose of this instance.",
-            "default": [],
-            "examples": [
-                "xyz@gmail.com"
-            ]
-        },
         "sub": {
             "$id": "#/properties/sub",
             "type": "string",
