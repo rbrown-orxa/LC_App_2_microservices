@@ -1,0 +1,93 @@
+{
+	"info": {
+		"_postman_id": "797f6534-9abb-436c-a30c-5d406c42bd3b",
+		"name": "LCAPP2",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "documentation",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": ""
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "optimise",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "accessToken",
+							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6ImppYk5ia0ZTU2JteFBZck45Q0ZxUms0SzRndyJ9.eyJhdWQiOiI0NTRmNTYwYy00ZTA0LTQ2ZGMtYmI3ZC1hNzRmNzUzZjM5NTIiLCJpc3MiOiJodHRwczovL2xvZ2luLm1pY3Jvc29mdG9ubGluZS5jb20vZjBlOGEzYzEtZjU3Zi00NDZiLWIxMDUtMzdiNmQxZWU5NGNjL3YyLjAiLCJpYXQiOjE2MDEzOTUxMzEsIm5iZiI6MTYwMTM5NTEzMSwiZXhwIjoxNjAxMzk5MDMxLCJhaW8iOiJBVFFBeS84UkFBQUExc0o1d0FFK2VaK2ZjZ2dHM2hTSFdtd3lYQUZsUHRwbHFxZkJPdHRvdDBGVHhsUU1ndFc1Y2FjVERrOWJYTW41IiwiYXpwIjoiNDU0ZjU2MGMtNGUwNC00NmRjLWJiN2QtYTc0Zjc1M2YzOTUyIiwiYXpwYWNyIjoiMCIsIm5hbWUiOiJSb2JlcnQgQnJvd24iLCJvaWQiOiJiZjc0ODEyNS01ZmNjLTQ5MjEtOWRhOS05NDMwNDJmYmZiODEiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJyYnJvd25Ab3J4YWdyaWQuY29tIiwicmgiOiIwLkFSOEF3YVBvOEhfMWEwU3hCVGUyMGU2VXpBeFdUMFVFVHR4R3UzMm5UM1VfT1ZJZkFQay4iLCJzY3AiOiJVc2VyLnJlYWQiLCJzdWIiOiJKNnFkMTAzZUozejFwZmc0Slk3ZHpkVjNFN1Y1d1VCZDg4X0dXaUJiX3U4IiwidGlkIjoiZjBlOGEzYzEtZjU3Zi00NDZiLWIxMDUtMzdiNmQxZWU5NGNjIiwidXRpIjoiekg3S0hQaFhpRS1hekx3c25Ld1FBQSIsInZlciI6IjIuMCJ9.nt0u_Aw2lWi8Ja2caZcgKU8BJYYnngV4uWfetcksTZ2Hpqfa9_-PE0Du2bZy68ztUJmXh0c1tmP2Y7qbMJkfc1o5YDWubiFbbcc2laJ5cPC3d7WTznUU6JiroGx3BSiZDoKN3VhInah3ZVELu5C-Ubin9dwRLPEVM3vFnH_8ce-L4lj1xMPXkO_ZzJiL4rmATz-nnnHwUtuItuya19Okm5qos-2to3ngB2KB_U1htclXrapTK2WQu5XFAaUhfrvcATKAsyySvKcKrfCyzLeO28w1e0HgcizWJ5GDiU5lEsw_Jt3uCgyU2Ywnn51Ul5m_IktwvWJGkHOq8DMc_swp0A",
+							"type": "string"
+						},
+						{
+							"key": "tokenType",
+							"value": "Bearer",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "        {   \n            \"sub\": \"1f75f128-e047-4b3f-ae1a-cdc4961b59e3\",\n            \"oid\": \"1f75f128-e047-4b3f-ae1a-cdc4961b59e3\",\n            \"lat\": 51.492233,\n            \"lon\": -0.102547,\n            \"import_cost_kwh\": 1.0,\n            \"export_price_kwh\": 1.0,\n            \"pv_cost_kwp\": 1.0,\n            \"pv_life_yrs\": 1,\n            \"battery_life_cycles\": 1,\n            \"battery_cost_kwh\": 1.0,\n            \"load_profile_csv_optional\": \"\",\n            \"building_data\": [\n                {\n                    \"name\": \"building 1\",\n                    \"building_type\": \"domestic\",\n                    \"roof_size_m2\": 1.0,\n                    \"azimuth_deg\": 1,\n                    \"pitch_deg\": 1,\n                    \"num_ev_chargers\": 1,\n                    \"pv_size_kwp_optional\": 1.0,\n                    \"load_profile_csv_optional\": \"\",\n                    \"annual_kwh_consumption_optional\": 1.0\n                },\n                {\n                    \"name\": \"building 2\",\n                    \"building_type\": \"commercial\",\n                    \"roof_size_m2\": 1.0,\n                    \"azimuth_deg\": 1,\n                    \"pitch_deg\": 1,\n                    \"num_ev_chargers\": 1,\n                    \"pv_size_kwp_optional\": 1.0,\n                    \"load_profile_csv_optional\": \"\",\n                    \"annual_kwh_consumption_optional\": 1.0\n                }\n            ]\n        }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5000/optimise",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"optimise"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "b8433334-7c1e-459c-92ba-92cf9c766311",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "fe988ced-0c78-4e45-a487-dfb546601775",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"protocolProfileBehavior": {}
+}
