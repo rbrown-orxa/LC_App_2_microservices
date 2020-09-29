@@ -6,17 +6,17 @@ PROFILES_BUILDING = './profiles/building_profiles.csv'
 PROFILES_EV = './profiles/profiles_for_production_use.csv'
 
 
+REQUIRE_AUTH = False
 
 APPLY_BILLING = True
 MAX_FREE_CALLS = 5
  
+#Use these for local testing:
 BILLING_DB_CONN_STR = "host=localhost "\
                        + "user=postgres "\
                        + "dbname=postgres "\
                        + "password=password "\
                        + "sslmode=allow"    
-
-#Use these for local testing:
 
 SUBSCRIPTION_DB_CONN_STR = "host=localhost "\
                        + "user=postgres "\

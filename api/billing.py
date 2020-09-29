@@ -157,19 +157,22 @@ if __name__ == '__main__':
 
 
     id2 = query_started(
-            subscription_id='CEF06856-837B-4661-A627-6B20FD268A5C')
+            subscription_id='CEF06856-837B-4661-A627-6B20FD268A5C',
+            oid='9e6e8167-b3e7-4e76-93a2-d99bcd9fe7cc')
     time.sleep(random.random()/2)
     query_successful(id2)
 
-    id2 = query_started(
-            subscription_id='CEF06856-837B-4661-A627-6B20FD268A5C')
-    time.sleep(random.random()/2)
-    query_successful(id2)
+    # id2 = query_started(
+    #         subscription_id='CEF06856-837B-4661-A627-6B20FD268A5C')
+    # time.sleep(random.random()/2)
+    # query_successful(id2)
 
-    id4 = query_started(
-            subscription_id='2EF06856-837B-4661-A627-6B20FD268A5B')
-    time.sleep(random.random()/2)
-    query_successful(id4)
+    # id4 = query_started(
+    #         subscription_id='2EF06856-837B-4661-A627-6B20FD268A5B')
+    # time.sleep(random.random()/2)
+    # query_successful(id4)
+
+
 
 
     # bill = get_billing_quantities(current_app.config['BILLING_DB_CONN_STR'])

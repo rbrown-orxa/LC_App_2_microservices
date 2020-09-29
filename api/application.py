@@ -98,8 +98,8 @@ def activate():
 
 
 @app.route("/optimise", methods=['GET','POST'])
-@auto.doc()
 @utils.handle_exceptions
+@auto.doc()
 @cross_origin(allow_headers=['Content-Type', 'Authorization'])
 @utils.requires_auth
 def optimise():
@@ -121,12 +121,14 @@ def optimise():
 
     logging.info('got an optimise request')
 
-    # object_id = request.json['oid'] # get oid from request.json
-    object_id = g.oid # get oid from JWT claim instead of request.json
-    tenant = g.tenant
 
-    logging.info(f'got oid: {object_id}')
-    subscription_id = billing.check_subscription(object_id,tenant)
+    object_id, tenant, subscription_id = None, None, None
+    if app.config['REQUIRE_AUTH']:
+	    # object_id = request.json['oid'] # get oid from request.json
+	    object_id = g.oid # get oid from JWT claim instead of request.json
+	    tenant = g.tenant
+	    logging.info(f'got oid: {object_id}')
+	    subscription_id = billing.check_subscription(object_id,tenant)
 
 
     query_id = billing.query_started(subscription_id,object_id)

@@ -253,8 +253,13 @@ def get_token_auth_header():
 def requires_auth(f):
     """Determines if the Access Token is valid
     """
+
     @wraps(f)
     def decorated(*args, **kwargs):
+
+        if not cfg.REQUIRE_AUTH:
+            return f(*args, **kwargs)
+
         try:
             token = get_token_auth_header()
             jsonurl_b2c = urlopen("https://" + \
