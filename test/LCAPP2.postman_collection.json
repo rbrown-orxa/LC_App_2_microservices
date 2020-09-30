@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "797f6534-9abb-436c-a30c-5d406c42bd3b",
+		"_postman_id": "37e3ca55-58cb-4707-a761-d561aa76b70c",
 		"name": "LCAPP2",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -71,7 +71,7 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "b8433334-7c1e-459c-92ba-92cf9c766311",
+				"id": "46207138-8340-4416-a8ba-1759cfc3261d",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -81,7 +81,7 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "fe988ced-0c78-4e45-a487-dfb546601775",
+				"id": "ff387e93-f019-48ce-aa65-bb7be6b43359",
 				"type": "text/javascript",
 				"exec": [
 					""
