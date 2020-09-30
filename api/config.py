@@ -12,31 +12,31 @@ APPLY_BILLING = True
 MAX_FREE_CALLS = 5
  
 #Use these for local testing:
-BILLING_DB_CONN_STR = "host=localhost "\
-                       + "user=postgres "\
-                       + "dbname=postgres "\
-                       + "password=password "\
-                       + "sslmode=allow"    
+# BILLING_DB_CONN_STR = "host=localhost "\
+#                        + "user=postgres "\
+#                        + "dbname=postgres "\
+#                        + "password=password "\
+#                        + "sslmode=allow"    
 
-SUBSCRIPTION_DB_CONN_STR = "host=localhost "\
-                       + "user=postgres "\
-                       + "dbname=postgres "\
-                       + "password=password "\
-                       + "sslmode=allow"         
+# SUBSCRIPTION_DB_CONN_STR = "host=localhost "\
+#                        + "user=postgres "\
+#                        + "dbname=postgres "\
+#                        + "password=password "\
+#                        + "sslmode=allow"         
 
 #Use these  for production:
 
-# SUBSCRIPTION_DB_CONN_STR = "host=lcapppostgreserver.postgres.database.azure.com "\
-#                          + "user=lcapp@lcapppostgreserver "\
-#                          + "dbname=Azuresubscriptiondb "\
-#                          + "password=SANorxagrid12 "\
-#                          + "sslmode=require"         
+SUBSCRIPTION_DB_CONN_STR = "host=lcapppostgreserver.postgres.database.azure.com "\
+                         + "user=lcapp@lcapppostgreserver "\
+                         + "dbname=Azuresubscriptiondb "\
+                         + "password=SANorxagrid12 "\
+                         + "sslmode=require"         
 
-# BILLING_DB_CONN_STR = "host=lcapppostgreserver.postgres.database.azure.com "\
-#                     + "user=lcapp@lcapppostgreserver "\
-#                     + "dbname=postgres "\
-#                     + "password=SANorxagrid12 "\
-#                     + "sslmode=require"
+BILLING_DB_CONN_STR = "host=lcapppostgreserver.postgres.database.azure.com "\
+                    + "user=lcapp@lcapppostgreserver "\
+                    + "dbname=postgres "\
+                    + "password=SANorxagrid12 "\
+                    + "sslmode=require"
 
 
 #Dummy uuid for b2c/free users
