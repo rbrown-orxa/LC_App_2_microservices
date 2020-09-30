@@ -6,17 +6,17 @@ PROFILES_BUILDING = './profiles/building_profiles.csv'
 PROFILES_EV = './profiles/profiles_for_production_use.csv'
 
 
-REQUIRE_AUTH = False
+REQUIRE_AUTH = True
 
 APPLY_BILLING = True
 MAX_FREE_CALLS = 5
  
 #Use these for local testing:
-# BILLING_DB_CONN_STR = "host=localhost "\
-#                        + "user=postgres "\
-#                        + "dbname=postgres "\
-#                        + "password=password "\
-#                        + "sslmode=allow"    
+BILLING_DB_CONN_STR = "host=localhost "\
+                       + "user=postgres "\
+                       + "dbname=postgres "\
+                       + "password=password "\
+                       + "sslmode=allow"    
 
 # SUBSCRIPTION_DB_CONN_STR = "host=localhost "\
 #                        + "user=postgres "\
@@ -25,6 +25,11 @@ MAX_FREE_CALLS = 5
 #                        + "sslmode=allow"         
 
 #Use these  for production:
+# BILLING_DB_CONN_STR = "host=lcapppostgreserver.postgres.database.azure.com "\
+#                     + "user=lcapp@lcapppostgreserver "\
+#                     + "dbname=postgres "\
+#                     + "password=SANorxagrid12 "\
+#                     + "sslmode=require"
 
 SUBSCRIPTION_DB_CONN_STR = "host=lcapppostgreserver.postgres.database.azure.com "\
                          + "user=lcapp@lcapppostgreserver "\
@@ -32,11 +37,6 @@ SUBSCRIPTION_DB_CONN_STR = "host=lcapppostgreserver.postgres.database.azure.com 
                          + "password=SANorxagrid12 "\
                          + "sslmode=require"         
 
-BILLING_DB_CONN_STR = "host=lcapppostgreserver.postgres.database.azure.com "\
-                    + "user=lcapp@lcapppostgreserver "\
-                    + "dbname=postgres "\
-                    + "password=SANorxagrid12 "\
-                    + "sslmode=require"
 
 
 #Dummy uuid for b2c/free users
