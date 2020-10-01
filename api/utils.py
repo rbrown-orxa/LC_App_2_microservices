@@ -233,18 +233,11 @@ def get_token_auth_header():
     parts = auth.split()
 
     if parts[0].lower() != "bearer":
-        raise AuthError({"code": "invalid_header",
-                         "description":
-                         "Authorization header must start with"
-                         " Bearer"}, 401)
+        assert False, '401 Invalid authorization header'
     elif len(parts) == 1:
-        raise AuthError({"code": "invalid_header",
-                         "description": "Token not found"}, 401)
+        assert False, '401 Invalid header no token'
     elif len(parts) > 2:
-        raise AuthError({"code": "invalid_header",
-                         "description":
-                         "Authorization header must be"
-                         " Bearer token"}, 401)
+        assert False, '401 Invalid header token'
 
     token = parts[1]
     return token
@@ -313,26 +306,18 @@ def requires_auth(f):
                 )
                 
             except jwt.ExpiredSignatureError:
-                raise AuthError({"code": "token_expired",
-                                 "description": "token is expired"}, 401)
+                assert False, '401 token_expired'
             except jwt.JWTClaimsError:
-                raise AuthError({"code": "invalid_claims",
-                                 "description":
-                                 "incorrect claims,"
-                                 "please check the audience and issuer"}, 401)
+                assert False, '401 invalid_claims'
             except Exception:
-                raise AuthError({"code": "invalid_header",
-                                 "description":
-                                 "Unable to parse authentication"
-                                 " token."}, 401)
+                assert False, '401 invalid_header'
             _request_ctx_stack.top.current_user = payload
 
             g.oid = payload['oid']
             g.tenant = tenant
             
             return f(*args, **kwargs)
-        raise AuthError({"code": "invalid_header",
-                         "description": "Unable to find appropriate key"}, 401)
+        assert False, '401 invalid_header'
     return decorated
 
 
