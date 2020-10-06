@@ -9,23 +9,29 @@ import subscription
 
 
 
-def check_subscription(object_id,ten):
+def check_subscription(object_id, SSO_type):
     
-    if not ten == 'ad' or not current_app.config['APPLY_BILLING']:
-        
-        free_queries_so_far =  get_unbillable_queries(
+    if not current_app.config['APPLY_BILLING']:
+      return
+    
+    if SSO_type == 'ad':
+        return subscription.check_user_subscribed(object_id) #str(sid)
+
+    elif SSO_type == 'b2c':
+        return check_free_query_quota(object_id) #None
+
+    assert False, '500 Unexpected SSO type'
+
+
+def check_free_query_quota(object_id):
+    free_queries_so_far =  get_unbillable_queries(
         current_app.config['BILLING_DB_CONN_STR'],
         object_id)
-        logging.info('Free queries used so far: ' + str(free_queries_so_far) + \
-        ' by user: ' + str(object_id))
+    logging.info('Free queries used so far: ' + str(free_queries_so_far) + \
+    ' by user: ' + str(object_id))
 
-        assert free_queries_so_far < current_app.config['MAX_FREE_CALLS'], \
-        '402 Free quota query limits exceeded for user'
-        
-        return cfg.DUMMY_UUID # Check has passed, but no valid subscription_id
-    
-    assert object_id, '401 User object id required'
-    return subscription.check_user_subscribed(object_id)
+    assert free_queries_so_far < current_app.config['MAX_FREE_CALLS'], \
+    '402 Free quota query limits exceeded for user'
 
 
 def make_tables(conn_str):

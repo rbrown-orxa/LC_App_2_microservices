@@ -11,11 +11,7 @@ CONN_STR = cfg.SUBSCRIPTION_DB_CONN_STR
 
 def check_user_subscribed(object_id):
     logging.info(f'Checking subscriptions for {object_id}')
-    if not cfg.APPLY_BILLING:
-        logging.warning('Billing is switched off. Skipping subscription check.')
-        return # Check has passed
-
-
+    assert object_id, '401 User object id required'
     for sid in get_subscription_ids(object_id):
         logging.info(sid)
         if subscription_is_valid( sid, get_AAD_token() ):
