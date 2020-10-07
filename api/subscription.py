@@ -12,11 +12,11 @@ CONN_STR = cfg.SUBSCRIPTION_DB_CONN_STR
 def check_user_subscribed(object_id):
     logging.info(f'Checking subscriptions for {object_id}')
     assert object_id, '401 User object id required'
-    for sid in get_subscription_ids(object_id):
-        logging.info(sid)
-        if subscription_is_valid( sid, get_AAD_token() ):
+    for sub_id, plan_id in get_subscription_ids(object_id):
+        logging.info(sub_id)
+        if subscription_is_valid( sub_id, get_AAD_token() ):
             logging.info('Found a valid subscription for user, ending check')
-            return sid # str
+            return sub_id, plan_id # str, str
         logging.info('Individual subscription ID check failed')
     logging.info('Failed to find any valid subscriptions')
     assert False, '402 User not subscribed'
@@ -24,7 +24,7 @@ def check_user_subscribed(object_id):
 
 def get_subscription_ids(object_id):
     SQL =   """
-            SELECT subscriptionid from subscriptiondetails
+            SELECT subscriptionid, planid from subscriptiondetails
             where objectid = %s
             order by id desc ;
             """
@@ -32,10 +32,12 @@ def get_subscription_ids(object_id):
     with psycopg2.connect(CONN_STR) as conn:
         cur = conn.cursor()
         cur.execute( SQL, (object_id, ) )
-        subscription_ids = cur.fetchall()
+        rv = cur.fetchall()
         cur.close()
+        
+    return rv
     
-    return [elem[0] for elem in subscription_ids]
+#    return [elem[0] for elem in subscription_ids]
 
 
 def get_AAD_token():
@@ -92,7 +94,7 @@ def create_test_table():
                     subscriptionid uuid not null,
                     -- subscriptionname text not null,
                     -- offerid text not null,
-                    -- planid text not null,
+                    planid text not null,
                     -- purchasertenantid uuid not null,
                     -- subscriptionstatus text not null,
                     created timestamptz not null default NOW(),
@@ -106,17 +108,17 @@ def create_test_table():
         cur.close()
 
 
-def insert_dummy_data(object_id, subscription_id):
+def insert_dummy_data(object_id, subscription_id, plan_id):
 
     SQL =   """
             insert into subscriptiondetails
-            (objectid, subscriptionid)
-            values (%s, %s)
+            (objectid, subscriptionid, planid)
+            values (%s, %s, %s)
             on conflict do nothing;
             """
     with psycopg2.connect(CONN_STR) as conn:
         cur = conn.cursor()
-        cur.execute(SQL, (object_id, subscription_id))
+        cur.execute(SQL, (object_id, subscription_id, plan_id))
         cur.close()
 
 
@@ -126,9 +128,12 @@ if __name__ == '__main__':
     Creates dummy test data, so do NOT run against production DB"""
     
     logging.basicConfig(level=logging.INFO)
-    input('WARNING - This test creates dummy data in DB. '
-    'DO NOT run against production DB. '
-    'Press enter to continue, or CTRL-C to quit')
+
+    CONN_STR = "host=localhost "\
+                        + "user=postgres "\
+                        + "dbname=postgres "\
+                        + "password=password "\
+                        + "sslmode=allow"
 
     create_test_table()
 
@@ -137,8 +142,9 @@ if __name__ == '__main__':
     oid = '5995EBF0-D3D8-4C3F-8921-DC59DB7E5280'
     sid_1 = '6b71cfa4-fa75-3540-fc41-b72fd8ef2555' #valid
     sid_2 = 'ea3c3199-253d-14c3-be36-7e5118102b75' #valid
-    insert_dummy_data(oid, sid_1)
-    insert_dummy_data(oid, sid_2)
+    planid = 'm1'
+    insert_dummy_data(oid, sid_1, planid)
+    insert_dummy_data(oid, sid_2, planid)
     check_user_subscribed(oid)
 
     # should pass
@@ -146,13 +152,15 @@ if __name__ == '__main__':
     oid = '9320C4D7-5B8A-45E6-98F8-4E36B47C0618'
     sid_1 = 'd673ba79-5854-a957-96b5-9c5eafc4079d' #valid
     sid_2_bad = '009E9534-4961-456D-AF46-0CB03FEB23D7' # invalid
-    insert_dummy_data(oid, sid_1)
-    insert_dummy_data(oid, sid_2_bad)
+    planid = 'm1'    
+    insert_dummy_data(oid, sid_1, planid)
+    insert_dummy_data(oid, sid_2_bad, planid)
     check_user_subscribed(oid)
 
     # should fail
     print('\nTest 3 - this should raise an assertion error with code 402')
     oid = '975040DE-D354-4D1D-9802-B20D2AE54572'
     sid_1_bad = '1031BCA9-DB8C-4805-A751-FC99D90B0F51' # invalid
-    insert_dummy_data(oid, sid_1_bad)
+    planid = 'm1'    
+    insert_dummy_data(oid, sid_1_bad, planid)
     check_user_subscribed(oid)

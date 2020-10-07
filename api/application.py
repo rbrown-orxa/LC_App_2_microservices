@@ -68,16 +68,16 @@ def optimise():
     logging.info('got an optimise request')
 
 
-    object_id, tenant, subscription_id = None, None, None
+    object_id, tenant, sub_id, plan_id = None, None, None, None
     if app.config['REQUIRE_AUTH']:
 	    # object_id = request.json['oid'] # get oid from request.json
 	    object_id = g.oid # get oid from JWT claim instead of request.json
 	    tenant = g.tenant
 	    logging.info(f'got oid: {object_id}')
-	    subscription_id = billing.check_subscription(object_id,tenant)
+	    sub_id, plan_id = billing.check_subscription(object_id, tenant)
 
 
-    query_id = billing.query_started(subscription_id,object_id)
+    query_id = billing.query_started(subscription_id, object_id, plan_id)
 
     rv = library._optimise(request)
 

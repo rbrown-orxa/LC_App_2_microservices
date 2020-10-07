@@ -11,14 +11,17 @@ import subscription
 
 def check_subscription(object_id, SSO_type):
     
+    sub_id, plan_id = None, None
     if not current_app.config['APPLY_BILLING']:
-      return
+      return sub_id, plan_id
     
     if SSO_type == 'ad':
-        return subscription.check_user_subscribed(object_id) #str(sid)
+        sub_id, plan_id = subscription.check_user_subscribed(object_id) #str(sid)
+        return sub_id, plan_id
 
     elif SSO_type == 'b2c':
-        return check_free_query_quota(object_id) #None
+        check_free_query_quota(object_id)
+        return sub_id, plan_id
 
     assert False, '500 Unexpected SSO type'
 
@@ -38,7 +41,7 @@ def make_tables(conn_str):
 
     success = False
     while not success:
-        logging.info('Trying to make billing tables if not exist')
+        logging.info('Trying to make query table if not exist')
         try:
             with psycopg2.connect(conn_str) as conn:
                 SQL =   """
@@ -48,19 +51,21 @@ def make_tables(conn_str):
                             started TIMESTAMPTZ NOT NULL DEFAULT NOW(),
                             success BOOLEAN NOT NULL DEFAULT FALSE,
                             subscription_id UUID,
+                            plan_id TEXT,
                             object_id UUID,
                             completed TIMESTAMPTZ,
                             billed BOOLEAN NOT NULL DEFAULT FALSE,
                             date_billed TIMESTAMPTZ 
                         );
                         
-                        CREATE TABLE
-                        IF NOT EXISTS bills (
-                            id SERIAL PRIMARY KEY,
-                            subscription_id UUID NOT NULL,
-                            units INT NOT NULL,
-                            created TIMESTAMPTZ NOT NULL DEFAULT NOW()
-                        ) ;
+                        -- CREATE TABLE
+                        -- IF NOT EXISTS bills (
+                        --     id SERIAL PRIMARY KEY,
+                        --     subscription_id UUID NOT NULL,
+                        --     plan_id TEXT NOT NULL, 
+                        --     units INT NOT NULL,
+                        --     created TIMESTAMPTZ NOT NULL DEFAULT NOW()
+                        -- ) ;
                         """
                         
 
@@ -78,7 +83,7 @@ def make_tables(conn_str):
 
 
 
-def query_started(subscription_id,oid):
+def query_started(subscription_id, oid, plan_id):
     
     if not current_app.config['APPLY_BILLING']:
         # return None
@@ -89,14 +94,14 @@ def query_started(subscription_id,oid):
     
     SQL =  """
             INSERT INTO queries
-            (subscription_id,object_id)
-            VALUES (%s,%s) 
+            (subscription_id, object_id, plan_id)
+            VALUES (%s, %s, %s) 
             RETURNING id;
             """
 
     with psycopg2.connect(conn_str) as conn:
         cur = conn.cursor()
-        cur.execute( SQL, (subscription_id,oid,) )
+        cur.execute( SQL, (subscription_id, oid, plan_id) )
         conn.commit()
         id = cur.fetchone()[0]
         cur.close()
@@ -163,8 +168,9 @@ if __name__ == '__main__':
 
 
     id2 = query_started(
-            subscription_id='CEF06856-837B-4661-A627-6B20FD268A5C',
-            oid='9e6e8167-b3e7-4e76-93a2-d99bcd9fe7cc')
+            subscription_id='6b71cfa4-fa75-3540-fc41-b72fd8ef2555',
+            oid='5995EBF0-D3D8-4C3F-8921-DC59DB7E5280',
+            plan_id='m1')
     time.sleep(random.random()/2)
     query_successful(id2)
 

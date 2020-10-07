@@ -16,23 +16,23 @@ if not config.read('config.ini'):
 loglevel = getattr(logging, config['DEBUG']['loglevel'].upper())
 logging.basicConfig(level=loglevel)
 
-CONN_STR = f"host={config['DB']['host']} " \
-        + f"user={config['DB']['user']} " \
-        + f"dbname={config['DB']['dbname']} " \
-        + f"password={config['DB']['password']} " \
-        + f"sslmode={config['DB']['sslmode']}"
+CONN_STR_QUERIES = f"host={config['QUERIES']['host']} " \
+        + f"user={config['QUERIES']['user']} " \
+        + f"dbname={config['QUERIES']['dbname']} " \
+        + f"password={config['QUERIES']['password']} " \
+        + f"sslmode={config['QUERIES']['sslmode']}"
         
-CONN_STR_SUB = f"host={config['DB']['host']} " \
-            + f"user={config['DB']['user']} " \
-            + f"dbname={config['DB']['dbnamesub']} " \
-            + f"password={config['DB']['password']} " \
-            + f"sslmode={config['DB']['sslmode']}"
+CONN_STR_SUB = f"host={config['BILLING']['host']} " \
+            + f"user={config['BILLING']['user']} " \
+            + f"dbname={config['BILLING']['dbname']} " \
+            + f"password={config['BILLING']['password']} " \
+            + f"sslmode={config['BILLING']['sslmode']}"
 
 
 def get_users_to_bill():
     SQL =   """
             select distinct 
-                subscription_id 
+                subscription_id, plan_id 
             from 
                 queries 
             where
@@ -43,16 +43,18 @@ def get_users_to_bill():
             ;
             """
 
-    with psycopg2.connect(CONN_STR) as conn:
+    with psycopg2.connect(CONN_STR_QUERIES) as conn:
         cur = conn.cursor()
         cur.execute( SQL, (config['BILLING']['billing_horizon'], ) )
         uuids = cur.fetchall()
         cur.close()
+        
+    return uuids # list of tuples [(sub_id, plan_id), ...]
     
-    return [uuid[0] for uuid in uuids]
+#    return [uuid[0] for uuid in uuids]
 
 
-def get_billing_qty(db_cursor, subscription_id):
+def get_billing_qty(db_cursor, subscription_id, plan_id):
 
     SQL1 =   """
             update queries
@@ -61,6 +63,7 @@ def get_billing_qty(db_cursor, subscription_id):
                 date_billed = now() 
             where 
                 subscription_id = %s 
+                and plan_id = %s
                 and success = true 
                 and billed = false 
                 and completed >= now() - interval %s
@@ -70,40 +73,44 @@ def get_billing_qty(db_cursor, subscription_id):
 
     SQL2 =  """
             insert into bills
-                (subscription_id, units)
+                (subscription_id, plan_id, units)
             values
-                (%s, %s)
+                (%s, %s, %s)
             ;
             """
 
     db_cursor.execute( SQL1, (
-        subscription_id, config['BILLING']['billing_horizon'] ) )
+        subscription_id, plan_id, config['BILLING']['billing_horizon'] ) )
     query_ids = db_cursor.fetchall()
     
     qty = len(query_ids)
     assert qty > 0
     logging.debug(f'subscription_id: {subscription_id}, units: {qty}')
     
-    db_cursor.execute( SQL2, (subscription_id, qty) )
+    db_cursor.execute( SQL2, (subscription_id, plan_id, qty) )
 
     return qty
 
 
-def process_single_bill(subscription_id):
+def process_single_bill(subscription_id, plan_id):
     """Use two stage DB transaction to process bills"""
     try:
-        conn = psycopg2.connect(CONN_STR)
+        conn = psycopg2.connect(CONN_STR_QUERIES)
         conn.autocommit = False
         cur = conn.cursor()
         
         post_bill_to_API(
-            subscription_id, get_billing_qty(cur, subscription_id))
+            subscription_id, 
+            plan_id, 
+            get_billing_qty(cur, subscription_id, plan_id))
 
         conn.commit()
         logging.debug(f'Bill posted successfully: {subscription_id}')
     except:
         conn.rollback()
-        raise RuntimeError(f'Error while processing bill: {subscription_id}')
+#        logging.warning(f'Error while processing bill: {subscription_id}')
+        raise
+#        raise RuntimeError(f'Error while processing bill: {subscription_id}')
     finally:
         if conn:
             cur.close()
@@ -115,34 +122,36 @@ def process_bills():
     num_bills, n_successful = len(users_to_bill), 0
     logging.info(f'Processing {num_bills} bills')
     
-    for subscription_id in users_to_bill:
+    for subscription_id, plan_id in users_to_bill:
         try:
-            process_single_bill(subscription_id)
+            process_single_bill(subscription_id, plan_id)
             n_successful += 1
         except:
-            logging.warning(f'Error while processing bill: {subscription_id}')
+            logging.exception(f'Error while processing bill: {subscription_id}')
+#            logging.warning(f'Error while processing bill: {subscription_id}')
 
     logging.info(
         f'Processed {num_bills} bills, with {num_bills - n_successful} failures')
 
 
-def post_bill_to_API(uuid, qty):
+def post_bill_to_API(uuid, plan_id, qty):
         r = requests.post(
                 config['BILLING']['baseURL'],
-                data=make_body(uuid, qty),
+                data=make_body(uuid, plan_id, qty),
                 params={'api-version': '2018-08-31'},
                 headers=make_headers(uuid),
                 timeout=config['BILLING'].getint('timeout_s'))
         logging.debug(f'Status code: {r.status_code} for UUID: {uuid}')
 #        logging.debug(r.json())
-        assert r.status_code == 200
-
+        if not r.status_code == 200:
+            raise RuntimeError(f'Error while posting bill.\n{r.json()}')
 
 def job():
     try:
         process_bills()
     except:
         logging.exception('Error while running batch billing job')
+
         
 def get_plan_id(uuid):
     SQL3 =   """
@@ -159,14 +168,14 @@ def get_plan_id(uuid):
     return([pid[0] for pid in pids])
     
 
-def make_body(uuid, qty):
+def make_body(uuid, plan_id, qty):
     now = datetime.datetime.utcnow()
     effectiveStartTime = now.strftime('%Y-%m-%dT%H:%M:%S')
     body = {'resourceId': uuid,
             'quantity': qty,
             'dimension': config['BILLING']['dimension'],
             'effectiveStartTime': effectiveStartTime,
-            'planId': get_plan_id(uuid)[0]}
+            'planId': plan_id}
     return json.dumps(body)
 
 
@@ -191,12 +200,42 @@ def get_authorization_token():
     return(res['access_token'])
     
     
+def make_tables(conn_str):
 
+    success = False
+    while not success:
+        logging.info('Trying to make bills table if not exist')
+        try:
+            with psycopg2.connect(conn_str) as conn:
+                SQL =   """
+                        CREATE TABLE
+                        IF NOT EXISTS bills (
+                            id SERIAL PRIMARY KEY,
+                            subscription_id UUID NOT NULL,
+                            plan_id TEXT NOT NULL, 
+                            units INT NOT NULL,
+                            created TIMESTAMPTZ NOT NULL DEFAULT NOW()
+                        ) ;
+                        """
+                        
+                cur = conn.cursor()
+                cur.execute(SQL)
+                conn.commit()
+                cur.close()
+
+            logging.info('Success')
+            success = True
+
+        except Exception as err:
+                logging.info(err)
+                time.sleep(5)
 
 
 
 if __name__ == "__main__":
     logging.info('Starting billing service')
+    
+    make_tables(CONN_STR_QUERIES)
 
     if config['DEBUG']['enable_fast_query']:
         schedule.every(

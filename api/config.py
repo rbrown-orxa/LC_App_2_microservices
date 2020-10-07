@@ -18,11 +18,11 @@ BILLING_DB_CONN_STR = "host=localhost "\
                        + "password=password "\
                        + "sslmode=allow"    
 
-# SUBSCRIPTION_DB_CONN_STR = "host=localhost "\
-#                        + "user=postgres "\
-#                        + "dbname=postgres "\
-#                        + "password=password "\
-#                        + "sslmode=allow"         
+SUBSCRIPTION_DB_CONN_STR = "host=localhost "\
+                        + "user=postgres "\
+                        + "dbname=postgres "\
+                        + "password=password "\
+                        + "sslmode=allow"         
 
 #Use these  for production:
 # BILLING_DB_CONN_STR = "host=lcapppostgreserver.postgres.database.azure.com "\
@@ -31,11 +31,11 @@ BILLING_DB_CONN_STR = "host=localhost "\
 #                     + "password=SANorxagrid12 "\
 #                     + "sslmode=require"
 
-SUBSCRIPTION_DB_CONN_STR = "host=lcapppostgreserver.postgres.database.azure.com "\
-                         + "user=lcapp@lcapppostgreserver "\
-                         + "dbname=Azuresubscriptiondb "\
-                         + "password=SANorxagrid12 "\
-                         + "sslmode=require"         
+#SUBSCRIPTION_DB_CONN_STR = "host=lcapppostgreserver.postgres.database.azure.com "\
+#                         + "user=lcapp@lcapppostgreserver "\
+#                         + "dbname=Azuresubscriptiondb "\
+#                         + "password=SANorxagrid12 "\
+#                         + "sslmode=require"         
 
 
 
