@@ -18,7 +18,12 @@
                     "annual_import_with_pv_and_battery_kwh": 1.0,
                     "original_import_cost": 1.0,
                     "with_ev_import_cost": 1.0,
-                    "optimised_import_cost": 1.0
+                    "total_import_cost":1.0,
+                    "with_pv_optimised_import_cost":1.0,
+                    "with_battery_optimised_import_cost":1.0, 
+                    "lifetime_profit":1.0,
+                    "roi": 1.0,
+                    "payback_period":1.0
                 },
                 "buildings": [
                     {
@@ -62,7 +67,12 @@
                         "annual_import_with_pv_and_battery_kwh": 1.0,
                         "original_import_cost": 1.0,
                         "with_ev_import_cost": 1.0,
-                        "optimised_import_cost": 1.0
+                        "total_import_cost":1.0,
+                        "with_pv_optimised_import_cost":1.0,
+                        "with_battery_optimised_import_cost":1.0, 
+                        "lifetime_profit":1.0,
+                        "roi": 1.0,
+                        "payback_period":1.0
                     },
                     "buildings": [
                         {
@@ -96,29 +106,39 @@
                     "default": {},
                     "examples": [
                         {
-                            "success": true,
-                            "battery_size_kwh": 1.0,
-                            "annual_import_site_kwh": 1.0,
-                            "annual_import_ev_kwh": 1.0,
-                            "annual_import_total_kwh": 1.0,
-                            "annual_import_with_pv_kwh": 1.0,
-                            "annual_import_with_pv_and_battery_kwh": 1.0,
-                            "original_import_cost": 1.0,
-                            "with_ev_import_cost": 1.0,
-                            "optimised_import_cost": 1.0
+                        "success": true,
+                        "battery_size_kwh": 1.0,
+                        "annual_import_site_kwh": 1.0,
+                        "annual_import_ev_kwh": 1.0,
+                        "annual_import_total_kwh": 1.0,
+                        "annual_import_with_pv_kwh": 1.0,
+                        "annual_import_with_pv_and_battery_kwh": 1.0,
+                        "original_import_cost": 1.0,
+                        "with_ev_import_cost": 1.0,
+                        "total_import_cost":1.0,
+                        "with_pv_optimised_import_cost":1.0,
+                        "with_battery_optimised_import_cost":1.0, 
+                        "lifetime_profit":1.0,
+                        "roi": 1.0,
+                        "payback_period":1.0
                         }
                     ],
                     "required": [
                         "success",
-                        "battery_size_kwh",
-                        "annual_import_site_kwh",
-                        "annual_import_ev_kwh",
-                        "annual_import_total_kwh",
-                        "annual_import_with_pv_kwh",
-                        "annual_import_with_pv_and_battery_kwh",
-                        "original_import_cost",
-                        "with_ev_import_cost",
-                        "optimised_import_cost"
+                        "battery_size_kwh": 1.0,
+                        "annual_import_site_kwh": 1.0,
+                        "annual_import_ev_kwh": 1.0,
+                        "annual_import_total_kwh": 1.0,
+                        "annual_import_with_pv_kwh": 1.0,
+                        "annual_import_with_pv_and_battery_kwh": 1.0,
+                        "original_import_cost": 1.0,
+                        "with_ev_import_cost": 1.0,
+                        "total_import_cost":1.0,
+                        "with_pv_optimised_import_cost":1.0,
+                        "with_battery_optimised_import_cost":1.0, 
+                        "lifetime_profit":1.0,
+                        "roi": 1.0,
+                        "payback_period":1.0
                     ],
                     "properties": {
                         "success": {
@@ -211,10 +231,60 @@
                                 1.0
                             ]
                         },
-                        "optimised_import_cost": {
-                            "$id": "#/properties/results/properties/site/properties/optimised_import_cost",
+                        "total_import_cost": {
+                            "$id": "#/properties/results/properties/site/properties/total_import_cost",
                             "type": "number",
-                            "title": "The optimised_import_cost schema",
+                            "title": "The total_import_cost schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": 0.0,
+                            "examples": [
+                                1.0
+                            ]
+                        },                        
+                        "with_pv_optimised_import_cost": {
+                            "$id": "#/properties/results/properties/site/properties/with_pv_optimised_import_cost",
+                            "type": "number",
+                            "title": "The with_pv_optimised_import_cost schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": 0.0,
+                            "examples": [
+                                1.0
+                            ]
+                        },
+                        "with_battery_optimised_import_cost": {
+                            "$id": "#/properties/results/properties/site/properties/with_battery_optimised_import_cost",
+                            "type": "number",
+                            "title": "The with_battery_optimised_import_cost schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": 0.0,
+                            "examples": [
+                                1.0
+                            ]
+                        },
+                        "lifetime_profit": {
+                            "$id": "#/properties/results/properties/site/properties/lifetime_profit",
+                            "type": "number",
+                            "title": "The lifetime_profit schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": 0.0,
+                            "examples": [
+                                1.0
+                            ]
+                        },
+                        "roi": {
+                            "$id": "#/properties/results/properties/site/properties/roi",
+                            "type": "number",
+                            "title": "The roi schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": 0.0,
+                            "examples": [
+                                1.0
+                            ]
+                        },
+                        "payback_period": {
+                            "$id": "#/properties/results/properties/site/properties/payback_period",
+                            "type": "number",
+                            "title": "The payback_period schema",
                             "description": "An explanation about the purpose of this instance.",
                             "default": 0.0,
                             "examples": [
