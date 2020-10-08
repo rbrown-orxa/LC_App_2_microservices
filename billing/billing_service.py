@@ -134,8 +134,9 @@ def process_bills():
 
 
 def post_bill_to_API(uuid, plan_id, qty):
-        r = requests.post(
-                config['BILLING']['baseURL'],
+        url = config['BILLING']['baseURL']
+        logging.debug(f'posting a bill to {url}')
+        r = requests.post(url,
                 data=make_body(uuid, plan_id, qty),
                 params={'api-version': '2018-08-31'},
                 headers=make_headers(uuid),
@@ -249,8 +250,18 @@ if __name__ == "__main__":
 
     loglevel = getattr(logging, config['DEBUG']['loglevel'].upper())
     logging.basicConfig(level=loglevel)
-    
-    logging.info('Starting billing service')
+    logging.warning('Starting inline TEST MODE for billing service.'
+                    ' Ensure a postgres instance is running on localhost.')
+
+    CONN_STR_QUERIES = f"host=localhost " \
+            + f"user=postgres " \
+            + f"dbname=postgres " \
+            + f"password=password " \
+            + f"sslmode=allow"
+            
+    CONN_STR_SUB = CONN_STR_QUERIES
+
+    config['BILLING']['baseURL'] = 'https://postman-echo.com/post'
     
     make_tables(CONN_STR_QUERIES)
     run_service()
