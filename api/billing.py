@@ -58,14 +58,14 @@ def make_tables(conn_str):
                             date_billed TIMESTAMPTZ 
                         );
                         
-                        -- CREATE TABLE
-                        -- IF NOT EXISTS bills (
-                        --     id SERIAL PRIMARY KEY,
-                        --     subscription_id UUID NOT NULL,
-                        --     plan_id TEXT NOT NULL, 
-                        --     units INT NOT NULL,
-                        --     created TIMESTAMPTZ NOT NULL DEFAULT NOW()
-                        -- ) ;
+                           CREATE TABLE
+                           IF NOT EXISTS bills (
+                             id SERIAL PRIMARY KEY,
+                             subscription_id UUID NOT NULL,
+                             plan_id TEXT NOT NULL, 
+                             units INT NOT NULL,
+                             created TIMESTAMPTZ NOT NULL DEFAULT NOW()
+                         ) ;
                         """
                         
 

@@ -63,6 +63,7 @@ def optimise():
     # Replace these with actual values sent from frontend
     # email = app.config['EMAIL']
     # subscription_id = app.config['SUBSCRIPTION_ID']
+    
     # subscription_id = billing.check_user_subscribed()
 
     logging.info('got an optimise request')
@@ -77,12 +78,12 @@ def optimise():
 	    sub_id, plan_id = billing.check_subscription(object_id, tenant)
 
 
-    query_id = billing.query_started(subscription_id, object_id, plan_id)
+    query_id = billing.query_started(sub_id, object_id, plan_id)
 
     rv = library._optimise(request)
 
     if app.config['PICKLE_RESULTS']:
-        utils.pickle_results(rv, subscription_id, app.config['UPLOAD_PATH'])
+        utils.pickle_results(rv, sub_id, app.config['UPLOAD_PATH'])
     
     billing.query_successful(query_id)
 
