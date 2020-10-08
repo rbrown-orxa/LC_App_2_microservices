@@ -13,8 +13,7 @@ if not config.read('config.ini'):
     config.read(os.path.join(os.getcwd(), 'config.ini'))
 
 
-loglevel = getattr(logging, config['DEBUG']['loglevel'].upper())
-logging.basicConfig(level=loglevel)
+
 
 CONN_STR_QUERIES = f"host={config['QUERIES']['host']} " \
         + f"user={config['QUERIES']['user']} " \
@@ -231,12 +230,7 @@ def make_tables(conn_str):
                 time.sleep(5)
 
 
-
-if __name__ == "__main__":
-    logging.info('Starting billing service')
-    
-    make_tables(CONN_STR_QUERIES)
-
+def run_service():
     if config['DEBUG']['enable_fast_query']:
         schedule.every(
             config['DEBUG'].getint('fast_query_interval_s')).seconds.do(job)
@@ -248,6 +242,18 @@ if __name__ == "__main__":
     while True:
         schedule.run_pending()
         time.sleep(1)
+
+
+
+if __name__ == "__main__":
+
+    loglevel = getattr(logging, config['DEBUG']['loglevel'].upper())
+    logging.basicConfig(level=loglevel)
+    
+    logging.info('Starting billing service')
+    
+    make_tables(CONN_STR_QUERIES)
+    run_service()
 
 
 
