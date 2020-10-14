@@ -1,3 +1,12 @@
+# Billing service for LC App Phase 2
+
+This is a docker container service which calculates Azure SaaS bills every n seconds (3600 typical) based on the number of unbilled queries over the past n hours (24 typical) and posts the bills to SaaS API.
+
+- Queries, bills and subscription references are handled in the LC App Phase 2 postgres DB.
+- Subscription status is handled by SaaS API
+- User authentication is handled by Azure B2C and Azure SSO APIs with JWTs
+
+
 ## To install Docker locally on Ubuntu machine (not for production):
     
 1. Get the convenience script:
