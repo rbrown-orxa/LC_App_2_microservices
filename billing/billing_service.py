@@ -7,12 +7,11 @@ import datetime
 import json
 import requests
 import os
+import uuid
 
 config = configparser.ConfigParser()
 if not config.read('config.ini'):
     config.read(os.path.join(os.getcwd(), 'config.ini'))
-
-
 
 
 CONN_STR_QUERIES = f"host={config['QUERIES']['host']} " \
@@ -202,28 +201,28 @@ def get_authorization_token():
     
 def make_tables(conn_str):
 
+    SQL =   """
+            CREATE TABLE
+            IF NOT EXISTS bills (
+                id SERIAL PRIMARY KEY,
+                subscription_id UUID NOT NULL,
+                plan_id TEXT NOT NULL, 
+                units INT NOT NULL,
+                created TIMESTAMPTZ NOT NULL DEFAULT NOW()
+            ) ;
+            """
+    
     success = False
     while not success:
         logging.info('Trying to make bills table if not exist')
         try:
             with psycopg2.connect(conn_str) as conn:
-                SQL =   """
-                        CREATE TABLE
-                        IF NOT EXISTS bills (
-                            id SERIAL PRIMARY KEY,
-                            subscription_id UUID NOT NULL,
-                            plan_id TEXT NOT NULL, 
-                            units INT NOT NULL,
-                            created TIMESTAMPTZ NOT NULL DEFAULT NOW()
-                        ) ;
-                        """
                         
                 cur = conn.cursor()
                 cur.execute(SQL)
                 conn.commit()
                 cur.close()
 
-            logging.info('Success')
             success = True
 
         except Exception as err:
@@ -232,24 +231,68 @@ def make_tables(conn_str):
 
 
 def run_service():
-    if config['DEBUG']['enable_fast_query']:
-        schedule.every(
-            config['DEBUG'].getint('fast_query_interval_s')).seconds.do(job)
-    else:
-        schedule.every(
-            config['BILLING'].getint('query_interval_hrs')).hours.do(job)
+    make_tables(CONN_STR_QUERIES)
 
-    job() # initial run
+    schedule.every(
+        config['BILLING'].getint('query_interval_seconds')).seconds.do(job)
+
+    # job() # initial run
     while True:
         schedule.run_pending()
         time.sleep(1)
 
 
+def make_test_data(conn_str):
+    SQL1 =   """
+            CREATE TABLE
+            IF NOT EXISTS queries (
+                id SERIAL PRIMARY KEY,
+                started TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                success BOOLEAN NOT NULL DEFAULT FALSE,
+                subscription_id UUID,
+                plan_id TEXT,
+                object_id UUID,
+                completed TIMESTAMPTZ,
+                billed BOOLEAN NOT NULL DEFAULT FALSE,
+                date_billed TIMESTAMPTZ 
+            );
+            """
+
+    SQL2 =  """
+            INSERT INTO queries
+            (subscription_id, object_id, plan_id)
+            VALUES (%s, %s, %s) 
+            RETURNING id;
+            """
+
+    SQL3 =  """
+            UPDATE queries
+            SET 
+            success = true,
+            completed = NOW()
+            WHERE id = %s 
+            -- RETURNING subscription_id 
+            ;
+            """            
+
+    subscription_id, oid, plan_id = str(uuid.uuid4()), str(uuid.uuid4()), 'foo'
+
+    with psycopg2.connect(conn_str) as conn:
+        cur = conn.cursor()
+        cur.execute(SQL1)
+        cur.execute( SQL2, (subscription_id, oid, plan_id) )   
+        query_id = cur.fetchone()[0]     
+        time.sleep(0.1)
+        cur.execute( SQL3, (query_id, ) )        
+        conn.commit()
+        cur.close()
+
+
 
 if __name__ == "__main__":
 
-    loglevel = getattr(logging, config['DEBUG']['loglevel'].upper())
-    logging.basicConfig(level=loglevel)
+    # loglevel = getattr(logging, config['DEBUG']['loglevel'].upper())
+    logging.basicConfig(level=logging.DEBUG)
     logging.warning('Starting inline TEST MODE for billing service.'
                     ' Ensure a postgres instance is running on localhost.')
 
@@ -262,8 +305,10 @@ if __name__ == "__main__":
     CONN_STR_SUB = CONN_STR_QUERIES
 
     config['BILLING']['baseURL'] = 'https://postman-echo.com/post'
-    
-    make_tables(CONN_STR_QUERIES)
+    config['BILLING']['query_interval_seconds'] = '5'
+
+    logging.debug('Job should run every 5 seconds')
+    make_test_data(CONN_STR_QUERIES)
     run_service()
 
 
