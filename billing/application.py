@@ -14,4 +14,8 @@ logging.basicConfig(level=loglevel)
 
 if __name__ == '__main__':
 	logging.info('Starting billing service')
-	billing_service.run_service()
+	try:
+		billing_service.run_service()
+	except:
+		logging.warning('Billing service exited unexpectedly')
+

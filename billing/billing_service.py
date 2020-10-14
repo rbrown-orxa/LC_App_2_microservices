@@ -51,8 +51,6 @@ def get_users_to_bill():
         
     return uuids # list of tuples [(sub_id, plan_id), ...]
     
-#    return [uuid[0] for uuid in uuids]
-
 
 def get_billing_qty(db_cursor, subscription_id, plan_id):
 
@@ -108,9 +106,7 @@ def process_single_bill(subscription_id, plan_id):
         logging.debug(f'Bill posted successfully: {subscription_id}')
     except:
         conn.rollback()
-#        logging.warning(f'Error while processing bill: {subscription_id}')
         raise
-#        raise RuntimeError(f'Error while processing bill: {subscription_id}')
     finally:
         if conn:
             cur.close()
@@ -128,7 +124,6 @@ def process_bills():
             n_successful += 1
         except:
             logging.exception(f'Error while processing bill: {subscription_id}')
-#            logging.warning(f'Error while processing bill: {subscription_id}')
 
     logging.info(
         f'Processed {num_bills} bills, with {num_bills - n_successful} failures')
@@ -187,6 +182,7 @@ def make_headers(uuid):
                 'authorization': 'Bearer ' + get_authorization_token()}
     return headers
 
+
 def get_authorization_token():
     headers = {'Content-type': 'application/x-www-form-urlencoded'}
     body = {'grant_type': 'client_credentials',
@@ -238,7 +234,6 @@ def run_service():
     schedule.every(
         config['BILLING'].getint('query_interval_seconds')).seconds.do(job)
 
-    # job() # initial run
     while True:
         schedule.run_pending()
         time.sleep(1)
@@ -274,7 +269,6 @@ def make_test_data(conn_str):
             success = true,
             completed = NOW()
             WHERE id = %s 
-            -- RETURNING subscription_id 
             ;
             """            
 

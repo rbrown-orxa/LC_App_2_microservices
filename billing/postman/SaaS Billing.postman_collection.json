@@ -1,14 +1,14 @@
 {
 	"info": {
-		"_postman_id": "2649978d-3249-4d1d-81d9-7737e532faba",
-		"name": "get the publisher's authorization token - collection Script",
+		"_postman_id": "e9487d10-d1c8-4032-9eee-0cc31858b6f3",
+		"name": "SaaS Billing",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "Get Access Token",
+			"name": "Post a bill",
 			"request": {
-				"method": "GET",
+				"method": "POST",
 				"header": [
 					{
 						"key": "content-type",
@@ -31,8 +31,17 @@
 						"type": "text"
 					}
 				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\"resourceId\": \"68649575-e1e7-7864-ba8f-7ec24b0ee66e\", \n\"quantity\": 1, \n\"dimension\": \"result\", \n\"effectiveStartTime\": \"2020-10-14T11:00:00\", \n\"planId\": \"m1\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
-					"raw": "https://marketplaceapi.microsoft.com/api/saas/subscriptions?api-version=2018-08-31",
+					"raw": "https://marketplaceapi.microsoft.com/api/usageEvent?api-version=2018-08-31",
 					"protocol": "https",
 					"host": [
 						"marketplaceapi",
@@ -41,8 +50,7 @@
 					],
 					"path": [
 						"api",
-						"saas",
-						"subscriptions"
+						"usageEvent"
 					],
 					"query": [
 						{
@@ -59,7 +67,7 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "dc69c4ce-9fad-43f4-8166-b0d0cf3d0fba",
+				"id": "74698812-bdf7-4d24-9537-296a412de334",
 				"type": "text/javascript",
 				"exec": [
 					"var client_id      = pm.environment.get(\"client_id\");",
@@ -97,7 +105,7 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "50ac596d-4669-4abc-869f-9e024f4bae40",
+				"id": "ec8b96ad-f034-4344-870a-bc3cf3db69b2",
 				"type": "text/javascript",
 				"exec": [
 					""
