@@ -4,7 +4,6 @@ This is a docker container service which calculates Azure SaaS bills every n sec
 
 - Queries, bills and subscription references are handled in the LC App Phase 2 postgres DB.
 - Subscription status is handled by SaaS API
-- User authentication is handled by Azure B2C and Azure SSO APIs with JWTs
 
 
 ## To install Docker locally on Ubuntu machine (not for production):
@@ -13,6 +12,7 @@ This is a docker container service which calculates Azure SaaS bills every n sec
 
         curl -fsSL https://get.docker.com -o get-docker.sh
         sudo sh get-docker.sh
+
 2. Add permissions (replace <your-user> with your user name)
 
         sudo usermod -aG docker <your-user>
@@ -24,13 +24,16 @@ This is a docker container service which calculates Azure SaaS bills every n sec
 1. Start a postgres instance against localhost
 
         docker run -d --name postgres -e POSTGRES_PASSWORD=password postgres
+
 2. Create a virtual environment
 
         python3 -m venv venv
+
 3. Activate virtual environment and install dependencies
 
         source ./venv/bin/activate
         pip install -r requirements.txt
+
 4. Run the script. A billing job should run against dummy data
 
         python3 billing_service.py
@@ -41,18 +44,23 @@ This is a docker container service which calculates Azure SaaS bills every n sec
 1. Build the image
 
         docker build -t billing_service:v1 .
+
 2. Run the container in background
 
         docker run -d --name billing billing_service:v1
+
 3. Check the logs
 
         docker logs -f billing 
+
 4. Check if container is up
 
         docker container ls -a
+
 5. Stop billing service
 
         docker stop billing
+        
 6. Remove billing service
 
         docker rm billing
