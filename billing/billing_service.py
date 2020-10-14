@@ -40,10 +40,12 @@ def get_users_to_bill():
                 and completed >= now() - interval %s
             ;
             """
+    billing_horizon = config['BILLING']['billing_horizon']            
 
     with psycopg2.connect(CONN_STR_QUERIES) as conn:
         cur = conn.cursor()
-        cur.execute( SQL, (config['BILLING']['billing_horizon'], ) )
+        cur.execute( SQL, (billing_horizon, ) )
+        logging.debug(f'Billing horizon: {billing_horizon}')
         uuids = cur.fetchall()
         cur.close()
         
@@ -243,6 +245,7 @@ def run_service():
 
 
 def make_test_data(conn_str):
+    logging.debug('Inserting test data into DB')
     SQL1 =   """
             CREATE TABLE
             IF NOT EXISTS queries (
@@ -291,7 +294,6 @@ def make_test_data(conn_str):
 
 if __name__ == "__main__":
 
-    # loglevel = getattr(logging, config['DEBUG']['loglevel'].upper())
     logging.basicConfig(level=logging.DEBUG)
     logging.warning('Starting inline TEST MODE for billing service.'
                     ' Ensure a postgres instance is running on localhost.')
