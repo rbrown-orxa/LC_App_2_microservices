@@ -75,12 +75,12 @@ This is a Flask app which optimally sizes solar PV and storage batteries for a c
 
 1. Ensure following four dependencies are running (if required by config choices):
 
-    - Billing service (Python3 Docker) - https://bitbucket.org/OrxaGridRepo/solarpv_battery/src/billing_db/billing/
+    - Billing service (Python3 Docker) - https://bitbucket.org/OrxaGridRepo/solarpv_battery/src/master/billing/
     - Subscription service (C# dotnet) - https://bitbucket.org/OrxaGridRepo/contosoampbasic/src/dev/
     - Frontend (React.js) - https://bitbucket.org/OrxaGridRepo/solarpv-phase2/src/master/
     - Database (postgres Azure) - lcapppostgreserver.postgres.database.azure.com
 
-1. Check the config file options are configured for production
+1. Check the config file options in config.py are configured for production
     - Enable billing
     - Enable authentication
     - Uncomment production DB connection strings and comment test strings

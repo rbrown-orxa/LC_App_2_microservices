@@ -1,29 +1,17 @@
-# README #
+#LC App Phase 2
 
-This README would normally document whatever steps are necessary to get your application up and running.
+This repo contains the API and billing services for LC App Phase 2, which optimally sizes solar PV and battery storage for a complex containing one or more buildings.
 
-### What is this repository for? ###
+Instructions for testing and deploying these services are given in readme files at /api and /billing respectively.
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+## Dependencies
 
-### How do I get set up? ###
+LC App Phase 2 consists of five services:
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+	- API service (Python3 Flask) - https://bitbucket.org/OrxaGridRepo/solarpv_battery/src/master/api/
+    - Billing service (Python3 Docker) - https://bitbucket.org/OrxaGridRepo/solarpv_battery/src/master/billing/
+    - Subscription service (C# dotnet) - https://bitbucket.org/OrxaGridRepo/contosoampbasic/src/dev/
+    - Frontend (React.js) - https://bitbucket.org/OrxaGridRepo/solarpv-phase2/src/master/
+    - Database (postgres Azure) - lcapppostgreserver.postgres.database.azure.com
 
-### Contribution guidelines ###
 
-* Writing tests
-* Code review
-* Other guidelines
-
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
