@@ -26,6 +26,7 @@ def check_subscription(object_id, SSO_type):
         return sub_id, plan_id
 
     assert False, '500 Unexpected SSO type'
+ 
 
 
 def check_free_query_quota(object_id):
@@ -138,6 +139,7 @@ def query_successful(query_id):
         conn.commit()
         cur.close()
 
+
 def get_unbillable_queries(conn_str, oid=''):
 
      if oid:
@@ -162,37 +164,79 @@ if __name__ == '__main__':
     current_app.config = {}
 
     logging.basicConfig(level=logging.DEBUG)
+
+    logging.debug('Running inline test for billing.py')
     
-    current_app.config['APPLY_BILLING'] = True
     current_app.config['BILLING_DB_CONN_STR'] = \
         'postgres://postgres:password@localhost:5432/postgres'
+    current_app.config['APPLY_BILLING'] = True
 
     make_tables(current_app.config['BILLING_DB_CONN_STR'])
 
 
-    id2 = query_started(
+    logging.debug('Creating query entry with subscription_id for AAD')
+    id1 = query_started(
             subscription_id='6b71cfa4-fa75-3540-fc41-b72fd8ef2555',
             oid='5995EBF0-D3D8-4C3F-8921-DC59DB7E5280',
             plan_id='m1')
     time.sleep(random.random()/2)
+    query_successful(id1)
+
+
+    logging.debug('Creating query entry with object_id for B2C')
+    id2 = query_started(
+            subscription_id=None,
+            oid='9e5ffe58-9a55-41d4-ad25-3d1f45b544dc',
+            plan_id=None)
+    time.sleep(random.random()/2)
     query_successful(id2)
 
-    # id2 = query_started(
-    #         subscription_id='CEF06856-837B-4661-A627-6B20FD268A5C')
-    # time.sleep(random.random()/2)
-    # query_successful(id2)
 
-    # id4 = query_started(
-    #         subscription_id='2EF06856-837B-4661-A627-6B20FD268A5B')
-    # time.sleep(random.random()/2)
-    # query_successful(id4)
+    logging.debug('Creating query entry with subscription_id but billing off')
+    current_app.config['APPLY_BILLING'] = False    
+    id3 = query_started(
+            subscription_id='69a7c491-88d5-4a51-ab28-abc351234fe9',
+            oid=None,
+            plan_id='m1')
+    time.sleep(random.random()/2)
+    query_successful(id3)    
+
+    
+    logging.debug("Checking correct subscription_id's were put into DB")
+
+    conn_str = 'postgres://postgres:password@localhost:5432/postgres'
+    SQL =   """
+            SELECT subscription_id
+            FROM queries
+            WHERE id = %s
+            """
+
+    logging.debug('Checking AAD query entry')
+    with psycopg2.connect(conn_str) as conn:
+        cur = conn.cursor()
+        cur.execute( SQL, (id1, ) )
+        rv = cur.fetchone()[0]
+        cur.close()
+    assert rv == '6b71cfa4-fa75-3540-fc41-b72fd8ef2555', f'Query ID {id1} failed'
+    logging.debug(f'Query ID {id1} test passed')
+    
+    logging.debug('Checking B2C query entry')
+    with psycopg2.connect(conn_str) as conn:
+        cur = conn.cursor()
+        cur.execute( SQL, (id2, ) )
+        rv = cur.fetchone()[0]
+        cur.close()
+    assert rv is None, f'Query ID {id2} failed'
+    logging.debug(f'Query ID {id2} test passed')
+
+    logging.debug('Checking unbilled query entry')
+    with psycopg2.connect(conn_str) as conn:
+        cur = conn.cursor()
+        cur.execute( SQL, (id2, ) )
+        rv = cur.fetchone()[0]
+        cur.close()
+    assert rv is None, f'Query ID {id3} failed'
+    logging.debug(f'Query ID {id3} test passed')
 
 
-
-
-    # bill = get_billing_quantities(current_app.config['BILLING_DB_CONN_STR'])
-    # print(f'Unbilled units: {bill}')
-
-    # time.sleep(random.random()) # simulate API billing request being sent
-
-    # register_billed_quantities(current_app.config['BILLING_DB_CONN_STR'], bill)
+    logging.debug('Inline test passed')

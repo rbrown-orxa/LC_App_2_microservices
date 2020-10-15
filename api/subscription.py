@@ -62,8 +62,7 @@ def get_AAD_token():
 def subscription_is_valid(subscription_id, token):
     #Todo: add a cache, with expire time per entry for invalidation
     #https://docs.microsoft.com/en-us/azure/marketplace/partner-center-portal/pc-saas-fulfillment-api-v2#get-subscription
-    url =   f'https://marketplaceapi.microsoft.com/api/saas/subscriptions/' + \
-            f'{subscription_id}'
+    url =   f'{cfg.SUBSCRIPTION_URL}/{subscription_id}'
 
     try:
 

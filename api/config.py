@@ -37,10 +37,11 @@ SUBSCRIPTION_DB_CONN_STR = "host=lcapppostgreserver.postgres.database.azure.com 
                          + "password=SANorxagrid12 "\
                          + "sslmode=require"         
 
+SUBSCRIPTION_URL = 'https://marketplaceapi.microsoft.com/api/saas/subscriptions'
 
 
 #Dummy uuid for b2c/free users
-DUMMY_UUID = "dd7a9e38-ff3f-11ea-adc1-0242ac120002"
+# DUMMY_UUID = "dd7a9e38-ff3f-11ea-adc1-0242ac120002"
 
 PICKLE_RESULTS = False
 
