@@ -7,15 +7,10 @@ import time
 from pathlib import Path
 import pickle
 
-import utils
-import library
-import config
-import billing
-import subscription
+import config as cfg
 
-debugging_mode = False
 
-if debugging_mode:
+if cfg.DEBUG_MODE:
     log_level = logging.DEBUG
 else:
     log_level = logging.INFO
@@ -23,6 +18,13 @@ else:
 FORMAT = '%(asctime)-s\t%(levelname)-s\t%(filename)-s\t' +\
          '%(funcName)-s\tLine:%(lineno)-s\t\t\'%(message)s\''
 logging.basicConfig(level=log_level, format=FORMAT)
+
+
+import utils
+import library
+import config
+import billing
+import subscription
 
 app = Flask(__name__)
 app.config.from_object(config)

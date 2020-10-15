@@ -1,14 +1,11 @@
-import psycopg2
 import logging
 import time
 import random
 from flask import current_app
 import config as cfg
+import psycopg2
 
 import subscription
-
-if cfg.APPLY_BILLING and __name__ != '__main__':
-    make_tables(cfg.BILLING_DB_CONN_STR)
 
 
 def check_subscription(object_id, SSO_type):
@@ -156,7 +153,13 @@ def get_unbillable_queries(conn_str, oid=''):
              cur.close()
          return rv
 
-if __name__ == '__main__':
+if __name__ != '__main__':
+
+    if cfg.APPLY_BILLING:
+        make_tables(cfg.BILLING_DB_CONN_STR)
+
+else: #run inline tests
+
     class CurrentApp():
         pass
 
