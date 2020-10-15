@@ -7,6 +7,8 @@ import config as cfg
 
 import subscription
 
+if cfg.APPLY_BILLING and __name__ != '__main__':
+    make_tables(cfg.BILLING_DB_CONN_STR)
 
 
 def check_subscription(object_id, SSO_type):
@@ -58,14 +60,14 @@ def make_tables(conn_str):
                             date_billed TIMESTAMPTZ 
                         );
                         
-                           CREATE TABLE
-                           IF NOT EXISTS bills (
-                             id SERIAL PRIMARY KEY,
-                             subscription_id UUID NOT NULL,
-                             plan_id TEXT NOT NULL, 
-                             units INT NOT NULL,
-                             created TIMESTAMPTZ NOT NULL DEFAULT NOW()
-                         ) ;
+                         --   CREATE TABLE
+                         --   IF NOT EXISTS bills (
+                         --     id SERIAL PRIMARY KEY,
+                         --     subscription_id UUID NOT NULL,
+                         --     plan_id TEXT NOT NULL, 
+                         --     units INT NOT NULL,
+                         --     created TIMESTAMPTZ NOT NULL DEFAULT NOW()
+                         -- ) ;
                         """
                         
 
@@ -86,8 +88,7 @@ def make_tables(conn_str):
 def query_started(subscription_id, oid, plan_id):
     
     if not current_app.config['APPLY_BILLING']:
-        # return None
-        pass # log the query in DB even though subscription_id will be empty
+        subscription_id = None
 
     conn_str = current_app.config['BILLING_DB_CONN_STR']
     logging.info('Registering query started')
@@ -114,7 +115,9 @@ def query_started(subscription_id, oid, plan_id):
 def query_successful(query_id):
 
     if not current_app.config['APPLY_BILLING']:
-        return
+        pass # mark as successful
+        #TODO: check that suscription_id is Null
+        # return # TODO - mark as successful but do not bill
 
     conn_str = current_app.config['BILLING_DB_CONN_STR']
     logging.info('Registering successful query')

@@ -8,8 +8,8 @@ PROFILES_EV = './profiles/profiles_for_production_use.csv'
 
 REQUIRE_AUTH = True
 
-APPLY_BILLING = True
-MAX_FREE_CALLS = 5
+APPLY_BILLING = True # Affects AAD users
+MAX_FREE_CALLS = 5 # Affects B2C users
  
 #Use these for local testing:
 #BILLING_DB_CONN_STR = "host=localhost "\

@@ -23,8 +23,8 @@ This is a docker container service which calculates Azure SaaS bills every n sec
 
 1. Start a postgres instance against localhost
 
-        docker run -d --name postgres -e POSTGRES_PASSWORD=password postgres
-
+        docker run -d --name postgres -p 5432:5432 -e POSTGRES_PASSWORD=password postgres
+        
 2. Create a virtual environment
 
         python3 -m venv venv

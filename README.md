@@ -1,4 +1,4 @@
-#LC App Phase 2
+# LC App Phase 2
 
 This repo contains the API and billing services for LC App Phase 2, which optimally sizes solar PV and battery storage for a complex containing one or more buildings.
 

@@ -19,8 +19,7 @@ This is a Flask app which optimally sizes solar PV and storage batteries for a c
 
 1. Start a postgres instance against localhost
 
-        docker run -d --name postgres -e POSTGRES_PASSWORD=password postgres
-
+        docker run -d --name postgres -p 5432:5432 -e POSTGRES_PASSWORD=password postgres
 
 ## To run inline tests of .py modules (N.B. not all modules have an inline test)
 

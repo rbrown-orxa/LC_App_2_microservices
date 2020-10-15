@@ -30,8 +30,8 @@ CORS(app)
 auto = Autodoc(app)
 utils.init_file_handler(app.config['UPLOAD_PATH'])
 
-if app.config['APPLY_BILLING']:
-    billing.make_tables(app.config['BILLING_DB_CONN_STR'])
+# if app.config['APPLY_BILLING']:
+#     billing.make_tables(app.config['BILLING_DB_CONN_STR'])
 
 
 # @app.route("/register_plan_purchase/<plan_token>", methods=['POST'])
