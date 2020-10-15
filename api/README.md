@@ -4,7 +4,7 @@ This is a Flask app which optimally sizes solar PV and storage batteries for a c
 
 
 - Incoming requests to some endpoints can be optionally required to authenticate via a JSON Web Token (JWT) included in the HTTP header.
-- Calls to some endpoints are logged in the LC App Phase 2 postgres DB, including authentication IDs required for rate limiting and billing
+- Calls to some endpoints are logged in the LC App Phase 2 postgres DB, including authenticated IDs required for rate limiting and billing
 - Files uploaded through the API are stored with sanitised file names in the server's local filesystem
 
 
@@ -67,7 +67,7 @@ This is a Flask app which optimally sizes solar PV and storage batteries for a c
 1. Point browser to localhost:5000 for API documentation
 
 1. Use postman collection to test API
-- lcapp2.postman_collection.json
+    - lcapp2.postman_collection.json
 
 
 
@@ -75,15 +75,21 @@ This is a Flask app which optimally sizes solar PV and storage batteries for a c
 
 1. Ensure following four dependencies are running (if required by config choices):
 
-- Billing service (Python3 Docker) - https://bitbucket.org/OrxaGridRepo/solarpv_battery/src/billing_db/billing/
-- Subscription service (C# dotnet) - https://bitbucket.org/OrxaGridRepo/contosoampbasic/src/dev/
-- Frontend (React.js) - https://bitbucket.org/OrxaGridRepo/solarpv-phase2/src/master/
-- Database (postgres Azure) - lcapppostgreserver.postgres.database.azure.com
+    - Billing service (Python3 Docker) - https://bitbucket.org/OrxaGridRepo/solarpv_battery/src/billing_db/billing/
+    - Subscription service (C# dotnet) - https://bitbucket.org/OrxaGridRepo/contosoampbasic/src/dev/
+    - Frontend (React.js) - https://bitbucket.org/OrxaGridRepo/solarpv-phase2/src/master/
+    - Database (postgres Azure) - lcapppostgreserver.postgres.database.azure.com
+
+1. Check the config file options are configured for production
+    - Enable billing
+    - Enable authentication
+    - Uncomment production DB connection strings and comment test strings
+    - Confirm Azure B2C and AAD tenant credentials are correct
 
 1. Push all source files, excluding /venv and /tmp directories to Azure flask runtime
 
 1. Use postman collection to test API
-- lcapp2.postman_collection.json
+    - lcapp2.postman_collection.json
         
 
 
