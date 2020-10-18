@@ -91,11 +91,11 @@ def create_test_table():
                     id serial primary key,
                     objectid uuid not null,
                     subscriptionid uuid not null,
-                    -- subscriptionname text not null,
-                    -- offerid text not null,
+                    subscriptionname text not null,
+                    offerid text not null,
                     planid text not null,
-                    -- purchasertenantid uuid not null,
-                    -- subscriptionstatus text not null,
+                    purchasertenantid uuid not null,
+                    subscriptionstatus text not null,
                     created timestamptz not null default NOW(),
                     unique(subscriptionid)
                 );
