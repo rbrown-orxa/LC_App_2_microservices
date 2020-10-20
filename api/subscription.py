@@ -1,7 +1,7 @@
 import requests
 import psycopg2
 import logging
-import uuid
+import billing
 
 import config as cfg
 
@@ -10,6 +10,7 @@ CONN_STR = cfg.SUBSCRIPTION_DB_CONN_STR
 
 
 def check_user_subscribed(object_id):
+    sub_id, plan_id = None, None
     logging.info(f'Checking subscriptions for {object_id}')
     assert object_id, '401 User object id required'
     for sub_id, plan_id in get_subscription_ids(object_id):
@@ -19,6 +20,14 @@ def check_user_subscribed(object_id):
             return sub_id, plan_id # str, str
         logging.info('Individual subscription ID check failed')
     logging.info('Failed to find any valid subscriptions')
+    logging.info('Using free quota')
+    free_queries_so_far =  billing.get_unbillable_queries(
+        cfg.BILLING_DB_CONN_STR,
+        object_id)
+    logging.info('Free queries used so far: ' + str(free_queries_so_far) + \
+    ' by user: ' + str(object_id))
+    if free_queries_so_far <= cfg.MAX_FREE_CALLS:
+        return sub_id, plan_id # str, str    
     assert False, '402 User not subscribed'
 
 
