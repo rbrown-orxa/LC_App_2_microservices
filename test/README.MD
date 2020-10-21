@@ -16,6 +16,10 @@
 
 ## With AAD account and valid subscription:
 
+**IMPORTANT**
+*Ensure Postman collection variables are not masked by any environment variables.*
+I.e. Set *'Environment'* to *'No Environment'* in top right corner
+
 1. Install Postman - https://www.postman.com/downloads/
 2. Postman > Import > File > Upload Files > solarpv_battery/test/LCAPP2_AAD.postman_collection.json
 3. Follow 'Add a test AAD subscription for an app which is in preview mode' instructions
@@ -37,6 +41,10 @@
 
 
 ## With B2C account (no subscription):
+
+**IMPORTANT**
+*Ensure Postman collection variables are not masked by any environment variables.*
+I.e. Set *'Environment'* to *'No Environment'* in top right corner
 
 1. Install Postman - https://www.postman.com/downloads/
 2. Postman > Import > File > Upload Files > solarpv_battery/test/LCAPP_B2C.postman_collection.json
@@ -60,6 +68,10 @@
 
 
 ## With AAD account and no valid subscription:
+
+**IMPORTANT**
+*Ensure Postman collection variables are not masked by any environment variables.*
+I.e. Set *'Environment'* to *'No Environment'* in top right corner
 
 1. Install Postman - https://www.postman.com/downloads/
 2. Postman > Import > File > Upload Files > LCAPP_bad_accounts.postman_collection.json
