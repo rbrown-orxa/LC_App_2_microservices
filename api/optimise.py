@@ -36,7 +36,8 @@ def generation_1kw(lat=None,lon=None, load=None,
 #     https://github.com/renewables-ninja/gsee >> trigon.py >> line 196
 #     azimuth : Deviation of the tilt direction from the meridian.
 #     0 = towards pole, going clockwise, 180 = towards equator.
-    assert all( [lat, lon, azimuth, roofpitch] )
+    logging.debug(f'lat:{lat}, lon:{lon}, az:{azimuth}, pitch:{roofpitch}')
+    assert all(param is not None for param in [lat, lon, azimuth, roofpitch] )
 
 #Get PV data
     token = '38707fa2a8eb32d983c8fcf348fffd82fe2aa7aa'
