@@ -10,14 +10,14 @@ CONN_STR = cfg.SUBSCRIPTION_DB_CONN_STR
 
 
 def check_user_subscribed(object_id):
-    sub_id, plan_id = None, None
+    sub_id, plan_id, free_no = None, None, None
     logging.info(f'Checking subscriptions for {object_id}')
     assert object_id, '401 User object id required'
     for sub_id, plan_id in get_subscription_ids(object_id):
         logging.info(sub_id)
         if subscription_is_valid( sub_id, get_AAD_token() ):
             logging.info('Found a valid subscription for user, ending check')
-            return sub_id, plan_id # str, str
+            return sub_id, plan_id, free_no # str, str
         logging.info('Individual subscription ID check failed')
     logging.info('Failed to find any valid subscriptions')
     logging.info('Using free quota')
@@ -27,7 +27,7 @@ def check_user_subscribed(object_id):
     logging.info('Free queries used so far: ' + str(free_queries_so_far) + \
     ' by user: ' + str(object_id))
     if free_queries_so_far <= cfg.MAX_FREE_CALLS:
-        return sub_id, plan_id # str, str    
+        return sub_id, plan_id, free_queries_so_far  # str, str    
     assert False, '402 User not subscribed'
 
 

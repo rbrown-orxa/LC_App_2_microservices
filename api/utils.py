@@ -273,12 +273,15 @@ def requires_auth(f):
             jwks = json.loads(jsonurl_b2c.read()) if val > 0 else json.loads(jsonurl_ad.read())
             #assign tenent name directory
             tenant = 'b2c' if val > 0 else 'ad'
+            #get tenantid
+            if val < 0:
+                tid = unverified_claims['tid']
             #select audience
             aud = cfg.CLIENT_ID if val > 0 else cfg.CLIENT_ID_AD_MULT
             #select issuer
             iss = "https://" + cfg.TENANT_NAME + \
                     ".b2clogin.com/" + cfg.TENANT_ID + "/v2.0/" if val > 0 else \
-                    "https://login.microsoftonline.com/" + cfg.TENANT_ID_AD + "/v2.0" 
+                    "https://login.microsoftonline.com/" + tid + "/v2.0" 
             #store key values in dictionary
             rsa_key = {}
             for key in jwks["keys"]:
