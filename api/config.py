@@ -62,3 +62,5 @@ FULLFILLMENT_URI = "https://marketplaceapi.microsoft.com/api/saas/subscriptions/
 SAAS_API_VERSION = '2018-08-31'
 
 CLIENT_ID_AD_MULT = "454f560c-4e04-46dc-bb7d-a74f753f3952"
+
+CO2_EMISSION_KWH = 0.0005 #Metric ton

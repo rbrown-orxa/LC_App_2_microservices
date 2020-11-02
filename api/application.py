@@ -1,4 +1,4 @@
-from flask import Flask, request, g, send_from_directory
+from flask import Flask, request, g, send_from_directory,render_template
 from flask_cors import CORS,cross_origin
 from flask_selfdoc import Autodoc
 import os
@@ -7,6 +7,9 @@ import time
 from pathlib import Path
 import pickle
 from utils import get_fixed_fields
+from jinja2 import Environment, FileSystemLoader
+import  pandas as pd
+import pdfkit
 
 import config as cfg
 
@@ -322,8 +325,8 @@ def resolve():
 	    sub_id, plan_id, free_no = billing.check_subscription(object_id, tenant)
         
     return {'object_id': object_id,'subscription_id':sub_id,'plan_id':plan_id, 'free_calls': free_no, \
-            'max_free_calls':cfg.MAX_FREE_CALLS}    
-
+            'max_free_calls':cfg.MAX_FREE_CALLS}
+        
 
 @app.route('/')
 def documentation():
