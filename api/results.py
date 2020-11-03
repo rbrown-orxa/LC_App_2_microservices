@@ -99,7 +99,7 @@ def _get_annual_import_with_pv_kwh(schema):
     payback_yrs = install_cost / revenue_pa
     
     return (
-     annual_cosumption_kwh, import_cost, sum_load, pv_size, df_cost_curve, payback_yrs, IRR)
+     annual_cosumption_kwh, import_cost, sum_load, pv_size, df_cost_curve, payback_yrs, IRR, profit_pa)
  
 def _get_annual_import_with_pv_and_battery_kwh(schema,df,pv_size):
         
@@ -146,7 +146,7 @@ def _get_lifetimeprofit_roi_payback_period(schema,df,battery_size,pv_size):
         payback_yrs = install_cost / revenue_pa
         
         return (
-        total_profit, ROI, payback_yrs, install_cost_pv, install_cost_battery)
+        total_profit, ROI, payback_yrs, install_cost_pv, install_cost_battery, profit_pa)
 
     
 
@@ -175,7 +175,7 @@ def get_optimise_results(schema):
         pv_size,
         pv_cost_curve,
         pay_back_yrs_pv,
-        IRR) = _get_annual_import_with_pv_kwh(schema)
+        IRR,savings_pv) = _get_annual_import_with_pv_kwh(schema)
      
      #PV and battery optimised load
      (battery_size,
@@ -185,13 +185,13 @@ def get_optimise_results(schema):
                 schema,df,pv_size)
   
     #Get lifetime profit, ROI, payback period in years
-     lifetime_profit,ROI,payback_period,pv_cost, battery_cost = \
+     lifetime_profit,ROI,payback_period,pv_cost, battery_cost, savings_batt = \
        _get_lifetimeprofit_roi_payback_period(schema,import_export_df,
                                               battery_size,pv_size)
     #Generate the file report handler 
      handler = report(original_import_cost,pv_cost,battery_cost,pay_back_yrs_pv,
             IRR,payback_period,ROI,annual_import_total_kwh,annual_import_with_pv_kwh,
-            annual_import_with_pv_and_battery_kwh
+            annual_import_with_pv_and_battery_kwh,savings_pv,savings_batt
             ) 
     
     
@@ -226,7 +226,7 @@ def get_optimise_results(schema):
                 int(lifetime_profit),
             'roi':
                 int(ROI),
-            'payback_period': 
+            'payback_period':
                 int(payback_period),
             'report': handler
                 
@@ -292,14 +292,15 @@ def get_optimise_results(schema):
  
     
 def report(base_cost,pv_cost,batt_cost,pay_back_pv,IRR_pv,pay_back_batt,IRR_batt,
-           ann_imp_base_kwh,ann_import_pv_kwh,ann_imp_batt_kwh):
+           ann_imp_base_kwh,ann_import_pv_kwh,ann_imp_batt_kwh,save_pv,save_batt):
     
     df_cost_and_savings = pd.DataFrame({
-      'BASE CASE':['', 0, int(base_cost)],
-      'WITH PV':['', int(pv_cost), 0],
-      'WITH PV PLUS BATTERY':['', int(batt_cost), 0]})
+      'BASE CASE':['', 0, int(base_cost),0,0],
+      'WITH PV':['', int(pv_cost), 0,save_pv,''],
+      'WITH PV PLUS BATTERY':['', int(batt_cost), 0, '',save_batt]})
     
-    df_cost_and_savings.index = ['Cost and savings', 'CAPEX', 'OPEX']
+    df_cost_and_savings.index = ['Cost and savings', 'CAPEX', 'OPEX', 'Annual Savings with PV',
+                                 'Annual Savings with PV plus Battery']
     
     df_economics = pd.DataFrame({
       'BASE CASE':['', '', ''],  
@@ -342,7 +343,7 @@ def report(base_cost,pv_cost,batt_cost,pay_back_pv,IRR_pv,pay_back_batt,IRR_batt
     
     os.rename(report,filename)
     
-    return ( os.path.basename(filename) )
+    return (os.path.basename(filename))
 
  
      
@@ -351,5 +352,5 @@ if __name__ == '__main__':
     
     from api_mock import *
     
-    print(get_optimise_results(request.json))
+    #print(get_optimise_results(request.json))
     

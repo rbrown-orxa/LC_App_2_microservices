@@ -326,7 +326,7 @@ def resolve():
         
     return {'object_id': object_id,'subscription_id':sub_id,'plan_id':plan_id, 'free_calls': free_no, \
             'max_free_calls':cfg.MAX_FREE_CALLS}
-        
+      
 
 @app.route('/')
 def documentation():
