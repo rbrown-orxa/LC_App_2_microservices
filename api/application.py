@@ -1,4 +1,4 @@
-from flask import Flask, request, g, send_from_directory,render_template
+from flask import Flask, request, g, send_from_directory
 from flask_cors import CORS,cross_origin
 from flask_selfdoc import Autodoc
 import os
@@ -7,9 +7,6 @@ import time
 from pathlib import Path
 import pickle
 from utils import get_fixed_fields
-from jinja2 import Environment, FileSystemLoader
-import  pandas as pd
-import pdfkit
 
 import config as cfg
 
@@ -316,16 +313,16 @@ def resolve():
           "free_calls": int, "max_free_calls": int}
     """
 
-    object_id, tenant, sub_id, plan_id, free_no = None, None, None, None, None
+    object_id, tenant, sub_id, plan_id, used_no, max_no = None, None, None, None, None, None
     if app.config['REQUIRE_AUTH']:
 	    # object_id = request.json['oid'] # get oid from request.json
 	    object_id = g.oid # get oid from JWT claim instead of request.json
 	    tenant = g.tenant
 	    logging.info(f'got oid: {object_id}')
-	    sub_id, plan_id, free_no = billing.check_subscription(object_id, tenant)
+	    sub_id, plan_id, used_no, max_no = billing.check_subscription(object_id, tenant)
         
-    return {'object_id': object_id,'subscription_id':sub_id,'plan_id':plan_id, 'free_calls': free_no, \
-            'max_free_calls':cfg.MAX_FREE_CALLS}
+    return {'object_id': object_id,'subscription_id':sub_id,'plan_id':plan_id, 'free_calls': used_no, \
+            'max_free_calls':max_no}
       
 
 @app.route('/')

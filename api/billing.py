@@ -10,17 +10,17 @@ import subscription
 
 def check_subscription(object_id, SSO_type):
     
-    sub_id, plan_id,free_no = None, None, None
+    sub_id, plan_id,used_no,max_no = None, None, None, None
     if not current_app.config['APPLY_BILLING']:
       return sub_id, plan_id
     
     if SSO_type == 'ad':
-        sub_id, plan_id, free_no = subscription.check_user_subscribed(object_id) #str(sid)
-        return sub_id, plan_id, free_no
+        sub_id, plan_id, used_no, max_no = subscription.check_user_subscribed(object_id) #str(sid)
+        return sub_id, plan_id, used_no, max_no
 
     elif SSO_type == 'b2c':
         free_no=check_free_query_quota(object_id)
-        return sub_id, plan_id,free_no
+        return sub_id, plan_id,used_no,cfg.MAX_FREE_CALLS
 
     assert False, '500 Unexpected SSO type'
  
@@ -151,6 +151,26 @@ def get_unbillable_queries(conn_str, oid=''):
          with psycopg2.connect(conn_str) as conn:
              cur = conn.cursor()
              cur.execute( SQL, (oid, ) )
+             rv = cur.fetchone()[0]
+             cur.close()
+         return rv
+     
+def get_billed_queries(conn_str,sid='',stdt='',enddt='',plan_id=''):
+
+     if sid:
+         SQL =   """
+                 SELECT count(*)
+                 FROM queries 
+                 WHERE subscription_id = %s
+                 AND to_date(to_char(date_billed,'YYYY-MM-DD'),'YYYY-MM-DD') >= %s
+                 AND to_date(to_char(date_billed,'YYYY-MM-DD'),'YYYY-MM-DD') <= %s
+                 AND success = True
+                 AND billed = True
+                 AND plan_id = %s;
+                 """
+         with psycopg2.connect(conn_str) as conn:
+             cur = conn.cursor()
+             cur.execute( SQL, (sid,stdt,enddt,plan_id) )
              rv = cur.fetchone()[0]
              cur.close()
          return rv

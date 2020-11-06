@@ -11,6 +11,12 @@ REQUIRE_AUTH = True
 
 APPLY_BILLING = True # Affects AAD users
 MAX_FREE_CALLS = 5 # Affects B2C users
+
+#Subscription quota limit
+MAX_CALLS_BASIC_PLAN = 5
+MAX_CALLS_SILVER_PLAN_MONTHLY = 20
+MAX_CALLS_SILVER_PLAN_ANNUAL = 240
+MAX_CALLS_GOLD_PLAN = 'unlimited'
  
 #Use these for local testing:
 #BILLING_DB_CONN_STR = "host=localhost "\

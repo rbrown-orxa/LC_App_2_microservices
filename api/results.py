@@ -322,9 +322,9 @@ def report(base_cost,pv_cost,batt_cost,pay_back_pv,IRR_pv,pay_back_batt,IRR_batt
     
     env = Environment( loader = FileSystemLoader('./templates') )
     
-    template = env.get_template('view.html')
+    template = env.get_template('table.html')
     
-    filename = os.path.join('./', 'html', 'view.html')
+    filename = os.path.join('./', 'html', 'table.html')
     
     with open(filename, 'w') as fh:
         fh.write(template.render(
@@ -344,8 +344,6 @@ def report(base_cost,pv_cost,batt_cost,pay_back_pv,IRR_pv,pay_back_batt,IRR_batt
     os.rename(report,filename)
     
     return (os.path.basename(filename))
-
- 
      
     
 if __name__ == '__main__':
