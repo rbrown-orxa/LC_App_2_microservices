@@ -30,6 +30,8 @@ def check_user_subscribed(object_id):
             return sub_id, plan_id, used_no, max_no # str, str, str, str
         logging.info('Individual subscription ID check failed')
     logging.info('Failed to find any valid subscriptions')
+    #No active subscription so set values to None
+    sub_id, plan_id = None, None
     logging.info('Using free quota')
     used_no =  billing.get_unbillable_queries(
         cfg.BILLING_DB_CONN_STR,

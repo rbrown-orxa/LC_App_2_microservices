@@ -146,7 +146,7 @@ def _get_lifetimeprofit_roi_payback_period(schema,df,battery_size,pv_size):
         payback_yrs = install_cost / revenue_pa
         
         return (
-        total_profit, ROI, payback_yrs, install_cost_pv, install_cost_battery, profit_pa)
+        total_profit, ROI, payback_yrs, install_cost_pv, install_cost, profit_pa)
 
     
 
@@ -189,10 +189,10 @@ def get_optimise_results(schema):
        _get_lifetimeprofit_roi_payback_period(schema,import_export_df,
                                               battery_size,pv_size)
     #Generate the file report handler 
-     handler = report(original_import_cost,pv_cost,battery_cost,pay_back_yrs_pv,
-            IRR,payback_period,ROI,annual_import_total_kwh,annual_import_with_pv_kwh,
-            annual_import_with_pv_and_battery_kwh,savings_pv,savings_batt
-            ) 
+     # handler = report(pv_size,battery_size,total_cost,pv_cost,battery_cost,pay_back_yrs_pv,
+     #         IRR,payback_period,ROI,annual_import_total_kwh,annual_import_with_pv_kwh,
+     #         annual_import_with_pv_and_battery_kwh,savings_pv,savings_batt
+     #         )
     
     
     
@@ -227,8 +227,7 @@ def get_optimise_results(schema):
             'roi':
                 int(ROI),
             'payback_period':
-                int(payback_period),
-            'report': handler
+                int(payback_period)
                 
             }
      
@@ -279,7 +278,6 @@ def get_optimise_results(schema):
              'name':building_name,
              'pv_cost_curve':curve.to_dict(orient='list')
              })
-         
 
 
      site = {'site':site}
@@ -291,32 +289,41 @@ def get_optimise_results(schema):
      return(json.dumps( {'results':merge_results,'charts':merge_charts}))
  
     
-def report(base_cost,pv_cost,batt_cost,pay_back_pv,IRR_pv,pay_back_batt,IRR_batt,
+def report(pv_sz,batt_sz,total_cost,with_pv_cost,with_pv_plus_batt_cost,pay_back_pv,IRR_pv,pay_back_batt,IRR_batt,
            ann_imp_base_kwh,ann_import_pv_kwh,ann_imp_batt_kwh,save_pv,save_batt):
     
-    df_cost_and_savings = pd.DataFrame({
-      'BASE CASE':['', 0, int(base_cost),0,0],
-      'WITH PV':['', int(pv_cost), 0,save_pv,''],
-      'WITH PV PLUS BATTERY':['', int(batt_cost), 0, '',save_batt]})
     
-    df_cost_and_savings.index = ['Cost and savings', 'CAPEX', 'OPEX', 'Annual Savings with PV',
-                                 'Annual Savings with PV plus Battery']
+    df_system_size = pd.DataFrame({
+      'BASE CASE':['', '', ''],
+      'WITH PV':['', round(sum(pv_sz),0),''],
+      'WITH PV PLUS BATTERY':['', '', batt_sz]})
+    
+    df_system_size.index = ['SYSTEM SIZE', 'PV Size(Kwp)', 'Battery Size(Kwh)']
+    
+    df_cost_and_savings = pd.DataFrame({
+      'BASE CASE':['', 0, int(total_cost)],
+      'WITH PV':['', int(with_pv_cost),int(total_cost-save_pv)],
+      'WITH PV PLUS BATTERY':['', int(with_pv_plus_batt_cost), int(total_cost-save_batt)]})
+    
+    df_cost_and_savings.index = ['COST AND SAVINGS', 'Capex', 'Opex']
     
     df_economics = pd.DataFrame({
       'BASE CASE':['', '', ''],  
-      'WITH PV':['', pay_back_pv, IRR_pv],
-      'WITH PV PLUS BATTERY':['', pay_back_batt, IRR_batt]})
+      'WITH PV':['', round(pay_back_pv,2), round(IRR_pv,2)],
+      'WITH PV PLUS BATTERY':['', round(pay_back_batt,2), round(IRR_batt,2)]})
     
-    df_economics.index = ['Economic Metrics', 'payback time', 'IRR']
+    df_economics.index = ['ECONOMIC METRICS', 'payback time(yrs)', 'IRR(%)']
     
     df_environmental = pd.DataFrame({
-      'BASE CASE':['', ann_imp_base_kwh * cfg.CO2_EMISSION_KWH],  
-      'WITH PV':['', ann_import_pv_kwh * cfg.CO2_EMISSION_KWH],
-      'WITH PV PLUS BATTERY':['', ann_imp_batt_kwh * cfg.CO2_EMISSION_KWH]})
+      'BASE CASE':['', round(ann_imp_base_kwh * cfg.CO2_EMISSION_KWH,2)],  
+      'WITH PV':['', round(ann_import_pv_kwh * cfg.CO2_EMISSION_KWH,2)],
+      'WITH PV PLUS BATTERY':['', round(ann_imp_batt_kwh * cfg.CO2_EMISSION_KWH,0)]})
     
-    df_environmental.index = ['Environmental Impact', 'CO2 emission metric ton per year']
+    df_environmental.index = ['ENVIRONMENTAL IMPACT', 'CO2 emission(metric ton/year)']
     
-    df = df_cost_and_savings.append(df_economics)
+    df = df_system_size.append(df_cost_and_savings)
+    
+    df = df.append(df_economics)
     
     df = df.append(df_environmental)
     
@@ -342,6 +349,22 @@ def report(base_cost,pv_cost,batt_cost,pay_back_pv,IRR_pv,pay_back_batt,IRR_batt
     filename = tf.name + '.pdf'
     
     os.rename(report,filename)
+    
+    title = 'Monthly Data'
+    labels = ["January", "February", "March", "April", "May", "June", "July", "August"]
+    values = [{10,20}, {9,18}, {8,20}, {7,15}, {6,12}, {4,8}, {7,14}, {8,16}]
+    env = Environment( loader = FileSystemLoader('./templates') )
+    template = env.get_template('bar_chart.html')
+    
+    filename = os.path.join('./', 'html', 'bar.html')
+    
+    with open(filename, 'w') as fh:
+        fh.write(template.render(values=values, labels=labels, title=title, max=15)
+        )
+        
+    report = os.path.join('./', cfg.UPLOAD_PATH, 'report.pdf') 
+        
+    pdfkit.from_file(filename, report)
     
     return (os.path.basename(filename))
      

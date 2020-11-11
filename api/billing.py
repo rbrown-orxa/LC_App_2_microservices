@@ -19,7 +19,7 @@ def check_subscription(object_id, SSO_type):
         return sub_id, plan_id, used_no, max_no
 
     elif SSO_type == 'b2c':
-        free_no=check_free_query_quota(object_id)
+        used_no=check_free_query_quota(object_id)
         return sub_id, plan_id,used_no,cfg.MAX_FREE_CALLS
 
     assert False, '500 Unexpected SSO type'

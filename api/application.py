@@ -79,13 +79,13 @@ def optimise():
 	#    logging.info(f'got oid: {object_id}')
 	#    sub_id, plan_id = billing.check_subscription(object_id, tenant)
         
-    object_id, tenant, sub_id, plan_id, free_no = None, None, None, None, None
+    object_id, tenant, sub_id, plan_id, used_no, max_no = None, None, None, None, None, None
     if app.config['REQUIRE_AUTH']:
 	    # object_id = request.json['oid'] # get oid from request.json
 	    object_id = g.oid # get oid from JWT claim instead of request.json
 	    tenant = g.tenant
 	    logging.info(f'got oid: {object_id}')
-	    sub_id, plan_id, free_no = billing.check_subscription(object_id, tenant)
+	    sub_id, plan_id, used_no, max_no = billing.check_subscription(object_id, tenant)
 
 
     query_id = billing.query_started(sub_id, object_id, plan_id)

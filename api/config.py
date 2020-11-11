@@ -10,7 +10,7 @@ DEBUG_MODE = False # Sets log level to debug if True
 REQUIRE_AUTH = True
 
 APPLY_BILLING = True # Affects AAD users
-MAX_FREE_CALLS = 5 # Affects B2C users
+MAX_FREE_CALLS = 100 # Affects B2C users
 
 #Subscription quota limit
 MAX_CALLS_BASIC_PLAN = 5
