@@ -350,22 +350,6 @@ def report(pv_sz,batt_sz,total_cost,with_pv_cost,with_pv_plus_batt_cost,pay_back
     
     os.rename(report,filename)
     
-    title = 'Monthly Data'
-    labels = ["January", "February", "March", "April", "May", "June", "July", "August"]
-    values = [{10,20}, {9,18}, {8,20}, {7,15}, {6,12}, {4,8}, {7,14}, {8,16}]
-    env = Environment( loader = FileSystemLoader('./templates') )
-    template = env.get_template('bar_chart.html')
-    
-    filename = os.path.join('./', 'html', 'bar.html')
-    
-    with open(filename, 'w') as fh:
-        fh.write(template.render(values=values, labels=labels, title=title, max=15)
-        )
-        
-    report = os.path.join('./', cfg.UPLOAD_PATH, 'report.pdf') 
-        
-    pdfkit.from_file(filename, report)
-    
     return (os.path.basename(filename))
      
     
