@@ -10,7 +10,13 @@ DEBUG_MODE = False # Sets log level to debug if True
 REQUIRE_AUTH = True
 
 APPLY_BILLING = True # Affects AAD users
-MAX_FREE_CALLS = 5 # Affects B2C users
+MAX_FREE_CALLS = 100 # Affects B2C users
+
+#Subscription quota limit
+MAX_CALLS_BASIC_PLAN = 5
+MAX_CALLS_SILVER_PLAN_MONTHLY = 20
+MAX_CALLS_SILVER_PLAN_ANNUAL = 240
+MAX_CALLS_GOLD_PLAN = 'unlimited'
  
 #Use these for local testing:
 #BILLING_DB_CONN_STR = "host=localhost "\
@@ -62,3 +68,5 @@ FULLFILLMENT_URI = "https://marketplaceapi.microsoft.com/api/saas/subscriptions/
 SAAS_API_VERSION = '2018-08-31'
 
 CLIENT_ID_AD_MULT = "454f560c-4e04-46dc-bb7d-a74f753f3952"
+
+CO2_EMISSION_KWH = 0.0005 #Metric ton

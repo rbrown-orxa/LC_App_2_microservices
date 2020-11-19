@@ -10,24 +10,36 @@ CONN_STR = cfg.SUBSCRIPTION_DB_CONN_STR
 
 
 def check_user_subscribed(object_id):
-    sub_id, plan_id = None, None
+    sub_id, plan_id, used_no, max_no = None, None, None, None
     logging.info(f'Checking subscriptions for {object_id}')
     assert object_id, '401 User object id required'
     for sub_id, plan_id in get_subscription_ids(object_id):
         logging.info(sub_id)
         if subscription_is_valid( sub_id, get_AAD_token() ):
             logging.info('Found a valid subscription for user, ending check')
-            return sub_id, plan_id # str, str
+            logging.info(f'getting subscriptions details for {sub_id}')
+            (stdate,
+             endate,
+             term,planid) = get_subscription_details(sub_id, get_AAD_token())
+            used_no =  billing.get_billed_queries(cfg.BILLING_DB_CONN_STR,
+                                                                     sub_id,
+                                                                     stdate,
+                                                                     endate,
+                                                                     planid)
+            max_no = get_results_plan(planid,term)
+            return sub_id, plan_id, used_no, max_no # str, str, str, str
         logging.info('Individual subscription ID check failed')
     logging.info('Failed to find any valid subscriptions')
+    #No active subscription so set values to None
+    sub_id, plan_id = None, None
     logging.info('Using free quota')
-    free_queries_so_far =  billing.get_unbillable_queries(
+    used_no =  billing.get_unbillable_queries(
         cfg.BILLING_DB_CONN_STR,
         object_id)
-    logging.info('Free queries used so far: ' + str(free_queries_so_far) + \
+    logging.info('Free queries used so far: ' + str(used_no) + \
     ' by user: ' + str(object_id))
-    if free_queries_so_far <= cfg.MAX_FREE_CALLS:
-        return sub_id, plan_id # str, str    
+    if used_no <= cfg.MAX_FREE_CALLS:
+        return sub_id, plan_id, used_no,cfg.MAX_FREE_CALLS  # str, str    
     assert False, '402 User not subscribed'
 
 
@@ -89,6 +101,29 @@ def subscription_is_valid(subscription_id, token):
 
     if status == 'Subscribed':
         return True
+    
+def get_subscription_details(subscription_id, token):
+     #Todo: add a cache, with expire time per entry for invalidation
+    #https://docs.microsoft.com/en-us/azure/marketplace/partner-center-portal/pc-saas-fulfillment-api-v2#get-subscription
+    url =   f'{cfg.SUBSCRIPTION_URL}/{subscription_id}'
+
+    try:
+        r = requests.get(url, timeout=5,
+                        params = {'api-version': cfg.SAAS_API_VERSION},
+                        headers = {'content-type': 'application/json',
+                                   'authorization': f'Bearer {token}' })
+    except:
+        assert False, '503 failed to reach subscription server'
+
+    try:
+        start_date = r.json()['term']['startDate'].split('T')[0]
+        end_date = r.json()['term']['endDate'].split('T')[0]
+        term = r.json()['term']['termUnit']
+        planid = r.json()['planId']
+        return(start_date,end_date,term,planid)
+    except KeyError:
+        assert False, 'key error'
+    
 
 
 def create_test_table():
@@ -128,6 +163,24 @@ def insert_dummy_data(object_id, subscription_id, plan_id):
         cur = conn.cursor()
         cur.execute(SQL, (object_id, subscription_id, plan_id))
         cur.close()
+        
+def get_results_plan(planid,term):
+    
+    if planid == 'm1':
+        max_no = cfg.MAX_CALLS_BASIC_PLAN
+    else:
+        if planid == 'm2':
+            if term == 'P1M':
+                max_no = cfg.MAX_CALLS_SILVER_PLAN_MONTHLY
+            else:
+                max_no = cfg.MAX_CALLS_SILVER_PLAN_ANNUAL
+        else:
+            max_no = cfg.MAX_CALLS_GOLD_PLAN
+    
+    return max_no
+            
+        
+            
 
 
 if __name__ == '__main__':

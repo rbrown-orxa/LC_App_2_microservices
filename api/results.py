@@ -15,6 +15,11 @@ from handle_base_loads import get_base_loads
 from handle_ev_loads import get_ev_loads
 from utils import get_fixed_fields,get_variable_fields
 from optimise_pv import get_optimise_pv_size
+import config as cfg
+import os
+from jinja2 import Environment, FileSystemLoader
+import pdfkit
+import tempfile
 
 def _get_annual_import_site_kwh(schema):
     
@@ -65,15 +70,36 @@ def _get_annual_import_total_kwh(schema,base_load,ev_load):
 
 def _get_annual_import_with_pv_kwh(schema):
        
-     pv_size,sum_load,df_cost_curve = get_aggregate_loads_site_pv_optimised(schema)   
-         
-     cost_kwh = get_fixed_fields(schema,fields=['import_cost_kwh'])
-     
-     annual_cosumption_kwh = sum_load['import_kWh'].sum()
-     
-     import_cost = annual_cosumption_kwh*cost_kwh['import_cost_kwh']   
-       
-     return(annual_cosumption_kwh,import_cost,sum_load,pv_size,df_cost_curve)
+    pv_size, sum_load, df_cost_curve = get_aggregate_loads_site_pv_optimised(schema)
+    
+    dict = get_fixed_fields(schema, fields=['import_cost_kwh', 'export_price_kwh', 'pv_cost_kwp', 'pv_life_yrs'])
+    
+    annual_cosumption_kwh = sum_load['import_kWh'].sum()
+    
+    import_cost = annual_cosumption_kwh * dict['import_cost_kwh']
+    
+    load_cost = sum_load['load_kWh'].sum() * dict['import_cost_kwh']
+    
+    import_cost_savings = load_cost - import_cost
+    
+    export_revenue = sum_load['export_kWh'].abs().sum() * dict['export_price_kwh']
+    
+    revenue_pa = import_cost_savings + export_revenue
+    
+    install_cost = dict['pv_cost_kwp'] * sum(pv_size)
+    
+    amortized_install_cost = install_cost / dict['pv_life_yrs']
+    
+    profit_pa = import_cost_savings + export_revenue - amortized_install_cost
+    
+    total_profit = profit_pa * dict['pv_life_yrs']
+    
+    IRR = 100 * (total_profit / install_cost)
+    
+    payback_yrs = install_cost / revenue_pa
+    
+    return (
+     annual_cosumption_kwh, import_cost, sum_load, pv_size, df_cost_curve, payback_yrs, IRR, profit_pa)
  
 def _get_annual_import_with_pv_and_battery_kwh(schema,df,pv_size):
         
@@ -119,7 +145,9 @@ def _get_lifetimeprofit_roi_payback_period(schema,df,battery_size,pv_size):
         ROI = 100 * (total_profit / install_cost)
         payback_yrs = install_cost / revenue_pa
         
-        return(total_profit,ROI,payback_yrs)
+        return (
+        total_profit, ROI, payback_yrs, install_cost_pv, install_cost, profit_pa)
+
     
 
 def get_optimise_results(schema):    
@@ -138,13 +166,16 @@ def get_optimise_results(schema):
      (aggr_load,
         annual_import_total_kwh,
         total_cost) = _get_annual_import_total_kwh(schema,base_load,ev_load)
+
      
      #PV optimised load
      (annual_import_with_pv_kwh,
         pv_optimised_cost,
         df,
         pv_size,
-        pv_cost_curve) = _get_annual_import_with_pv_kwh(schema)
+        pv_cost_curve,
+        pay_back_yrs_pv,
+        IRR,savings_pv) = _get_annual_import_with_pv_kwh(schema)
      
      #PV and battery optimised load
      (battery_size,
@@ -152,11 +183,16 @@ def get_optimise_results(schema):
         battery_optimised_cost,battery_cost_curve,import_export_df) = \
             _get_annual_import_with_pv_and_battery_kwh(
                 schema,df,pv_size)
-            
+  
     #Get lifetime profit, ROI, payback period in years
-     lifetime_profit,ROI,payback_period = \
+     lifetime_profit,ROI,payback_period,pv_cost, battery_cost, savings_batt = \
        _get_lifetimeprofit_roi_payback_period(schema,import_export_df,
                                               battery_size,pv_size)
+    #Generate the file report handler 
+     # handler = report(pv_size,battery_size,total_cost,pv_cost,battery_cost,pay_back_yrs_pv,
+     #         IRR,payback_period,ROI,annual_import_total_kwh,annual_import_with_pv_kwh,
+     #         annual_import_with_pv_and_battery_kwh,savings_pv,savings_batt
+     #         )
     
     
     
@@ -190,8 +226,9 @@ def get_optimise_results(schema):
                 int(lifetime_profit),
             'roi':
                 int(ROI),
-            'payback_period': 
-                int(payback_period),
+            'payback_period':
+                int(payback_period)
+                
             }
      
      var = get_variable_fields(schema,fields=['name','num_ev_chargers'])
@@ -241,7 +278,6 @@ def get_optimise_results(schema):
              'name':building_name,
              'pv_cost_curve':curve.to_dict(orient='list')
              })
-         
 
 
      site = {'site':site}
@@ -252,11 +288,74 @@ def get_optimise_results(schema):
     
      return(json.dumps( {'results':merge_results,'charts':merge_charts}))
  
+    
+def report(pv_sz,batt_sz,total_cost,with_pv_cost,with_pv_plus_batt_cost,pay_back_pv,IRR_pv,pay_back_batt,IRR_batt,
+           ann_imp_base_kwh,ann_import_pv_kwh,ann_imp_batt_kwh,save_pv,save_batt):
+    
+    
+    df_system_size = pd.DataFrame({
+      'BASE CASE':['', '', ''],
+      'WITH PV':['', round(sum(pv_sz),0),''],
+      'WITH PV PLUS BATTERY':['', '', batt_sz]})
+    
+    df_system_size.index = ['SYSTEM SIZE', 'PV Size(Kwp)', 'Battery Size(Kwh)']
+    
+    df_cost_and_savings = pd.DataFrame({
+      'BASE CASE':['', 0, int(total_cost)],
+      'WITH PV':['', int(with_pv_cost),int(total_cost-save_pv)],
+      'WITH PV PLUS BATTERY':['', int(with_pv_plus_batt_cost), int(total_cost-save_batt)]})
+    
+    df_cost_and_savings.index = ['COST AND SAVINGS', 'Capex', 'Opex']
+    
+    df_economics = pd.DataFrame({
+      'BASE CASE':['', '', ''],  
+      'WITH PV':['', round(pay_back_pv,2), round(IRR_pv,2)],
+      'WITH PV PLUS BATTERY':['', round(pay_back_batt,2), round(IRR_batt,2)]})
+    
+    df_economics.index = ['ECONOMIC METRICS', 'payback time(yrs)', 'IRR(%)']
+    
+    df_environmental = pd.DataFrame({
+      'BASE CASE':['', round(ann_imp_base_kwh * cfg.CO2_EMISSION_KWH,2)],  
+      'WITH PV':['', round(ann_import_pv_kwh * cfg.CO2_EMISSION_KWH,2)],
+      'WITH PV PLUS BATTERY':['', round(ann_imp_batt_kwh * cfg.CO2_EMISSION_KWH,0)]})
+    
+    df_environmental.index = ['ENVIRONMENTAL IMPACT', 'CO2 emission(metric ton/year)']
+    
+    df = df_system_size.append(df_cost_and_savings)
+    
+    df = df.append(df_economics)
+    
+    df = df.append(df_environmental)
+    
+    env = Environment( loader = FileSystemLoader('./templates') )
+    
+    template = env.get_template('table.html')
+    
+    filename = os.path.join('./', 'html', 'table.html')
+    
+    with open(filename, 'w') as fh:
+        fh.write(template.render(
+           tables=[df.to_html()],titles = ['OrxaGrid Report'])
+        )
+        
+    report = os.path.join('./', cfg.UPLOAD_PATH, 'report.pdf') 
+        
+    pdfkit.from_file(filename, report)
+    
+    tf = tempfile.NamedTemporaryFile(dir=cfg.UPLOAD_PATH)
+    
+    tf.close()
+    
+    filename = tf.name + '.pdf'
+    
+    os.rename(report,filename)
+    
+    return (os.path.basename(filename))
      
     
 if __name__ == '__main__':
     
     from api_mock import *
     
-    print(get_optimise_results(request.json))
+    #print(get_optimise_results(request.json))
     

@@ -6,6 +6,7 @@ import logging
 import time
 from pathlib import Path
 import pickle
+from utils import get_fixed_fields
 
 import config as cfg
 
@@ -45,12 +46,67 @@ if app.config['APPLY_BILLING']:
 #     SSO_token = utils.get_token_auth_header()
     
 
+# @app.route("/optimise", methods=['GET','POST'])
+# @utils.handle_exceptions
+# @auto.doc()
+# @cross_origin(allow_headers=['Content-Type', 'Authorization'])
+# @utils.requires_auth
+# def optimise():
+#     """Optimise a solar and battery system size
+
+#     Request:
+#         Content-Type: application/json
+#         Body: According to /schema
+
+#     Return:
+#         Content-Type: application/json
+#         According to /result_schema
+#     """
+
+#     # Replace these with actual values sent from frontend
+#     # email = app.config['EMAIL']
+#     # subscription_id = app.config['SUBSCRIPTION_ID']
+    
+#     # subscription_id = billing.check_user_subscribed()
+
+#     logging.info('got an optimise request')
+
+#     #object_id, tenant, sub_id, plan_id = None, None, None, None
+#     #if app.config['REQUIRE_AUTH']:
+# 	#    # object_id = request.json['oid'] # get oid from request.json
+# 	#    object_id = g.oid # get oid from JWT claim instead of request.json
+# 	#    tenant = g.tenant
+# 	#    logging.info(f'got oid: {object_id}')
+# 	#    sub_id, plan_id = billing.check_subscription(object_id, tenant)
+        
+#     object_id, tenant, sub_id, plan_id, used_no, max_no = None, None, None, None, None, None
+#     if app.config['REQUIRE_AUTH']:
+# 	    # object_id = request.json['oid'] # get oid from request.json
+# 	    object_id = g.oid # get oid from JWT claim instead of request.json
+# 	    tenant = g.tenant
+# 	    logging.info(f'got oid: {object_id}')
+# 	    sub_id, plan_id, used_no, max_no = billing.check_subscription(object_id, tenant)
+
+
+#     query_id = billing.query_started(sub_id, object_id, plan_id)
+
+#     rv = library._optimise(request)
+
+#     if app.config['PICKLE_RESULTS']:
+#         utils.pickle_results(rv, sub_id, app.config['UPLOAD_PATH'])
+    
+#     billing.query_successful(query_id)
+
+#     return (rv,
+#             200, 
+#             {'Content-Type': 'application/json; charset=utf-8'})
+
 @app.route("/optimise", methods=['GET','POST'])
 @utils.handle_exceptions
 @auto.doc()
 @cross_origin(allow_headers=['Content-Type', 'Authorization'])
 @utils.requires_auth
-def optimise():
+def optimisetest():
     """Optimise a solar and battery system size
 
     Request:
@@ -69,15 +125,15 @@ def optimise():
     # subscription_id = billing.check_user_subscribed()
 
     logging.info('got an optimise request')
-
-
+    
     object_id, tenant, sub_id, plan_id = None, None, None, None
+    
     if app.config['REQUIRE_AUTH']:
-	    # object_id = request.json['oid'] # get oid from request.json
-	    object_id = g.oid # get oid from JWT claim instead of request.json
-	    tenant = g.tenant
-	    logging.info(f'got oid: {object_id}')
-	    sub_id, plan_id = billing.check_subscription(object_id, tenant)
+        dict = get_fixed_fields(request.json,fields=['oid','sub_id','plan_id'])
+        object_id = dict['oid']
+        tenant = g.tenant
+        sub_id = dict['sub_id']
+        plan_id = dict['plan_id']
 
 
     query_id = billing.query_started(sub_id, object_id, plan_id)
@@ -92,7 +148,6 @@ def optimise():
     return (rv,
             200, 
             {'Content-Type': 'application/json; charset=utf-8'})
-
 
 
 @app.route("/upload", methods=['POST'])
@@ -232,6 +287,43 @@ def consumption():
  
     return library._consumption(request)
 
+@app.route("/resolve", methods=['GET','POST'])
+@utils.handle_exceptions
+@auto.doc()
+@cross_origin(allow_headers=['Content-Type', 'Authorization'])
+@utils.requires_auth
+def resolve():
+    """Resolve the user by decoding accesstoken sent by request header. 
+    The objectid in case of ad account user will be checked if the user has 
+    active subscription and plan id. If there are no active subscription or 
+    user has not susbcribed to our offer then user will be allowed free quote 
+    equal to configured value of MAX_FREE_CALL. 
+    In case of b2c account user will be allowed free quote 
+    equal to configured value of MAX_FREE_CALL
+
+    Request:
+        Content-Type: application/json
+        Body: According to /schema
+
+    Return:
+        Content-Type: application/json
+        According to /usage_schema
+        Body:
+        { "object_id": uuid, "subscription_id': uuid, "plan_id": str,
+          "free_calls": int, "max_free_calls": int}
+    """
+
+    object_id, tenant, sub_id, plan_id, used_no, max_no = None, None, None, None, None, None
+    if app.config['REQUIRE_AUTH']:
+	    # object_id = request.json['oid'] # get oid from request.json
+	    object_id = g.oid # get oid from JWT claim instead of request.json
+	    tenant = g.tenant
+	    logging.info(f'got oid: {object_id}')
+	    sub_id, plan_id, used_no, max_no = billing.check_subscription(object_id, tenant)
+        
+    return {'object_id': object_id,'subscription_id':sub_id,'plan_id':plan_id, 'free_calls': used_no, \
+            'max_free_calls':max_no}
+      
 
 @app.route('/')
 def documentation():
