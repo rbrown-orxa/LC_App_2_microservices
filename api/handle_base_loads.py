@@ -39,7 +39,7 @@ def get_base_loads(schema):
        building_load = list_buildings(schema) # API will be called
 
        dict = get_variable_fields(schema,fields=['building_type'])
-       building_type = dict['building_type']
+       building_type = dict['building_type'] # domestic,work,public,commercial,delivery
        for load,btype in zip(building_load.values(),building_type):
            if type(load).__name__=='float' or type(load).__name__=='int':
                #Consumption
