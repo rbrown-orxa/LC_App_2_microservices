@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Optimization Results</title>
+<link rel=stylesheet type=text/css href="../static/style.css">
+</head>
+<body>
+<table>
+    <thead>
+        <tr>
+            <th>Battery Size(Kwh)</th>
+            <th>Annual Import Site(Kwh)</th>
+            <th>Annual Import EV(Kwh)</th>
+        </tr>
+    </thead>
+<tbody>
+    <tr>
+        <td>{{data['output']['results']['site']['battery_size_kwh']}}</td>
+        <td>{{data['output']['results']['site']['annual_import_site_kwh']}}</td>
+        <td>{{data['output']['results']['site']['annual_import_ev_kwh']}}</td>
+    </tr>
+</tbody>
+  <thead>
+        <tr>
+            <th>Annual Import Total(Kwh)</th>
+            <th>Annual Import with PV(Kwh)</th>
+            <th>Annual Import with PV and Battery(Kwh)</th>
+        </tr>
+    </thead>
+<tbody>
+    <tr>
+        <td>{{data['output']['results']['site']['annual_import_total_kwh']}}</td>
+        <td>{{data['output']['results']['site']['annual_import_with_pv_kwh']}}</td>
+        <td>{{data['output']['results']['site']['annual_import_with_pv_and_battery_kwh']}}</td>
+    </tr>
+</tbody>
+</tbody>
+  <thead>
+        <tr>
+            <th>Original Import Cost</th>
+            <th>With EV Import Cost</th>
+            <th>Total Import Cost</th>
+        </tr>
+    </thead>
+<tbody>
+    <tr>
+        <td>{{data['output']['results']['site']['original_import_cost']}}</td>
+        <td>{{data['output']['results']['site']['with_ev_import_cost']}}</td>
+        <td>{{data['output']['results']['site']['total_import_cost']}}</td>
+    </tr>
+</tbody>
+<thead>
+        <tr>
+            <th>With PV Optimised Import Cost</th>
+            <th></th>
+            <th>With Battery Optimised Import Cost</th>
+        </tr>
+    </thead>
+<tbody>
+    <tr>
+        <td>{{data['output']['results']['site']['with_pv_optimised_import_cost']}}</td>
+        <td></td>
+        <td>{{data['output']['results']['site']['with_battery_optimised_import_cost']}}</td>
+    </tr>
+</tbody>
+<thead>
+        <tr>
+            <th>Lifetime profit</th>
+            <th>ROI</th>
+            <th>Payback period</th>
+        </tr>
+    </thead>
+<tbody>
+    <tr>
+        <td>{{data['output']['results']['site']['lifetime_profit']}}</td>
+        <td>{{data['output']['results']['site']['roi']}}</td>
+        <td>{{data['output']['results']['site']['payback_period']}}</td>
+    </tr>
+</tbody>
+</table>
+
+</body>
+</html>

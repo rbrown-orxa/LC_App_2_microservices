@@ -1,23 +1,18 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Oct 29 13:11:02 2020
-
-@author: Sanjeev Kumar
-"""
-body            { font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;}
-a, h1, h2       { color: #377ba8; }
-h1, h2          { margin: 0; }
-h1              { border-bottom: 2px solid #eee; }
-h2              { font-size: 1.2em; }
-
-table.dataframe, .dataframe th, .dataframe td {
-  border: none;
-  border-bottom: 1px solid #C8C8C8;
-  border-collapse: collapse;
-  text-align:left;
-  padding: 10px;
-  margin-bottom: 40px;
-  font-size: 0.9em;
+table { 
+  width: 100%; 
+  border-collapse: collapse; 
 }
-
-tr:hover            { background-color: #ffff99;}
+/* Zebra striping */
+tr:nth-of-type(odd) { 
+  background: #eee; 
+}
+th { 
+  background: #333; 
+  color: white; 
+  font-weight: bold; 
+}
+td, th { 
+  padding: 6px; 
+  border: 1px solid #ccc; 
+  text-align: left; 
+}

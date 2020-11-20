@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>{{title}}</title>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+</head>
+
+<body>
+  <center>
+   <canvas id="line-chart" width="800" height="400"></canvas>
+    <script>
+
+  new Chart(document.getElementById("line-chart"), {
+  type: 'line',
+  data: {
+     labels : [
+          {% for item in labels %}
+            "{{ item }}",
+          {% endfor %}
+        ] ,
+    datasets: [{ 
+        data : [
+	    {% for item in data['output']['charts']['site']['import_export']['Generation'][0:len] %}
+              {{ item }},
+            {% endfor %}],
+        label: "Generation",
+        borderColor: "#3e95cd",
+        fill: false
+      }, { 
+        data : [
+	    {% for item in data['output']['charts']['site']['import_export']['Load'][0:len] %}
+              {{ item }},
+            {% endfor %}],
+        label: "Load",
+        borderColor: "#8e5ea2",
+        fill: false
+      }, { 
+        data : [
+	    {% for item in data['output']['charts']['site']['import_export']['Import'][0:len] %}
+              {{ item }},
+            {% endfor %}],
+        label: "Import",
+        borderColor: "#3cba9f",
+        fill: false
+      }, { 
+        data : [
+	    {% for item in data['output']['charts']['site']['import_export']['export'][0:len] %}
+              {{ item }},
+            {% endfor %}],
+        label: "export",
+        borderColor: "#e8c3b9",
+        fill: false
+      }
+    ]
+  },
+  options: {
+    title: {
+      display: true,
+      text: {{title}}
+    },elements: {
+                    point:{
+                        radius: 0
+                    }
+                }
+  }
+});
+
+    </script>
+  </center>
+</body>
+</html>
+

@@ -109,19 +109,23 @@ def get_variable_fields(schema,
 
 
 def get_consumption_profile(file,consumption_kwh,building_type):
+
+    try:
+        normalised_profile = pd.read_csv(
+            file, header=0, usecols=[building_type])
+    except(ValueError):
+        assert False, \
+            f'422 Unable to find \"{building_type}\" in list of building types'
+
+    logging.info(f'Using stored load shape for building type: {building_type}')
     
-    if building_type == "domestic":
-        df = pd.read_csv(file, header=0,usecols=['domestic_kW'])
-        df = df*consumption_kwh
-        df.rename(columns={'domestic_kW':'kWh'},inplace=True)
-    else:
-        df = pd.read_csv(file, header=0,usecols=['non_domestic_kW'])
-        df = df*consumption_kwh
-        df.rename(columns={'non_domestic_kW':'kWh'},inplace=True)
-   
-    df.index.name='hours'
-    
-    return(df)
+    scaled_profile = normalised_profile * consumption_kwh
+
+    scaled_profile = scaled_profile.rename(columns={ building_type:'kWh' })
+    scaled_profile.index.name = 'hours'
+
+    return scaled_profile
+
 
 def get_generation_1kw(form_data):
     

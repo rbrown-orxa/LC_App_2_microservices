@@ -323,6 +323,24 @@ def resolve():
         
     return {'object_id': object_id,'subscription_id':sub_id,'plan_id':plan_id, 'free_calls': used_no, \
             'max_free_calls':max_no}
+
+
+@app.route("/default_annual_kwh")
+@auto.doc()
+@utils.handle_exceptions
+def default_annual_kwh():
+    """Get default annual kwh consumption for a building type.
+
+    Request:
+        Body: {"building_type":building_type}
+    Return:
+        Content-Type: application/json
+        Body: {"building_type": building_type, "default_annual_kwh": int}
+    Example:
+        {"building_type":"domestic"}
+    """
+    return library._get_annual_kwh(request)
+
       
 
 @app.route('/')

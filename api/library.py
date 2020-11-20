@@ -11,6 +11,7 @@ import handle_base_loads
 from results import get_optimise_results
 from utils import get_fixed_fields
 import config as cfg
+import pandas as pd
 
 
 def _upload(request):
@@ -129,5 +130,17 @@ def _activate(request):
                 params={'api-version': '2018-08-31'},
                 headers=_make_headers(sid))
    return ( "OK" if r.status_code == 200 else "NOK")
-        
 
+
+def _get_annual_kwh(request):
+
+    content = request.json
+    building_type = content['building_type']
+
+    try:
+        annual_kwh = float( pd.read_csv(cfg.ANNUALS_BUILDING) [building_type] )
+    except(KeyError):
+        assert False, f'422 Building type \"{building_type}\" not found'
+        
+    return {'building_type':building_type, 'default_annual_kwh':annual_kwh}   
+        

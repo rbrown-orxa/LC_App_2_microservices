@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>'Cost vs Battery Size'</title>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+</head>
+
+<body>
+  <center>
+   <canvas id="line-chart" width="800" height="400"></canvas>
+    <script>
+
+    new Chart(document.getElementById("line-chart"), {
+    type: 'line',
+    data: {
+      labels : [
+          
+            "0",
+          
+            "1",
+          
+            "2",
+          
+            "3",
+          
+            "4",
+          
+            "5",
+          
+            "6",
+          
+            "7",
+          
+            "8",
+          
+            "9",
+          
+            "10",
+          
+            "11",
+          
+            "12",
+          
+            "13",
+          
+            "14",
+          
+            "15",
+          
+            "16",
+          
+        ] ,
+      datasets: [
+        {
+          label: 'cost',
+            data : [
+	    
+              1923.9382845157913,
+            
+              1903.890296860219,
+            
+              1885.1994351261856,
+            
+              1869.0710450083786,
+            
+              1855.9033179475732,
+            
+              1846.5430044208838,
+            
+              1841.702595807237,
+            
+              1840.703963123075,
+            
+              1842.7245081332044,
+            
+              1847.3038843604218,
+            
+              1854.480804394258,
+            
+              1864.7611961847379,
+            
+              1877.1147957987405,
+            
+              1890.5086934631174,
+            
+              1904.976139743185,
+            
+              1921.0593276356158,
+            
+              1937.9043351381765,
+            ]
+        }
+      ]
+    },
+    options: {
+      legend: { display: false },
+      title: {
+        display: true,
+        text: 'Cost vs Battery Size'
+      }
+    }
+});
+
+    </script>
+  </center>
+</body>
+</html>

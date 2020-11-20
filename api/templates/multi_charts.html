@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>{{title}}</title>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+</head>
+
+<body>
+  <center>
+    {% if len > 0 %}
+    <canvas id="line-chart-1" width="400" height="200"></canvas>
+    {% endif %}
+        {% if len > 1 %}
+       <canvas id="line-chart-2" width="400" height="200"></canvas>
+        {% endif %}
+    {% if len > 2 %}
+    <canvas id="line-chart-3" width="400" height="200"></canvas>
+    {% endif %}
+        {% if len > 3 %}
+       <canvas id="line-chart-4" width="400" height="200"></canvas>
+        {% endif %}
+    {% if len > 4 %}
+   <canvas id="line-chart-5" width="400" height="200"></canvas>
+    {% endif %}
+       {% if len > 5 %}
+       <canvas id="line-chart-6" width="400" height="200"></canvas>
+       {% endif %}
+    <script>
+    
+    {% if len > 0 %}
+    new Chart(document.getElementById("line-chart-1"), {
+    type: 'line',
+    data: {
+      labels : [
+          {% for item in data['output']['charts']['buildings'][0]['pv_cost_curve']['Size_kWp'] %}
+            "{{ item }}",
+          {% endfor %}
+        ] ,
+      datasets: [
+        {
+          label: {{name}},
+            data : [
+	    {% for item in data['output']['charts']['buildings'][0]['pv_cost_curve']['Profit_PA'] %}
+              {{ item }},
+            {% endfor %}]
+        }
+      ]
+    },
+    options: {
+      legend: { display: false },
+      title: {
+        display: true,
+        text: "{{title}}" + "{{data['output']['charts']['buildings'][0]['name']}}"
+      }
+    }
+  });
+  {% endif %}
+  
+    
+    {% if len > 1 %}
+    new Chart(document.getElementById("line-chart-2"), {
+    type: 'line',
+    data: {
+      labels : [
+          {% for item in data['output']['charts']['buildings'][1]['pv_cost_curve']['Size_kWp'] %}
+            "{{ item }}",
+          {% endfor %}
+        ] ,
+      datasets: [
+        {
+          label: {{name}},
+            data : [
+	    {% for item in data['output']['charts']['buildings'][1]['pv_cost_curve']['Profit_PA'] %}
+              {{ item }},
+            {% endfor %}]
+        }
+      ]
+    },
+    options: {
+      legend: { display: false },
+      title: {
+        display: true,
+        text: "{{title}}" + "{{data['output']['charts']['buildings'][1]['name']}}"
+      }
+    }
+  });
+  {% endif %}
+  
+    
+    {% if len > 2 %}
+    new Chart(document.getElementById("line-chart-3"), {
+    type: 'line',
+    data: {
+      labels : [
+          {% for item in data['output']['charts']['buildings'][2]['pv_cost_curve']['Size_kWp'] %}
+            "{{ item }}",
+          {% endfor %}
+        ] ,
+      datasets: [
+        {
+          label: {{name}},
+            data : [
+	    {% for item in data['output']['charts']['buildings'][2]['pv_cost_curve']['Profit_PA'] %}
+              {{ item }},
+            {% endfor %}]
+        }
+      ]
+    },
+    options: {
+      legend: { display: false },
+      title: {
+        display: true,
+        text: "{{title}}" + "{{data['output']['charts']['buildings'][2]['name']}}"
+      }
+    }
+  });
+  {% endif %}
+  
+   {% if len > 3 %}
+    new Chart(document.getElementById("line-chart-4"), {
+    type: 'line',
+    data: {
+      labels : [
+          {% for item in data['output']['charts']['buildings'][3]['pv_cost_curve']['Size_kWp'] %}
+            "{{ item }}",
+          {% endfor %}
+        ] ,
+      datasets: [
+        {
+          label: {{name}},
+            data : [
+	    {% for item in data['output']['charts']['buildings'][3]['pv_cost_curve']['Profit_PA'] %}
+              {{ item }},
+            {% endfor %}]
+        }
+      ]
+    },
+    options: {
+      legend: { display: false },
+      title: {
+        display: true,
+        text: "{{title}}" + "{{data['output']['charts']['buildings'][3]['name']}}"
+      }
+    }
+  });
+  {% endif %}
+  
+  {% if len > 4 %}
+    new Chart(document.getElementById("line-chart-5"), {
+    type: 'line',
+    data: {
+      labels : [
+          {% for item in data['output']['charts']['buildings'][4]['pv_cost_curve']['Size_kWp'] %}
+            "{{ item }}",
+          {% endfor %}
+        ] ,
+      datasets: [
+        {
+          label: {{name}},
+            data : [
+	    {% for item in data['output']['charts']['buildings'][4]['pv_cost_curve']['Profit_PA'] %}
+              {{ item }},
+            {% endfor %}]
+        }
+      ]
+    },
+    options: {
+      legend: { display: false },
+      title: {
+        display: true,
+        text: "{{title}}" + "{{data['output']['charts']['buildings'][4]['name']}}"
+      }
+    }
+  });
+  {% endif %}
+  
+   {% if len > 5 %}
+    new Chart(document.getElementById("line-chart-6"), {
+    type: 'line',
+    data: {
+      labels : [
+          {% for item in data['output']['charts']['buildings'][5]['pv_cost_curve']['Size_kWp'] %}
+            "{{ item }}",
+          {% endfor %}
+        ] ,
+      datasets: [
+        {
+          label: {{name}},
+            data : [
+	    {% for item in data['output']['charts']['buildings'][5]['pv_cost_curve']['Profit_PA'] %}
+              {{ item }},
+            {% endfor %}]
+        }
+      ]
+    },
+    options: {
+      legend: { display: false },
+      title: {
+        display: true,
+        text: "{{title}}" + "{{data['output']['charts']['buildings'][5]['name']}}"
+      }
+    }
+  });
+  {% endif %}
+
+    </script>
+  </center>
+</body>
+</html>
+

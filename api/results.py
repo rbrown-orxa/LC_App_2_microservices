@@ -230,7 +230,8 @@ def get_optimise_results(schema):
                 int(payback_period)
                 
             }
-     
+         
+         
      var = get_variable_fields(schema,fields=['name','num_ev_chargers'])
      
      #building results
@@ -285,7 +286,14 @@ def get_optimise_results(schema):
      buildings = {'buildings': buildings}
      
      merge_charts = {**site,** buildings}
-    
+     
+     
+     #call html templates build function
+     #inputs=schema
+     #outputs = {'results':merge_results,'charts':merge_charts}
+     #build_html_templates(inputs,outputs)
+     
+       
      return(json.dumps( {'results':merge_results,'charts':merge_charts}))
  
     
@@ -351,6 +359,75 @@ def report(pv_sz,batt_sz,total_cost,with_pv_cost,with_pv_plus_batt_cost,pay_back
     os.rename(report,filename)
     
     return (os.path.basename(filename))
+
+
+def build_html_templates(inputs,outputs):
+    
+    #merge two dictionaries
+    dict = {'input':inputs,'output':outputs}
+    
+    #Site Results
+    
+    env = Environment( loader = FileSystemLoader('./templates') )
+    
+    template = env.get_template('Results.html')
+    
+    filename = os.path.join('./', 'html', 'Results.html')
+    
+    with open(filename, 'w') as fh:
+        fh.write(template.render(data=dict)
+        )
+        
+    #Battery Cost Curve
+    template = env.get_template('line_chart.html')
+    
+    filename = os.path.join('./', 'html', 'batteryvscostcurve.html')
+        
+    with open(filename, 'w') as fh:
+        fh.write(template.render(data=dict,
+                                 title="'" + "Cost vs Battery Size" + "'",
+                                 name="'" + "cost" + "'")
+        )
+    
+    #Import/Export Yearly
+    dttimelabel =  pd.date_range('2018-12-31', periods=len(import_export_df), freq='60min')
+    dttimelabel = dttimelabel.strftime('%Y-%m-%d %H:%M:%S').to_list()
+    
+    template = env.get_template('multiline_chart.html')
+    
+    filename = os.path.join('./', 'html', 'importexportyearly.html')
+        
+    with open(filename, 'w') as fh:
+        fh.write(template.render(labels=dttimelabel,
+                                 data=dict,
+                                 len = 8736,
+                                 title="'" + "Import/Export Yearly" + "'")
+        )
+        
+    #Import/Export Weekly
+    
+    template = env.get_template('multiline_chart.html')
+    
+    filename = os.path.join('./', 'html', 'importexportweekly.html')
+        
+    with open(filename, 'w') as fh:
+        fh.write(template.render(labels=dttimelabel[0:24*7],
+                                 data=dict,
+                                 len=24*7,
+                                 title="'" + "Import/Export Weekly" + "'")
+        )
+    
+    #PV Cost Curve
+    template = env.get_template('multi_charts.html')
+    
+    filename = os.path.join('./', 'html', 'pvcostcurve.html')
+   
+    with open(filename, 'w') as fh:
+        fh.write(template.render(data=dict,
+                                 title="'" + "PV Cost Curve" + "'",
+                                 name="'" + "cost" + "'",
+                                 len=len(inputs['building_data']))
+        )
      
     
 if __name__ == '__main__':
