@@ -327,6 +327,11 @@ def requires_auth(f):
         assert False, '401 invalid_header'
     return decorated
 
+def degToCompass(num):
+    val=int((num/45)+.5)
+    arr=["NORTH","NORTH-EAST","EAST","SOUTH-EAST","SOUTH","SOUTH-WEST","WEST","NORTH-WEST"]
+    return (arr[(val % 8)])
+
 
 if __name__ == '__main__':
     

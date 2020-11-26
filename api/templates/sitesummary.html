@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Site Summary</title>
+</head>
+<style>
+table { 
+  width: 100%; 
+  border-collapse: collapse; 
+}
+th { 
+  background: #333; 
+  color: white; 
+  font-weight: bold; 
+}
+td, th { 
+  padding: 6px; 
+  border: 1px solid #ccc; 
+  text-align: left; 
+}
+</style>
+</head>
+<body>
+ <div id="site_summary" >
+<table>
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Building Name</th>
+            <th>Type</th>
+            <th>Direction</th>
+            <th>Slope</th>
+            <th>Roof Size</th>
+            <th>Annual Consumption</th>
+            <th>No of EV Chargers</th>
+        </tr>
+    </thead>
+{% for item in data['input']['building_data'] %}
+<tbody>
+    <tr>
+        <td>{{loop.index}}</td>
+        <td>{{item['name']}}</td>
+        <td>{{item['building_type']}}</td>
+        <td>{{item['azimuth_deg']}}</td>
+        <td>{{item['pitch_deg']}}</td>
+        <td>{{item['roof_size_m2']}}</td>
+        <td>{{item['annual_kwh_consumption_optional']}}</td>
+        <td>{{item['num_ev_chargers']}}</td>
+    </tr>
+</tbody>
+{% endfor %}
+</table>
+ </div>
+</body>
+</html>

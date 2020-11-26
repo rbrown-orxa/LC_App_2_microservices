@@ -7,63 +7,78 @@
 </head>
 
 <body>
-  <center>
-   <canvas id="line-chart" width="800" height="400"></canvas>
+  <center>  
+    {% if len <= 24*7 %}
+    <canvas id="line-chart-wk" width="800" height="400"></canvas>
+    {% endif %}
+    
+    {% if len > 24*7 %}
+    <canvas id="line-chart-yr" width="800" height="400"></canvas>
+    {% endif %}
+    
     <script>
 
-  new Chart(document.getElementById("line-chart"), {
-  type: 'line',
-  data: {
-     labels : [
-          {% for item in labels %}
-            "{{ item }}",
-          {% endfor %}
-        ] ,
-    datasets: [{ 
-        data : [
-	    {% for item in data['output']['charts']['site']['import_export']['Generation'][0:len] %}
-              {{ item }},
-            {% endfor %}],
-        label: "Generation",
-        borderColor: "#3e95cd",
-        fill: false
-      }, { 
-        data : [
-	    {% for item in data['output']['charts']['site']['import_export']['Load'][0:len] %}
-              {{ item }},
-            {% endfor %}],
-        label: "Load",
-        borderColor: "#8e5ea2",
-        fill: false
-      }, { 
-        data : [
-	    {% for item in data['output']['charts']['site']['import_export']['Import'][0:len] %}
-              {{ item }},
-            {% endfor %}],
-        label: "Import",
-        borderColor: "#3cba9f",
-        fill: false
-      }, { 
-        data : [
-	    {% for item in data['output']['charts']['site']['import_export']['export'][0:len] %}
-              {{ item }},
-            {% endfor %}],
-        label: "export",
-        borderColor: "#e8c3b9",
-        fill: false
-      }
-    ]
-  },
-  options: {
-    title: {
-      display: true,
-      text: {{title}}
-    },elements: {
-                    point:{
-                        radius: 0
+     {% if len <= 24*7 %} 
+      new Chart(document.getElementById("line-chart-wk"),
+     {% endif %}
+     
+     {% if len > 24*7 %} 
+      new Chart(document.getElementById("line-chart-yr"),
+     {% endif %}
+      
+      {
+      type: 'line',
+      data: {
+         labels : [
+              {% for item in labels %}
+                "{{ item }}",
+              {% endfor %}
+            ] ,
+        datasets: [{ 
+            data : [
+    	    {% for item in data['output']['charts']['site']['import_export']['Generation'][0:len] %}
+                  {{ item }},
+                {% endfor %}],
+            label: "Generation",
+            borderColor: "#3e95cd",
+            fill: false
+          }, { 
+            data : [
+    	    {% for item in data['output']['charts']['site']['import_export']['Load'][0:len] %}
+                  {{ item }},
+                {% endfor %}],
+            label: "Load",
+            borderColor: "#8e5ea2",
+            fill: false
+          }, { 
+            data : [
+    	    {% for item in data['output']['charts']['site']['import_export']['Import'][0:len] %}
+                  {{ item }},
+                {% endfor %}],
+            label: "Import",
+            borderColor: "#3cba9f",
+            fill: false
+          }, { 
+            data : [
+    	    {% for item in data['output']['charts']['site']['import_export']['export'][0:len] %}
+                  {{ item }},
+                {% endfor %}],
+            label: "export",
+            borderColor: "#e8c3b9",
+            fill: false
+          }
+        ]
+      },
+      options: {
+        title: {
+          display: true,
+          text: {{title}}
+        },elements: {
+                        point:{
+                            radius: 0
+                        }
                     }
-                }
-  }
+      }
 });
 
     </script>

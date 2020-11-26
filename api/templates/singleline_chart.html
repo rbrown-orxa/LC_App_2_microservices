@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>{{title}}</title>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+</head>
+
+<body>
+  <center>
+    <canvas id="singleline-chart" width="800" height="400"></canvas>
+   <script>
+      new Chart(document.getElementById("singleline-chart"),
+      {
+      type: 'line',
+      data: {
+         labels : [
+              {% for item in labels %}
+                "{{ item }}",
+              {% endfor %}
+            ] ,
+        datasets: [{ 
+            data : [
+    	    {% for item in data %}
+                  {{ item }},
+                {% endfor %}],
+            label: "Load",
+            borderColor: "#3e95cd",
+            fill: false
+          }
+        ]
+      },
+      options: {
+        title: {
+          display: true,
+          text: {{title}}
+        },elements: {
+                        point:{
+                            radius: 0
+                        }
+                    }
+      }
+});
+
+    </script>
+  </center>
+</body>
+</html>
+

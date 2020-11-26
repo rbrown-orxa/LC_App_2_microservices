@@ -1,0 +1,30 @@
+{% extends 'template.html' %}
+{% block content %}
+    {% if site_summary %}
+        {% include 'sitesummary.html' %}
+    {% endif %}
+    {% if optimisation_result %}
+        {% include 'Results.html' %}
+    {% endif %}
+    {% if battery_cost_curve %}
+        {% include 'batteryvscostcurve.html' %}
+    {% endif %}
+    {% if import_export_yearly %}
+        {% include 'importexportyearly.html' %}
+    {% endif %}
+     {% if import_export_weekly %}
+        {% include 'importexportweekly.html' %}
+    {% endif %}
+    {% if pv_cost_curve %}
+        {% include 'pvcostcurve.html' %}
+    {% endif %}
+    {% if heat_map %}
+        {% include 'EnergyConsumptionHeatMap.html' %}
+    {% endif %}
+    {% if load_profile_max_demand %}
+        {% include 'loadprofilemaxdemand.html' %}
+    {% endif %}
+    {% if report %}
+        {% include 'report.html' %}
+    {% endif %}
+{% endblock %}

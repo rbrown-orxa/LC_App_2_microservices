@@ -12,12 +12,12 @@ valid_json = """
             "oid":"123-gty-pqr",
             "lat": 18.51,
             "lon": 73.85,
-            "import_cost_kwh": 0.14,
+            "import_cost_kwh": 0.08,
             "export_price_kwh": 0.0,
-            "pv_cost_kwp": 1840,
+            "pv_cost_kwp": 1000,
             "pv_life_yrs": 20,
             "battery_life_cycles": 6000,
-            "battery_cost_kwh": 407,
+            "battery_cost_kwh": 300,
             "load_profile_csv_optional": "",
             "building_data": [
                 {

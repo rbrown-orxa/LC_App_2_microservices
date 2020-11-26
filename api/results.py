@@ -13,7 +13,7 @@ from aggregate_loads import (
 from optimise_battery import optimise_battery_size
 from handle_base_loads import get_base_loads
 from handle_ev_loads import get_ev_loads
-from utils import get_fixed_fields,get_variable_fields
+from utils import get_fixed_fields,get_variable_fields,degToCompass
 from optimise_pv import get_optimise_pv_size
 import config as cfg
 import os
@@ -189,10 +189,10 @@ def get_optimise_results(schema):
        _get_lifetimeprofit_roi_payback_period(schema,import_export_df,
                                               battery_size,pv_size)
     #Generate the file report handler 
-     # handler = report(pv_size,battery_size,total_cost,pv_cost,battery_cost,pay_back_yrs_pv,
-     #         IRR,payback_period,ROI,annual_import_total_kwh,annual_import_with_pv_kwh,
-     #         annual_import_with_pv_and_battery_kwh,savings_pv,savings_batt
-     #         )
+     dict_report = report(pv_size,battery_size,total_cost,pv_cost,battery_cost,pay_back_yrs_pv,
+               IRR,payback_period,ROI,annual_import_total_kwh,annual_import_with_pv_kwh,
+               annual_import_with_pv_and_battery_kwh,savings_pv,savings_batt
+               )
     
     
     
@@ -289,9 +289,9 @@ def get_optimise_results(schema):
      
      
      #call html templates build function
-     #inputs=schema
-     #outputs = {'results':merge_results,'charts':merge_charts}
-     #build_html_templates(inputs,outputs)
+     inputs=schema
+     outputs = {'results':merge_results,'charts':merge_charts}
+     build_html_templates(inputs,outputs,dict_report)
      
        
      return(json.dumps( {'results':merge_results,'charts':merge_charts}))
@@ -301,78 +301,42 @@ def report(pv_sz,batt_sz,total_cost,with_pv_cost,with_pv_plus_batt_cost,pay_back
            ann_imp_base_kwh,ann_import_pv_kwh,ann_imp_batt_kwh,save_pv,save_batt):
     
     
-    df_system_size = pd.DataFrame({
-      'BASE CASE':['', '', ''],
-      'WITH PV':['', round(sum(pv_sz),0),''],
-      'WITH PV PLUS BATTERY':['', '', batt_sz]})
-    
-    df_system_size.index = ['SYSTEM SIZE', 'PV Size(Kwp)', 'Battery Size(Kwh)']
-    
-    df_cost_and_savings = pd.DataFrame({
-      'BASE CASE':['', 0, int(total_cost)],
-      'WITH PV':['', int(with_pv_cost),int(total_cost-save_pv)],
-      'WITH PV PLUS BATTERY':['', int(with_pv_plus_batt_cost), int(total_cost-save_batt)]})
-    
-    df_cost_and_savings.index = ['COST AND SAVINGS', 'Capex', 'Opex']
-    
-    df_economics = pd.DataFrame({
-      'BASE CASE':['', '', ''],  
-      'WITH PV':['', round(pay_back_pv,2), round(IRR_pv,2)],
-      'WITH PV PLUS BATTERY':['', round(pay_back_batt,2), round(IRR_batt,2)]})
-    
-    df_economics.index = ['ECONOMIC METRICS', 'payback time(yrs)', 'IRR(%)']
-    
-    df_environmental = pd.DataFrame({
-      'BASE CASE':['', round(ann_imp_base_kwh * cfg.CO2_EMISSION_KWH,2)],  
-      'WITH PV':['', round(ann_import_pv_kwh * cfg.CO2_EMISSION_KWH,2)],
-      'WITH PV PLUS BATTERY':['', round(ann_imp_batt_kwh * cfg.CO2_EMISSION_KWH,0)]})
-    
-    df_environmental.index = ['ENVIRONMENTAL IMPACT', 'CO2 emission(metric ton/year)']
-    
-    df = df_system_size.append(df_cost_and_savings)
-    
-    df = df.append(df_economics)
-    
-    df = df.append(df_environmental)
-    
-    env = Environment( loader = FileSystemLoader('./templates') )
-    
-    template = env.get_template('table.html')
-    
-    filename = os.path.join('./', 'html', 'table.html')
-    
-    with open(filename, 'w') as fh:
-        fh.write(template.render(
-           tables=[df.to_html()],titles = ['OrxaGrid Report'])
-        )
-        
-    report = os.path.join('./', cfg.UPLOAD_PATH, 'report.pdf') 
-        
-    pdfkit.from_file(filename, report)
-    
-    tf = tempfile.NamedTemporaryFile(dir=cfg.UPLOAD_PATH)
-    
-    tf.close()
-    
-    filename = tf.name + '.pdf'
-    
-    os.rename(report,filename)
-    
-    return (os.path.basename(filename))
+    dict = {'sys_size_pv':round(sum(pv_sz),0),'sys_size_batt':batt_sz,
+            'capex_pv':int(with_pv_cost),'capex_batt':int(with_pv_plus_batt_cost),
+            'opex_base':int(total_cost),'opex_pv':int(total_cost-save_pv),'opex_batt':int(total_cost-save_batt),
+            'payback_yrs_pv':round(pay_back_pv,2),'payback_yrs_batt':round(pay_back_batt,2),
+            'irr_pv':round(IRR_pv,2),'irr_batt':round(IRR_batt,2),
+            'co2_base':round(ann_imp_base_kwh * cfg.CO2_EMISSION_KWH,2),
+            'co2_pv':round(ann_import_pv_kwh * cfg.CO2_EMISSION_KWH,2),
+            'co2_batt':round(ann_imp_batt_kwh * cfg.CO2_EMISSION_KWH,0)
+            }
+   
+    return (dict)
 
 
-def build_html_templates(inputs,outputs):
+def build_html_templates(inputs,outputs,dict_report):
     
     #merge two dictionaries
     dict = {'input':inputs,'output':outputs}
     
-    #Site Results
-    
+    #set template environment
     env = Environment( loader = FileSystemLoader('./templates') )
+    
+    #Site summary
+    template = env.get_template('sitesummary.html')
+    
+    filename = os.path.join('./', 'html', 'sitesummary.html')
+    
+    with open(filename, 'w') as fh:
+        fh.write(template.render(data=dict,count=0)
+        )
+    
+    
+    #Site Results
     
     template = env.get_template('Results.html')
     
-    filename = os.path.join('./', 'html', 'Results.html')
+    filename = os.path.join('./', 'html', 'results.html')
     
     with open(filename, 'w') as fh:
         fh.write(template.render(data=dict)
@@ -390,7 +354,8 @@ def build_html_templates(inputs,outputs):
         )
     
     #Import/Export Yearly
-    dttimelabel =  pd.date_range('2018-12-31', periods=len(import_export_df), freq='60min')
+    length=len(dict['output']['charts']['site']['import_export']['Import'])
+    dttimelabel =  pd.date_range('2018-12-31', periods=length, freq='60min')
     dttimelabel = dttimelabel.strftime('%Y-%m-%d %H:%M:%S').to_list()
     
     template = env.get_template('multiline_chart.html')
@@ -404,8 +369,7 @@ def build_html_templates(inputs,outputs):
                                  title="'" + "Import/Export Yearly" + "'")
         )
         
-    #Import/Export Weekly
-    
+    #Import/Export Weekly    
     template = env.get_template('multiline_chart.html')
     
     filename = os.path.join('./', 'html', 'importexportweekly.html')
@@ -417,7 +381,7 @@ def build_html_templates(inputs,outputs):
                                  title="'" + "Import/Export Weekly" + "'")
         )
     
-    #PV Cost Curve
+    #PV Cost Curve    
     template = env.get_template('multi_charts.html')
     
     filename = os.path.join('./', 'html', 'pvcostcurve.html')
@@ -428,8 +392,93 @@ def build_html_templates(inputs,outputs):
                                  name="'" + "cost" + "'",
                                  len=len(inputs['building_data']))
         )
-     
+        
+    #Heat Map    
+    template = env.get_template('heat_map.html')
     
+    filename = os.path.join('./', 'html', 'EnergyConsumptionHeatMap.html')
+    
+    df = pd.DataFrame(dict['output']['charts']['site']['import_export'])
+    df.index = pd.date_range('2018-12-31', periods=len(df), freq='60min')
+    df['Month'] = df.index.strftime('%m')
+    df['HourOfDay'] = df.index.strftime('%H')
+    df = df.groupby(by=['Month','HourOfDay']).mean()
+    df = df.reset_index()
+    df = df[['Month','HourOfDay','Load']]
+    df = df.astype('float')
+    df.Month = df.Month - 1
+    df.Load = round(df.Load,2)
+    values = df.to_numpy()
+   
+    with open(filename, 'w') as fh:
+        fh.write(template.render(labelx=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+                                 labely=list(df.HourOfDay.unique()),
+                                 arr = values.tolist(),
+                                 title="'" + "Energy Consumption Pattern" + "'")
+        )
+        
+    #load profile for highest demand day
+    df = pd.DataFrame(dict['output']['charts']['site']['import_export'])
+    df.index = pd.date_range('2018-12-31', periods=len(df), freq='60min')
+    df = df.reset_index()
+    df = df.set_index('index',append=True)
+    dttime = df.sort_values(by='Load',ascending=False).index[0][1]
+    df_max = df.loc[df.index.get_level_values(1).strftime('%Y-%m-%d')==dttime.strftime('%Y-%m-%d')]
+    
+    template = env.get_template('singleline_chart.html')
+    
+    filename = os.path.join('./', 'html', 'loadprofilemaxdemand.html')
+        
+    with open(filename, 'w') as fh:
+        fh.write(template.render(labels=df_max.index.get_level_values(1),
+                                 data=df_max.Load,
+                                 title="'" + "Load Profile for highest demand day" + "'")
+        )
+        
+        
+    #Savings/Economics/Environmental Impact for different modes
+    template = env.get_template('report.html')
+    
+    filename = os.path.join('./', 'html', 'report.html')
+    
+    with open(filename, 'w') as fh:
+        fh.write(template.render(data=dict_report)
+        )
+    
+        
+    #Master template
+    env = Environment( loader = FileSystemLoader('./html') )
+    
+    template = env.get_template('child_template.html')
+    
+    filename = os.path.join('./', 'html', 'master.html')
+   
+    with open(filename, 'w') as fh:
+        fh.write(template.render(data=dict,
+                                 site_summary = True,
+                                 optimisation_result = True,
+                                 battery_cost_curve = True,
+                                 import_export_yearly = True,
+                                 import_export_weekly = True,
+                                 pv_cost_curve = True,
+                                 heat_map = True,
+                                 load_profile_max_demand = True,
+                                 report = True)
+        )
+        
+    # report = os.path.join('./', cfg.UPLOAD_PATH, 'report.pdf') 
+        
+    # pdfkit.from_file(filename, report)
+    
+    # tf = tempfile.NamedTemporaryFile(dir=cfg.UPLOAD_PATH)
+    
+    # tf.close()
+    
+    # filename = tf.name + '.pdf'
+    
+    # os.rename(report,filename)
+    
+   
 if __name__ == '__main__':
     
     from api_mock import *
