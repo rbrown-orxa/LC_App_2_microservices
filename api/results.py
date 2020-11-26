@@ -20,6 +20,7 @@ import os
 from jinja2 import Environment, FileSystemLoader
 import pdfkit
 import tempfile
+import codecs
 
 def _get_annual_import_site_kwh(schema):
     
@@ -293,8 +294,12 @@ def get_optimise_results(schema):
      outputs = {'results':merge_results,'charts':merge_charts}
      build_html_templates(inputs,outputs,dict_report)
      
+     file=codecs.open('./html/master.html',"rb")
+     file=file.read()
+     file=str(file)
+     
        
-     return(json.dumps( {'results':merge_results,'charts':merge_charts}))
+     return(json.dumps( {'results':merge_results,'charts':merge_charts,'html':file}))
  
     
 def report(pv_sz,batt_sz,total_cost,with_pv_cost,with_pv_plus_batt_cost,pay_back_pv,IRR_pv,pay_back_batt,IRR_batt,
