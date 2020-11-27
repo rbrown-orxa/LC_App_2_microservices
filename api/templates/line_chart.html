@@ -2,11 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>{{title}}</title>
+  <title>Line Chart</title>
  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
 </head>
-
 <body>
+<br>
+<br>
+<h2>{{title}}</h2>
   <center>
    <canvas id="line-chart-batt" width="800" height="400"></canvas>
    </div>
@@ -34,7 +36,6 @@
       legend: { display: false },
       title: {
         display: true,
-        text: {{title}}
       }
     }
 });

@@ -271,6 +271,7 @@ def get_optimise_results(schema):
              'import_export' : import_export_df.to_dict(orient='list')
             }
      
+     
         
      #building results
      buildings = []
@@ -294,7 +295,7 @@ def get_optimise_results(schema):
      outputs = {'results':merge_results,'charts':merge_charts}
      build_html_templates(inputs,outputs,dict_report)
      
-     file=codecs.open('./html/master.html',"rb")
+     file=codecs.open('./html/master.html',"r")
      file=file.read()
      file=str(file)
      
@@ -354,7 +355,7 @@ def build_html_templates(inputs,outputs,dict_report):
         
     with open(filename, 'w') as fh:
         fh.write(template.render(data=dict,
-                                 title="'" + "Cost vs Battery Size" + "'",
+                                 title="Cost vs Battery Size",
                                  name="'" + "cost" + "'")
         )
     
@@ -371,7 +372,7 @@ def build_html_templates(inputs,outputs,dict_report):
         fh.write(template.render(labels=dttimelabel,
                                  data=dict,
                                  len = 8736,
-                                 title="'" + "Import/Export Yearly" + "'")
+                                 title="Import/Export Yearly")
         )
         
     #Import/Export Weekly    
@@ -383,7 +384,7 @@ def build_html_templates(inputs,outputs,dict_report):
         fh.write(template.render(labels=dttimelabel[0:24*7],
                                  data=dict,
                                  len=24*7,
-                                 title="'" + "Import/Export Weekly" + "'")
+                                 title="Import/Export Weekly")
         )
     
     #PV Cost Curve    
@@ -393,7 +394,7 @@ def build_html_templates(inputs,outputs,dict_report):
    
     with open(filename, 'w') as fh:
         fh.write(template.render(data=dict,
-                                 title="'" + "PV Cost Curve" + "'",
+                                 title="PV Cost Curve",
                                  name="'" + "cost" + "'",
                                  len=len(inputs['building_data']))
         )
@@ -419,7 +420,7 @@ def build_html_templates(inputs,outputs,dict_report):
         fh.write(template.render(labelx=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
                                  labely=list(df.HourOfDay.unique()),
                                  arr = values.tolist(),
-                                 title="'" + "Energy Consumption Pattern" + "'")
+                                 title="Energy Consumption Pattern(Load)")
         )
         
     #load profile for highest demand day
@@ -437,7 +438,7 @@ def build_html_templates(inputs,outputs,dict_report):
     with open(filename, 'w') as fh:
         fh.write(template.render(labels=df_max.index.get_level_values(1),
                                  data=df_max.Load,
-                                 title="'" + "Load Profile for highest demand day" + "'")
+                                 title="Load Profile for highest demand day")
         )
         
         

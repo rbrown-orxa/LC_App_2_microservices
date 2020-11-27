@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>{{title}}</title>
+<meta charset="utf-8" />
+<title>Multi-Chart</title>
  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
 </head>
-
 <body>
+<br>
+<br>
+<h2>{{title}}</h2>
   <center>
     {% if len > 0 %}
     <canvas id="line-chart-1" width="400" height="200"></canvas>
@@ -34,7 +36,7 @@
     data: {
       labels : [
           {% for item in data['output']['charts']['buildings'][0]['pv_cost_curve']['Size_kWp'] %}
-            "{{ item }}",
+            "{{ item|round }}",
           {% endfor %}
         ] ,
       datasets: [
@@ -51,7 +53,7 @@
       legend: { display: false },
       title: {
         display: true,
-        text: "{{title}}" + "{{data['output']['charts']['buildings'][0]['name']}}"
+        text: "{{data['output']['charts']['buildings'][0]['name']}}"
       }
     }
   });

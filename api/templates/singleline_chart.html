@@ -2,10 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>{{title}}</title>
+  <title>Single-Line Chart</title>
  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
 </head>
-
+<br>
+<br>
+<h2>{{title}}</h2>
 <body>
   <center>
     <canvas id="singleline-chart" width="800" height="400"></canvas>
@@ -33,7 +35,7 @@
       options: {
         title: {
           display: true,
-          text: {{title}}
+          text: ''
         },elements: {
                         point:{
                             radius: 0
