@@ -29,21 +29,37 @@
           
             "4",
           
+            "5",
+          
+            "6",
+          
+            "7",
+          
+            "8",
+          
         ] ,
       datasets: [
         {
           label: 'cost',
             data : [
 	    
-              171.58730092289352,
+              1169.1083128070873,
             
-              162.508127584489,
+              1155.9976979506982,
             
-              163.93565770679098,
+              1147.5031316912707,
             
-              180.66594493004698,
+              1144.1721216051972,
             
-              205.30128666666667,
+              1146.2790936738545,
+            
+              1155.197701882056,
+            
+              1169.8731137009554,
+            
+              1189.421455502355,
+            
+              1210.275650216766,
             ]
         }
       ]
@@ -52,6 +68,29 @@
       legend: { display: false },
       title: {
         display: true,
+      },
+      scales: {
+        xAxes: [ {
+          display: true,
+          scaleLabel: {
+            display: true,
+            labelString: 'Battery Size(Kwh)'
+          },
+          ticks: {
+            major: {
+              fontStyle: 'bold',
+              fontColor: '#FF0000'
+            }
+          }
+        } ],
+        yAxes: [ {
+          display: true,
+          scaleLabel: {
+            display: true,
+            labelString: 'Cost'
+          }
+         } 
+       ]
       }
     }
 });

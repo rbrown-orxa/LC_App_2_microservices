@@ -127,7 +127,6 @@ def optimisetest():
     logging.info('got an optimise request')
     
     object_id, tenant, sub_id, plan_id = None, None, None, None
-    
     if app.config['REQUIRE_AUTH']:
         dict = get_fixed_fields(request.json,fields=['oid','sub_id','plan_id'])
         object_id = dict['oid']

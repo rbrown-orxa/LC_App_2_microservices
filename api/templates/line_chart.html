@@ -36,6 +36,29 @@
       legend: { display: false },
       title: {
         display: true,
+      },
+      scales: {
+        xAxes: [ {
+          display: true,
+          scaleLabel: {
+            display: true,
+            labelString: 'Battery Size(Kwh)'
+          },
+          ticks: {
+            major: {
+              fontStyle: 'bold',
+              fontColor: '#FF0000'
+            }
+          }
+        } ],
+        yAxes: [ {
+          display: true,
+          scaleLabel: {
+            display: true,
+            labelString: 'Cost'
+          }
+         } 
+       ]
       }
     }
 });

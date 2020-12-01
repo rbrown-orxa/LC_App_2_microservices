@@ -49,12 +49,34 @@
         }
       ]
     },
-    options: {
+   options: {
       legend: { display: false },
       title: {
         display: true,
         text: "{{data['output']['charts']['buildings'][0]['name']}}"
-      }
+      },
+       scales: {
+        xAxes: [ {
+          display: true,
+          scaleLabel: {
+            display: true,
+            labelString: 'PV Size(Kwp)'
+          },
+          ticks: {
+            major: {
+              fontStyle: 'bold',
+              fontColor: '#FF0000'
+            }
+          }
+        } ],
+        yAxes: [ {
+          display: true,
+          scaleLabel: {
+            display: true,
+            labelString: 'Lifetime Profit'
+          }
+        } ]
+      }           
     }
   });
   {% endif %}
@@ -66,7 +88,7 @@
     data: {
       labels : [
           {% for item in data['output']['charts']['buildings'][1]['pv_cost_curve']['Size_kWp'] %}
-            "{{ item }}",
+            "{{ item|round }}",
           {% endfor %}
         ] ,
       datasets: [
@@ -79,12 +101,34 @@
         }
       ]
     },
-    options: {
+   options: {
       legend: { display: false },
       title: {
         display: true,
-        text: "{{title}}" + "{{data['output']['charts']['buildings'][1]['name']}}"
-      }
+        text: "{{data['output']['charts']['buildings'][1]['name']}}"
+      },
+       scales: {
+        xAxes: [ {
+          display: true,
+          scaleLabel: {
+            display: true,
+            labelString: 'PV Size(Kwp)'
+          },
+          ticks: {
+            major: {
+              fontStyle: 'bold',
+              fontColor: '#FF0000'
+            }
+          }
+        } ],
+        yAxes: [ {
+          display: true,
+          scaleLabel: {
+            display: true,
+            labelString: 'Lifetime Profit'
+          }
+        } ]
+      }           
     }
   });
   {% endif %}
@@ -96,7 +140,7 @@
     data: {
       labels : [
           {% for item in data['output']['charts']['buildings'][2]['pv_cost_curve']['Size_kWp'] %}
-            "{{ item }}",
+            "{{ item|round }}",
           {% endfor %}
         ] ,
       datasets: [
@@ -109,12 +153,34 @@
         }
       ]
     },
-    options: {
+   options: {
       legend: { display: false },
       title: {
         display: true,
-        text: "{{title}}" + "{{data['output']['charts']['buildings'][2]['name']}}"
-      }
+        text: "{{data['output']['charts']['buildings'][2]['name']}}"
+      },
+       scales: {
+        xAxes: [ {
+          display: true,
+          scaleLabel: {
+            display: true,
+            labelString: 'PV Size(Kwp)'
+          },
+          ticks: {
+            major: {
+              fontStyle: 'bold',
+              fontColor: '#FF0000'
+            }
+          }
+        } ],
+        yAxes: [ {
+          display: true,
+          scaleLabel: {
+            display: true,
+            labelString: 'Lifetime Profit'
+          }
+        } ]
+      }           
     }
   });
   {% endif %}
@@ -125,7 +191,7 @@
     data: {
       labels : [
           {% for item in data['output']['charts']['buildings'][3]['pv_cost_curve']['Size_kWp'] %}
-            "{{ item }}",
+            "{{ item|round }}",
           {% endfor %}
         ] ,
       datasets: [
@@ -138,12 +204,34 @@
         }
       ]
     },
-    options: {
+   options: {
       legend: { display: false },
       title: {
         display: true,
-        text: "{{title}}" + "{{data['output']['charts']['buildings'][3]['name']}}"
-      }
+        text: "{{data['output']['charts']['buildings'][3]['name']}}"
+      },
+       scales: {
+        xAxes: [ {
+          display: true,
+          scaleLabel: {
+            display: true,
+            labelString: 'PV Size(Kwp)'
+          },
+          ticks: {
+            major: {
+              fontStyle: 'bold',
+              fontColor: '#FF0000'
+            }
+          }
+        } ],
+        yAxes: [ {
+          display: true,
+          scaleLabel: {
+            display: true,
+            labelString: 'Lifetime Profit'
+          }
+        } ]
+      }           
     }
   });
   {% endif %}
@@ -154,7 +242,7 @@
     data: {
       labels : [
           {% for item in data['output']['charts']['buildings'][4]['pv_cost_curve']['Size_kWp'] %}
-            "{{ item }}",
+            "{{ item|round }}",
           {% endfor %}
         ] ,
       datasets: [
@@ -167,12 +255,34 @@
         }
       ]
     },
-    options: {
+   options: {
       legend: { display: false },
       title: {
         display: true,
-        text: "{{title}}" + "{{data['output']['charts']['buildings'][4]['name']}}"
-      }
+        text: "{{data['output']['charts']['buildings'][4]['name']}}"
+      },
+       scales: {
+        xAxes: [ {
+          display: true,
+          scaleLabel: {
+            display: true,
+            labelString: 'PV Size(Kwp)'
+          },
+          ticks: {
+            major: {
+              fontStyle: 'bold',
+              fontColor: '#FF0000'
+            }
+          }
+        } ],
+        yAxes: [ {
+          display: true,
+          scaleLabel: {
+            display: true,
+            labelString: 'Lifetime Profit'
+          }
+        } ]
+      }           
     }
   });
   {% endif %}
@@ -183,7 +293,7 @@
     data: {
       labels : [
           {% for item in data['output']['charts']['buildings'][5]['pv_cost_curve']['Size_kWp'] %}
-            "{{ item }}",
+            "{{ item|round }}",
           {% endfor %}
         ] ,
       datasets: [
@@ -197,11 +307,33 @@
       ]
     },
     options: {
-      legend: { display: false },
+      legend: { display: true },
       title: {
         display: true,
-        text: "{{title}}" + "{{data['output']['charts']['buildings'][5]['name']}}"
-      }
+        text: "{{data['output']['charts']['buildings'][5]['name']}}"
+      },
+       scales: {
+        xAxes: [ {
+          display: true,
+          scaleLabel: {
+            display: true,
+            labelString: 'PV Size(Kwp)'
+          },
+          ticks: {
+            major: {
+              fontStyle: 'bold',
+              fontColor: '#FF0000'
+            }
+          }
+        } ],
+        yAxes: [ {
+          display: true,
+          scaleLabel: {
+            display: true,
+            labelString: 'Lifetime Profit'
+          }
+        } ]
+      }           
     }
   });
   {% endif %}

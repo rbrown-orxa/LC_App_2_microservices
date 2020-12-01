@@ -40,7 +40,29 @@
                         point:{
                             radius: 0
                         }
-                    }
+                    },
+      scales: {
+        xAxes: [ {
+          display: true,
+          scaleLabel: {
+            display: true,
+            labelString: 'Time'
+          },
+          ticks: {
+            major: {
+              fontStyle: 'bold',
+              fontColor: '#FF0000'
+            }
+          }
+        } ],
+        yAxes: [ {
+          display: true,
+          scaleLabel: {
+            display: true,
+            labelString: 'Kwh'
+          }
+        } ]
+       }
       }
 });
 
