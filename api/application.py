@@ -106,7 +106,7 @@ if app.config['APPLY_BILLING']:
 @auto.doc()
 @cross_origin(allow_headers=['Content-Type', 'Authorization'])
 @utils.requires_auth
-def optimisetest():
+def optimise():
     """Optimise a solar and battery system size
 
     Request:
@@ -133,8 +133,13 @@ def optimisetest():
         tenant = g.tenant
         sub_id = dict['sub_id']
         plan_id = dict['plan_id']
+        
+    print(object_id , sub_id)
 
-
+    if sub_id is None:
+        free_quota = billing.check_free_query_quota(object_id)
+        logging.info(f'free quota used: {free_quota}')
+       
     query_id = billing.query_started(sub_id, object_id, plan_id)
 
     rv = library._optimise(request)

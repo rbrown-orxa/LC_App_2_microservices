@@ -293,21 +293,21 @@ def get_optimise_results(schema):
      #call html templates build function
      inputs=schema
      outputs = {'results':merge_results,'charts':merge_charts}
-     build_html_templates(inputs,outputs,dict_report)
+     master_str = build_html_templates(inputs,outputs,dict_report)
      
-     file=codecs.open('./html/master.html',"r")
-     file=file.read()
-     file=str(file)
+     # file=codecs.open('./html/master.html',"r")
+     # file=file.read()
+     # file=str(file)
      
        
-     return(json.dumps( {'results':merge_results,'charts':merge_charts,'html':file}))
+     return(json.dumps( {'results':merge_results,'charts':merge_charts,'html':master_str}))
  
     
 def report(pv_sz,batt_sz,total_cost,with_pv_cost,with_pv_plus_batt_cost,pay_back_pv,IRR_pv,pay_back_batt,IRR_batt,
            ann_imp_base_kwh,ann_import_pv_kwh,ann_imp_batt_kwh,save_pv,save_batt):
     
     
-    dict = {'sys_size_pv':round(sum(pv_sz),0),'sys_size_batt':batt_sz,
+    dict = {'sys_size_pv':int(sum(pv_sz)),'sys_size_batt':batt_sz,
             'capex_pv':int(with_pv_cost),'capex_batt':int(with_pv_plus_batt_cost),
             'opex_base':int(total_cost),'opex_pv':int(total_cost-save_pv),'opex_batt':int(total_cost-save_batt),
             'payback_yrs_pv':round(pay_back_pv,2),'payback_yrs_batt':round(pay_back_batt,2),
@@ -331,33 +331,19 @@ def build_html_templates(inputs,outputs,dict_report):
     #Site summary
     template = env.get_template('sitesummary.html')
     
-    filename = os.path.join('./', 'html', 'sitesummary.html')
-    
-    with open(filename, 'w') as fh:
-        fh.write(template.render(data=dict,count=0)
-        )
+    site_summary_str = template.render(data=dict,count=0)
     
     
-    #Site Results
-    
+    #Site Results    
     template = env.get_template('Results.html')
     
-    filename = os.path.join('./', 'html', 'results.html')
-    
-    with open(filename, 'w') as fh:
-        fh.write(template.render(data=dict)
-        )
+    result_str = template.render(data=dict,pv_size=int(dict_report['sys_size_pv']))
         
     #Battery Cost Curve
     template = env.get_template('line_chart.html')
     
-    filename = os.path.join('./', 'html', 'batteryvscostcurve.html')
-        
-    with open(filename, 'w') as fh:
-        fh.write(template.render(data=dict,
-                                 title="Cost vs Battery Size",
-                                 name="'" + "cost" + "'")
-        )
+    batt_cost_curve_str = template.render(data=dict,title="Cost vs Battery Size",
+                                          name="'" + "cost" + "'")
     
     #Import/Export Yearly
     length=len(dict['output']['charts']['site']['import_export']['Import'])
@@ -366,44 +352,28 @@ def build_html_templates(inputs,outputs,dict_report):
     
     template = env.get_template('multiline_chart.html')
     
-    filename = os.path.join('./', 'html', 'importexportyearly.html')
-        
-    with open(filename, 'w') as fh:
-        fh.write(template.render(labels=dttimelabel,
+    imp_exp_yr_str = template.render(labels=dttimelabel,
                                  data=dict,
                                  len = 8736,
                                  title="Import/Export Yearly")
-        )
         
     #Import/Export Weekly    
     template = env.get_template('multiline_chart.html')
     
-    filename = os.path.join('./', 'html', 'importexportweekly.html')
-        
-    with open(filename, 'w') as fh:
-        fh.write(template.render(labels=dttimelabel[0:24*7],
+    imp_exp_wk_str = template.render(labels=dttimelabel[0:24*7],
                                  data=dict,
                                  len=24*7,
                                  title="Import/Export Weekly")
-        )
     
     #PV Cost Curve    
     template = env.get_template('multi_charts.html')
     
-    filename = os.path.join('./', 'html', 'pvcostcurve.html')
-   
-    with open(filename, 'w') as fh:
-        fh.write(template.render(data=dict,
-                                 title="PV Cost Curve",
+    pv_cost_curve_str = template.render(data=dict, title="PV Cost Curve",
                                  name="'" + "cost" + "'",
                                  len=len(inputs['building_data']))
-        )
         
     #Heat Map    
     template = env.get_template('heat_map.html')
-    
-    filename = os.path.join('./', 'html', 'EnergyConsumptionHeatMap.html')
-    
     df = pd.DataFrame(dict['output']['charts']['site']['import_export'])
     df.index = pd.date_range('2018-12-31', periods=len(df), freq='60min')
     df['Month'] = df.index.strftime('%m')
@@ -415,13 +385,11 @@ def build_html_templates(inputs,outputs,dict_report):
     df.Month = df.Month - 1
     df.Load = round(df.Load,2)
     values = df.to_numpy()
-   
-    with open(filename, 'w') as fh:
-        fh.write(template.render(labelx=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+    
+    energy_heat_map_str = template.render(labelx=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
                                  labely=list(df.HourOfDay.unique()),
                                  arr = values.tolist(),
                                  title="Energy Consumption Pattern(Load)")
-        )
         
     #load profile for highest demand day
     df = pd.DataFrame(dict['output']['charts']['site']['import_export'])
@@ -433,56 +401,32 @@ def build_html_templates(inputs,outputs,dict_report):
     
     template = env.get_template('singleline_chart.html')
     
-    filename = os.path.join('./', 'html', 'loadprofilemaxdemand.html')
-        
-    with open(filename, 'w') as fh:
-        fh.write(template.render(labels=df_max.index.get_level_values(1),
+    load_profile_dmnd_str = template.render(labels=df_max.index.get_level_values(1),
                                  data=df_max.Load,
                                  title="Load Profile for highest demand day")
-        )
         
         
     #Savings/Economics/Environmental Impact for different modes
     template = env.get_template('report.html')
     
-    filename = os.path.join('./', 'html', 'report.html')
-    
-    with open(filename, 'w') as fh:
-        fh.write(template.render(data=dict_report)
-        )
-    
+    report_str = template.render(data=dict_report)    
         
     #Master template
     env = Environment( loader = FileSystemLoader('./html') )
     
     template = env.get_template('child_template.html')
     
-    filename = os.path.join('./', 'html', 'master.html')
-   
-    with open(filename, 'w') as fh:
-        fh.write(template.render(data=dict,
-                                 site_summary = True,
-                                 optimisation_result = True,
-                                 battery_cost_curve = True,
-                                 import_export_yearly = True,
-                                 import_export_weekly = True,
-                                 pv_cost_curve = True,
-                                 heat_map = True,
-                                 load_profile_max_demand = True,
-                                 report = True)
-        )
-        
-    # report = os.path.join('./', cfg.UPLOAD_PATH, 'report.pdf') 
-        
-    # pdfkit.from_file(filename, report)
-    
-    # tf = tempfile.NamedTemporaryFile(dir=cfg.UPLOAD_PATH)
-    
-    # tf.close()
-    
-    # filename = tf.name + '.pdf'
-    
-    # os.rename(report,filename)
+    master_str = template.render(
+                                site_summary_str=site_summary_str,
+                                result_str=result_str,
+                                batt_cost_curve_str=batt_cost_curve_str,
+                                imp_exp_yr_str=imp_exp_yr_str,
+                                imp_exp_wk_str=imp_exp_wk_str,
+                                pv_cost_curve_str=pv_cost_curve_str,
+                                energy_heat_map_str=energy_heat_map_str,
+                                load_profile_dmnd_str=load_profile_dmnd_str,
+                                report_str=report_str)
+    return(master_str)
     
    
 if __name__ == '__main__':

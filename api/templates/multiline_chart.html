@@ -11,11 +11,15 @@
 <h2>{{title}}</h2>
   <center>  
     {% if len <= 24*7 %}
-    <canvas id="line-chart-wk" width="800" height="400"></canvas>
+    <div>
+     <canvas id="line-chart-wk" width="800" height="400"></canvas>
+    </div>
     {% endif %}
     
     {% if len > 24*7 %}
-    <canvas id="line-chart-yr" width="800" height="400"></canvas>
+    <div>
+     <canvas id="line-chart-yr" width="800" height="400"></canvas>
+    </div>
     {% endif %}
     
     <script>

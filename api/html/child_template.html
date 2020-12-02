@@ -1,30 +1,30 @@
 {% extends 'template.html' %}
 {% block content %}
-    {% if site_summary %}
-        {% include 'sitesummary.html' %}
+    {% if site_summary_str %}
+        {{site_summary_str}}
     {% endif %}
-    {% if optimisation_result %}
-        {% include 'Results.html' %}
+    {% if result_str %}
+       {{result_str}}
     {% endif %}
-    {% if battery_cost_curve %}
-        {% include 'batteryvscostcurve.html' %}
+    {% if report_str %}
+         {{report_str}}
     {% endif %}
-    {% if import_export_yearly %}
-        {% include 'importexportyearly.html' %}
+    {% if batt_cost_curve_str %}
+       {{batt_cost_curve_str}}
     {% endif %}
-     {% if import_export_weekly %}
-        {% include 'importexportweekly.html' %}
+    {% if imp_exp_yr_str %}
+       {{imp_exp_yr_str}}
     {% endif %}
-    {% if pv_cost_curve %}
-        {% include 'pvcostcurve.html' %}
+     {% if imp_exp_wk_st %}
+         {{imp_exp_wk_str}}
     {% endif %}
-    {% if heat_map %}
-        {% include 'EnergyConsumptionHeatMap.html' %}
+    {% if pv_cost_curve_str %}
+        {{pv_cost_curve_str}}
     {% endif %}
-    {% if load_profile_max_demand %}
-        {% include 'loadprofilemaxdemand.html' %}
+    {% if energy_heat_map_str %}
+         {{energy_heat_map_str}}
     {% endif %}
-    {% if report %}
-        {% include 'report.html' %}
+    {% if load_profile_dmnd_str %}
+         {{load_profile_dmnd_str}}
     {% endif %}
 {% endblock %}
