@@ -1,73 +1,81 @@
-<!DOCTYPE html>
-<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Single-Line Chart</title>
- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
-</head>
+<meta charset="utf-8" />
+<title>Single-Line Chart</title>
+<body>
 <br>
 <br>
 <h2>{{title}}</h2>
-<body>
-  <center>
-    <canvas id="singleline-chart" width="800" height="400"></canvas>
-   <script>
-      new Chart(document.getElementById("singleline-chart"),
-      {
-      type: 'line',
-      data: {
-         labels : [
-              {% for item in labels %}
-                "{{ item }}",
-              {% endfor %}
-            ] ,
-        datasets: [{ 
-            data : [
-    	    {% for item in data %}
-                  {{ item }},
-                {% endfor %}],
-            label: "Load",
-            borderColor: "#3e95cd",
-            fill: false
-          }
-        ]
-      },
-      options: {
+  <center>  
+  <figure class="highcharts-figure">
+    <div id="singleline-chart"></div>
+  </figure>
+    
+    <script>
+   Highcharts.chart('singleline-chart', {
+
+    title: {
+        text: ''
+    },
+
+    yAxis: {
         title: {
-          display: true,
-          text: ''
-        },elements: {
-                        point:{
-                            radius: 0
-                        }
-                    },
-      scales: {
-        xAxes: [ {
-          display: true,
-          scaleLabel: {
-            display: true,
-            labelString: 'Time'
-          },
-          ticks: {
-            major: {
-              fontStyle: 'bold',
-              fontColor: '#FF0000'
+            text: 'Kwh'
+        }
+    },
+
+    xAxis: {
+         title: {
+            text: 'Time'
+        },
+        categories:  [
+          {% for item in labels %}
+                "{{ item }}",
+        {% endfor %}
+            ]
+    },
+
+    legend: {
+        enabled: false
+    },
+
+    plotOptions: {
+        series: {
+            label: {
+                connectorAllowed: false
+            },
+            marker: {
+                enabled: false
             }
-          }
-        } ],
-        yAxes: [ {
-          display: true,
-          scaleLabel: {
-            display: true,
-            labelString: 'Kwh'
-          }
-        } ]
-       }
-      }
+        }
+    },
+    series: [{
+        name: '',
+        data: [  
+       {% for item in data %}
+       {{ item }},
+       {% endfor %}],
+    }],
+    responsive: {
+        rules: [{
+            condition: {
+                maxWidth: 1600
+            },
+            chartOptions: {
+                legend: {
+                    layout: 'horizontal',
+                    align: 'center',
+                    verticalAlign: 'bottom'
+                }
+            }
+        }]
+    }
+
 });
 
     </script>
   </center>
 </body>
 </html>
+
+
 

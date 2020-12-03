@@ -338,6 +338,11 @@ def build_html_templates(inputs,outputs,dict_report):
     template = env.get_template('Results.html')
     
     result_str = template.render(data=dict,pv_size=int(dict_report['sys_size_pv']))
+    
+    #Savings/Economics/Environmental Impact for different modes
+    template = env.get_template('report.html')
+    
+    report_str = template.render(data=dict_report)    
         
     #Battery Cost Curve
     template = env.get_template('line_chart.html')
@@ -356,7 +361,7 @@ def build_html_templates(inputs,outputs,dict_report):
                                  data=dict,
                                  len = 8736,
                                  title="Import/Export Yearly")
-        
+          
     #Import/Export Weekly    
     template = env.get_template('multiline_chart.html')
     
@@ -370,8 +375,7 @@ def build_html_templates(inputs,outputs,dict_report):
     
     pv_cost_curve_str = template.render(data=dict, title="PV Cost Curve",
                                  name="'" + "cost" + "'",
-                                 len=len(inputs['building_data']))
-        
+                                 len=len(inputs['building_data']))        
     #Heat Map    
     template = env.get_template('heat_map.html')
     df = pd.DataFrame(dict['output']['charts']['site']['import_export'])
@@ -390,6 +394,7 @@ def build_html_templates(inputs,outputs,dict_report):
                                  labely=list(df.HourOfDay.unique()),
                                  arr = values.tolist(),
                                  title="Energy Consumption Pattern(Load)")
+    
         
     #load profile for highest demand day
     df = pd.DataFrame(dict['output']['charts']['site']['import_export'])
@@ -404,12 +409,6 @@ def build_html_templates(inputs,outputs,dict_report):
     load_profile_dmnd_str = template.render(labels=df_max.index.get_level_values(1),
                                  data=df_max.Load,
                                  title="Load Profile for highest demand day")
-        
-        
-    #Savings/Economics/Environmental Impact for different modes
-    template = env.get_template('report.html')
-    
-    report_str = template.render(data=dict_report)    
         
     #Master template
     env = Environment( loader = FileSystemLoader('./html') )
@@ -427,8 +426,6 @@ def build_html_templates(inputs,outputs,dict_report):
                                 load_profile_dmnd_str=load_profile_dmnd_str,
                                 report_str=report_str)
     return(master_str)
-
-
     
    
 if __name__ == '__main__':

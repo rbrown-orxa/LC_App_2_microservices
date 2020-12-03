@@ -1,70 +1,81 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Line Chart</title>
- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
-</head>
+<meta charset="utf-8" />
+<title>Line Chart</title>
 <body>
 <br>
 <br>
 <h2>{{title}}</h2>
-  <center>
-  <div>
-   <canvas id="line-chart-batt" width="800" height="400"></canvas>
-   </div>
+  <center>  
+  <figure class="highcharts-figure">
+    <div id="line-chart-batt"></div>
+  </figure>
+    
     <script>
+   Highcharts.chart('line-chart-batt', {
 
-    new Chart(document.getElementById("line-chart-batt"), {
-    type: 'line',
-    data: {
-      labels : [
+    title: {
+        text: ''
+    },
+
+    yAxis: {
+        title: {
+            text: 'Cost'
+        }
+    },
+
+    xAxis: {
+         title: {
+            text: 'Battery Size(Kwh)'
+        },
+        categories:  [
           {% for item in data['output']['charts']['site']['battery_cost_curve']['batt_size'] %}
             "{{ item }}",
           {% endfor %}
-        ] ,
-      datasets: [
-        {
-          label: {{name}},
-            data : [
-	    {% for item in data['output']['charts']['site']['battery_cost_curve']['total_cost'] %}
-              {{ item }},
-            {% endfor %}]
-        }
-      ]
+            ]
     },
-    options: {
-      legend: { display: false },
-      title: {
-        display: true,
-      },
-      scales: {
-        xAxes: [ {
-          display: true,
-          scaleLabel: {
-            display: true,
-            labelString: 'Battery Size(Kwh)'
-          },
-          ticks: {
-            major: {
-              fontStyle: 'bold',
-              fontColor: '#FF0000'
+
+    legend: {
+        enabled: false
+    },
+
+    plotOptions: {
+        series: {
+            label: {
+                connectorAllowed: false
+            },
+            marker: {
+                enabled: true
             }
-          }
-        } ],
-        yAxes: [ {
-          display: true,
-          scaleLabel: {
-            display: true,
-            labelString: 'Cost'
-          }
-         } 
-       ]
-      }
+        }
+    },
+    series: [{
+        name: '',
+        data: [  
+        {% for item in data['output']['charts']['site']['battery_cost_curve']['total_cost'] %}
+            {{ item }},
+        {% endfor %}]
+    }],
+    responsive: {
+        rules: [{
+            condition: {
+                maxWidth: 1600
+            },
+            chartOptions: {
+                legend: {
+                    layout: 'horizontal',
+                    align: 'center',
+                    verticalAlign: 'bottom'
+                }
+            }
+        }]
     }
+
 });
 
     </script>
   </center>
 </body>
 </html>
+
+
