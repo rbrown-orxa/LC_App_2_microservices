@@ -13,6 +13,7 @@ from six.moves.urllib.request import urlopen
 import json
 from jose import jwt
 from flask import request, g, _request_ctx_stack
+from urllib.request import urlopen
 
 
 def pickle_results(results, subscription_id, path):
@@ -331,6 +332,23 @@ def degToCompass(num):
     val=int((num/45)+.5)
     arr=["NORTH","NORTH-EAST","EAST","SOUTH-EAST","SOUTH","SOUTH-WEST","WEST","NORTH-WEST"]
     return (arr[(val % 8)])
+
+
+def getplace(lat, lon):
+    key = "AIzaSyCdXNN5iv5yl77PGwZpG5GPjZk_epT_U5Y"
+    url = "https://maps.googleapis.com/maps/api/geocode/json?"
+    url += "latlng=%s,%s&sensor=false&key=%s" % (lat, lon, key)
+    v = urlopen(url).read()
+    j = json.loads(v)
+    components = j['results'][0]['address_components']
+    country = town = None
+    for c in components:
+        if "country" in c['types']:
+            country = c['long_name']
+        if "postal_town" in c['types']:
+            town = c['long_name']
+
+    return town, country
 
 
 if __name__ == '__main__':

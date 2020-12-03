@@ -427,6 +427,8 @@ def build_html_templates(inputs,outputs,dict_report):
                                 load_profile_dmnd_str=load_profile_dmnd_str,
                                 report_str=report_str)
     return(master_str)
+
+
     
    
 if __name__ == '__main__':
