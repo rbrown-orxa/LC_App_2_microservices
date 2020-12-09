@@ -18,7 +18,7 @@ from optimise_pv import get_optimise_pv_size
 import config as cfg
 import os
 from jinja2 import Environment, FileSystemLoader
-import pdfkit
+# import pdfkit
 import tempfile
 import codecs
 

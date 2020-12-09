@@ -351,7 +351,7 @@ def getplace(lat, lon):
         if "postal_town" in c['types']:
             town = c['long_name']
 
-    return town, country
+    return {'town':town, 'country':country}
 
 
 def make_input_tables(conn_str):
@@ -392,23 +392,48 @@ def make_input_tables(conn_str):
                 logging.info(err)
                 time.sleep(5)
                 
-def get_default_values(country,building_type):
+def get_default_values(country,building_type, annual_kwh, 
+    exchange_rate_usd, currency_code):
     
     SQL =   """
             SELECT country, currency, import_cost_kwh, export_price_kwh, 
             solarpv_installation_cost_kwp, storage_battery_system_cost_kwh, 
-        expected_life_solar_years,discharge_cycles_battery from lcappinputvalues
-            where country = %s and type = %s and year = date_part('year', now())
-            order by id desc ;
+            expected_life_solar_years, discharge_cycles_battery 
+            from lcappinputvalues
+            where country = %s and type = %s 
+            -- and year = date_part('year', now())
+            order by id desc 
+            limit 1;
             """
 
     with psycopg2.connect(CONN_STR) as conn:
         cur = conn.cursor()
         cur.execute( SQL, (country,building_type ) )
-        rv = cur.fetchall()
+        _rv = cur.fetchall()
         cur.close()
+
+    if _rv:
+        rv = _rv[0]
+        return {'country':country,'currency':rv[1],
+                'default_annual_kwh':annual_kwh, 
+                'import_cost_kwh':float(rv[2]),
+                'export_price_kwh':float(rv[3]),
+                'solarpv_installation_cost_kwp':rv[4],
+                'storage_battery_system_cost_kwh':rv[5],
+                'expected_life_solar_years':rv[6],
+                'discharge_cycles_battery':rv[7]
+                }
+
+    return {'country':country,'currency':currency_code,
+            'default_annual_kwh':annual_kwh,
+            'import_cost_kwh':round(0.147*exchange_rate_usd,2),
+            'export_price_kwh':round(0.02*exchange_rate_usd,2),
+            'solarpv_installation_cost_kwp':int(1500*exchange_rate_usd),
+            'storage_battery_system_cost_kwh':int(170*exchange_rate_usd),
+            'expected_life_solar_years':20,
+            'discharge_cycles_battery':6000
+            }        
         
-    return rv
 
 
 if __name__ == '__main__':

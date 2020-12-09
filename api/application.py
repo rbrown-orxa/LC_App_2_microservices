@@ -367,9 +367,7 @@ def default_country_values():
     Return:
         Content-Type: application/json
         According to /usage_schema
-        Body:
-        { "object_id": uuid, "subscription_id': uuid, "plan_id": str,
-          "free_calls": int, "max_free_calls": int}
+        Body: Dictionary of default country values
     """
      
     print(request.json)
