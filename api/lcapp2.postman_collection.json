@@ -1,0 +1,92 @@
+{
+	"info": {
+		"_postman_id": "d8bd1350-c017-4239-af93-b9a5aa2e87f5",
+		"name": "lcapp2",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "localhost:5000/api",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{   \n            \"sub\": \"1f75f128-e047-4b3f-ae1a-cdc4961b59e3\",\n            \"oid\": \"1f75f128-e047-4b3f-ae1a-cdc4961b59e3\",\n            \"lat\": 51.442520,\n            \"lon\": -0.945213,\n            \"import_cost_kwh\": 0.14,\n            \"export_price_kwh\": 0.04,\n            \"pv_cost_kwp\": 1600,\n            \"pv_life_yrs\": 20,\n            \"battery_life_cycles\": 6000,\n            \"battery_cost_kwh\": 200,\n            \"load_profile_csv_optional\": \"\",\n            \"building_data\": [\n                {\n                    \"name\": \"building 1\",\n                    \"building_type\": \"domestic\",\n                    \"roof_size_m2\": 100,\n                    \"azimuth_deg\": 180,\n                    \"pitch_deg\": 30,\n                    \"num_ev_chargers\": 5,\n                    \"pv_size_kwp_optional\": 0.0,\n                    \"load_profile_csv_optional\": \"\",\n                    \"annual_kwh_consumption_optional\": 1000\n                },\n                {\n                    \"name\": \"building 2\",\n                    \"building_type\": \"commercial\",\n                    \"roof_size_m2\": 100,\n                    \"azimuth_deg\": 180,\n                    \"pitch_deg\": 30,\n                    \"num_ev_chargers\": 5,\n                    \"pv_size_kwp_optional\": 0.0,\n                    \"load_profile_csv_optional\": \"\",\n                    \"annual_kwh_consumption_optional\": 1000\n                }\n            ]\n        }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5000/optimise",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"optimise"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:5000/upload",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/Users/robertbrown/Downloads/Factory_Heavy_loads_15min.csv"
+						}
+					],
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5000/upload",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"upload"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:5000/download/tmpokr6rn39",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:5000/download/tmpokr6rn39",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"download",
+						"tmpokr6rn39"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

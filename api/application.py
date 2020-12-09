@@ -351,6 +351,7 @@ def default_annual_kwh():
     return library._get_annual_kwh(request)
 
 
+
 @app.route("/default_country_values", methods=['GET','POST'])
 @utils.handle_exceptions
 @auto.doc()
@@ -373,6 +374,7 @@ def default_country_values():
      
     print(request.json)
     return library._get_country_values(request)    
+
 
 @app.route('/')
 def documentation():

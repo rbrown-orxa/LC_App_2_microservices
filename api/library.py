@@ -14,6 +14,7 @@ import config as cfg
 import pandas as pd
 from exchangeratesapi import Api
 
+
 def _upload(request):
     logging.info('handling file upload request')
     file = request.files.get('file', None)
@@ -154,6 +155,7 @@ def _get_country_values(request):
     api = Api()
     
     #get building type
+
     try:
         annual_kwh = float( pd.read_csv(cfg.ANNUALS_BUILDING) [building_type] )
     except(KeyError):
@@ -200,4 +202,5 @@ def _get_country_values(request):
                 }
     
     return dict
+
         

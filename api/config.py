@@ -7,6 +7,7 @@ PROFILES_EV = './profiles/profiles_for_production_use.csv'
 ANNUALS_BUILDING = './profiles/building_annual_kWh.csv'
 COUNTRY_DETAILS = './profiles/country.csv'
 
+
 DEBUG_MODE = False # Sets log level to debug if True
 
 REQUIRE_AUTH = True

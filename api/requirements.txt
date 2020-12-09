@@ -34,5 +34,5 @@ timezonefinder==4.4.1
 urllib3==1.25.10
 Werkzeug==1.0.1
 zipp==3.1.0
-pdfkit
-python-exchangeratesapi
+pdfkit==0.6.1
+python-exchangeratesapi==0.0.2
