@@ -14,6 +14,9 @@ import json
 from jose import jwt
 from flask import request, g, _request_ctx_stack
 from urllib.request import urlopen
+import psycopg2
+
+CONN_STR = cfg.BILLING_DB_CONN_STR
 
 
 def pickle_results(results, subscription_id, path):
@@ -349,6 +352,63 @@ def getplace(lat, lon):
             town = c['long_name']
 
     return town, country
+
+
+def make_input_tables(conn_str):
+
+    success = False
+    while not success:
+        logging.info('Trying to make lcapp input table if not exist')
+        try:
+            with psycopg2.connect(conn_str) as conn:
+                SQL =   """
+                        CREATE TABLE
+                        IF NOT EXISTS lcappinputvalues (
+                            id SERIAL PRIMARY KEY,
+                            country TEXT,
+                            currency TEXT,
+                            import_cost_kwh numeric,
+                            export_price_kwh numeric,
+                            solarpv_installation_cost_kwp integer,
+                            storage_battery_system_cost_kwh integer,
+                            expected_life_solar_years integer,
+                            type TEXT,
+                            year integer,
+                            created_date TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                            edischarge_cycles_battery integer
+                        );
+                        """
+                        
+
+                cur = conn.cursor()
+                cur.execute(SQL)
+                conn.commit()
+                cur.close()
+
+            logging.info('Success')
+            success = True
+
+        except Exception as err:
+                logging.info(err)
+                time.sleep(5)
+                
+def get_default_values(country,building_type):
+    
+    SQL =   """
+            SELECT country, currency, import_cost_kwh, export_price_kwh, 
+            solarpv_installation_cost_kwp, storage_battery_system_cost_kwh, 
+        expected_life_solar_years,discharge_cycles_battery from lcappinputvalues
+            where country = %s and type = %s and year = date_part('year', now())
+            order by id desc ;
+            """
+
+    with psycopg2.connect(CONN_STR) as conn:
+        cur = conn.cursor()
+        cur.execute( SQL, (country,building_type ) )
+        rv = cur.fetchall()
+        cur.close()
+        
+    return rv
 
 
 if __name__ == '__main__':

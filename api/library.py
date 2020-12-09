@@ -9,10 +9,10 @@ import utils
 from ingest_file import process_load_file
 import handle_base_loads
 from results import get_optimise_results
-from utils import get_fixed_fields
+from utils import get_fixed_fields,getplace,get_default_values
 import config as cfg
 import pandas as pd
-
+from exchangeratesapi import Api
 
 def _upload(request):
     logging.info('handling file upload request')
@@ -142,5 +142,62 @@ def _get_annual_kwh(request):
     except(KeyError):
         assert False, f'422 Building type \"{building_type}\" not found'
         
-    return {'building_type':building_type, 'default_annual_kwh':annual_kwh}   
+    return {'building_type':building_type, 'default_annual_kwh':annual_kwh} 
+
+
+def _get_country_values(request):
+     
+    content = request.json
+    lat = content['lat']
+    lon = content['lon']
+    building_type = content['building_type']
+    api = Api()
+    
+    #get building type
+    try:
+        annual_kwh = float( pd.read_csv(cfg.ANNUALS_BUILDING) [building_type] )
+    except(KeyError):
+        assert False, f'422 Building type \"{building_type}\" not found'
+     
+    #get country name from lat/lon
+    country = getplace(lat,lon)[1]
+    
+    #get currency code from country
+    try:
+        dframe = pd.read_csv(cfg.COUNTRY_DETAILS)
+        currency_code = dframe.Code[dframe.Country==country].values[0]
+    except(KeyError):    
+        assert False, f'422 Currency Code \"{country}\" not found'
+        
+    #get default values from postgre db    
+    values_list = get_default_values(country,building_type)
+    
+    #get exchange rate from exchange rate API
+    try:
+        exchange_rate_usd = api.get_rate('USD', currency_code)
+    except: 
+        assert False, f'422 exchange rate error \"{country}\" not found'
+    
+    if values_list:
+        dict = {'country':country,'currency':values_list[0][1],
+                'default_annual_kwh':annual_kwh, 
+                'import_cost_kwh':float(values_list[0][2]),
+                'export_price_kwh':float(values_list[0][3]),
+                'solarpv_installation_cost_kwp':values_list[0][4],
+                'storage_battery_system_cost_kwh':values_list[0][5],
+                'expected_life_solar_years':values_list[0][6],
+                'discharge_cycles_battery':values_list[0][7]
+            }
+    else:
+        dict = {'country':country,'currency':currency_code,
+                'default_annual_kwh':annual_kwh,
+                'import_cost_kwh':round(0.147*exchange_rate_usd,2),
+                'export_price_kwh':round(0.02*exchange_rate_usd,2),
+                'solarpv_installation_cost_kwp':int(1500*exchange_rate_usd),
+                'storage_battery_system_cost_kwh':int(170*exchange_rate_usd),
+                'expected_life_solar_years':20,
+                'discharge_cycles_battery':6000
+                }
+    
+    return dict
         

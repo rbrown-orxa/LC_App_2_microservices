@@ -12,6 +12,8 @@ valid_json = """
             "oid":"123-gty-pqr",
             "lat": 18.51,
             "lon": 73.85,
+            "country": "India",
+            "currency":"INR",
             "import_cost_kwh": 0.08,
             "export_price_kwh": 0.0,
             "pv_cost_kwp": 1000,

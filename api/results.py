@@ -342,7 +342,7 @@ def build_html_templates(inputs,outputs,dict_report):
     #Savings/Economics/Environmental Impact for different modes
     template = env.get_template('report.html')
     
-    report_str = template.render(data=dict_report)    
+    report_str = template.render(data=dict_report,input=inputs)    
         
     #Battery Cost Curve
     template = env.get_template('line_chart.html')

@@ -6,7 +6,7 @@ import logging
 import time
 from pathlib import Path
 import pickle
-from utils import get_fixed_fields
+from utils import get_fixed_fields,make_input_tables
 
 import config as cfg
 
@@ -35,6 +35,9 @@ utils.init_file_handler(app.config['UPLOAD_PATH'])
 
 if app.config['APPLY_BILLING']:
     billing.make_tables(app.config['BILLING_DB_CONN_STR'])
+    
+if app.config['APPLY_DEFAULT_VALUES']: 
+    make_input_tables(app.config['BILLING_DB_CONN_STR'])
 
 
 # @app.route("/register_plan_purchase/<plan_token>", methods=['POST'])
@@ -125,6 +128,8 @@ def optimise():
     # subscription_id = billing.check_user_subscribed()
 
     logging.info('got an optimise request')
+    logging.info(f'json input schema: {request.json}')
+
     
     object_id, tenant, sub_id, plan_id = None, None, None, None
     if app.config['REQUIRE_AUTH']:
@@ -345,7 +350,29 @@ def default_annual_kwh():
     """
     return library._get_annual_kwh(request)
 
-      
+
+@app.route("/default_country_values", methods=['GET','POST'])
+@utils.handle_exceptions
+@auto.doc()
+@cross_origin(allow_headers=['Content-Type', 'Authorization'])
+@utils.requires_auth
+def default_country_values():
+    """get default values for a country using lat/Lon and building type
+
+    Request:
+        Content-Type: application/json
+        Body: According to /schema
+
+    Return:
+        Content-Type: application/json
+        According to /usage_schema
+        Body:
+        { "object_id": uuid, "subscription_id': uuid, "plan_id": str,
+          "free_calls": int, "max_free_calls": int}
+    """
+     
+    print(request.json)
+    return library._get_country_values(request)    
 
 @app.route('/')
 def documentation():

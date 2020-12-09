@@ -5,6 +5,7 @@ UPLOAD_PATH = 'tmp'
 PROFILES_BUILDING = './profiles/building_profiles.csv'
 PROFILES_EV = './profiles/profiles_for_production_use.csv'
 ANNUALS_BUILDING = './profiles/building_annual_kWh.csv'
+COUNTRY_DETAILS = './profiles/country.csv'
 
 DEBUG_MODE = False # Sets log level to debug if True
 
@@ -12,6 +13,7 @@ REQUIRE_AUTH = True
 
 APPLY_BILLING = True # Affects AAD users
 MAX_FREE_CALLS = 100 # Affects B2C users
+APPLY_DEFAULT_VALUES = True
 
 #Subscription quota limit
 MAX_CALLS_BASIC_PLAN = 5
