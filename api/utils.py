@@ -395,20 +395,35 @@ def make_input_tables(conn_str):
 def get_default_values(country,building_type, annual_kwh, 
     exchange_rate_usd, currency_code):
     
-    SQL =   """
-            SELECT country, currency, import_cost_kwh, export_price_kwh, 
-            solarpv_installation_cost_kwp, storage_battery_system_cost_kwh, 
-            expected_life_solar_years, discharge_cycles_battery 
-            from lcappinputvalues
-            where country = %s and type = %s 
-            -- and year = date_part('year', now())
-            order by id desc 
-            limit 1;
-            """
+    if(building_type=='domestic' or building_type=='commercial' ):
+        SQL =   """
+                SELECT country, currency, import_cost_kwh, export_price_kwh, 
+                solarpv_installation_cost_kwp, storage_battery_system_cost_kwh, 
+                expected_life_solar_years, discharge_cycles_battery 
+                from lcappinputvalues
+                where country = %s and type = %s 
+                -- and year = date_part('year', now())
+                order by id desc 
+                limit 1;
+                """
+    else:
+         SQL =  """
+                SELECT country, currency, import_cost_kwh, export_price_kwh, 
+                solarpv_installation_cost_kwp, storage_battery_system_cost_kwh, 
+                expected_life_solar_years,discharge_cycles_battery 
+                from lcappinputvalues
+                where country = %s and type ='commercial'
+                order by id desc 
+                limit 1;
+                """
 
     with psycopg2.connect(CONN_STR) as conn:
         cur = conn.cursor()
-        cur.execute( SQL, (country,building_type ) )
+        if(building_type=='domestic' or building_type=='commercial' ):
+            cur.execute( SQL, (country,building_type ) )
+        else:
+            cur.execute( SQL, (country,) )
+        
         _rv = cur.fetchall()
         cur.close()
 

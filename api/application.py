@@ -370,7 +370,7 @@ def default_country_values():
         Body: Dictionary of default country values
     """
      
-    print(request.json)
+    logging.info(f'default country values json input: {request.json}')
     return library._get_country_values(request)    
 
 
