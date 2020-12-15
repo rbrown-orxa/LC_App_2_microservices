@@ -21,6 +21,7 @@ from jinja2 import Environment, FileSystemLoader
 # import pdfkit
 import tempfile
 import codecs
+import datetime;
 
 def _get_annual_import_site_kwh(schema):
     
@@ -353,14 +354,14 @@ def build_html_templates(inputs,outputs,dict_report):
     #Import/Export Yearly
     length=len(dict['output']['charts']['site']['import_export']['Import'])
     dttimelabel =  pd.date_range('2018-12-31', periods=length, freq='60min')
-    dttimelabel = dttimelabel.strftime('%Y-%m-%d %H:%M:%S').to_list()
+    dttimelabel = dttimelabel.strftime('%Y-%m-%d %H:%M').to_list()
     
     template = env.get_template('multiline_chart.html')
     
     imp_exp_yr_str = template.render(labels=dttimelabel,
                                  data=dict,
                                  len = 8736,
-                                 title="Import/Export Yearly")
+                                 title="Import/Export")
           
     #Import/Export Weekly    
     template = env.get_template('multiline_chart.html')
@@ -368,7 +369,7 @@ def build_html_templates(inputs,outputs,dict_report):
     imp_exp_wk_str = template.render(labels=dttimelabel[0:24*7],
                                  data=dict,
                                  len=24*7,
-                                 title="Import/Export Weekly")
+                                 title="Sample Week")
     
     #PV Cost Curve    
     template = env.get_template('multi_charts.html')
@@ -415,6 +416,11 @@ def build_html_templates(inputs,outputs,dict_report):
     
     template = env.get_template('child_template.html')
     
+    #download report file name
+    ct=datetime.datetime.now()
+    ct=ct.strftime('%Y-%m-%d_%H:%M:%S')
+    filename = 'OrxaGrid_LC_App_V2_report_' + ct + '.pdf'
+    
     master_str = template.render(
                                 site_summary_str=site_summary_str,
                                 result_str=result_str,
@@ -424,7 +430,8 @@ def build_html_templates(inputs,outputs,dict_report):
                                 pv_cost_curve_str=pv_cost_curve_str,
                                 energy_heat_map_str=energy_heat_map_str,
                                 load_profile_dmnd_str=load_profile_dmnd_str,
-                                report_str=report_str)
+                                report_str=report_str,
+                                filename = "'" + filename + "'")
     return(master_str)
     
    

@@ -4,8 +4,26 @@
 <meta charset="utf-8" />
 <title>Multi-line chart</title>
 <body>
+{% if len <= 24*7 %}
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/> 
+<br/> 
+<br/> 
+<br/> 
+<br/>
+<br/>
+<br/>
+<br/>
+{% endif %}
+{% if len  > 24*7 %}
 <br>
 <br>
+{% endif %}
+
 <h2>{{title}}</h2>
   <center>  
   <figure class="highcharts-figure">
@@ -33,13 +51,13 @@
 
     yAxis: {
         title: {
-            text: 'Kwh'
+            text: 'Energy(kWh)'
         }
     },
 
     xAxis: {
          title: {
-            text: 'Time'
+            text: 'Date'
         },
         categories:  [
               {% for item in labels %}

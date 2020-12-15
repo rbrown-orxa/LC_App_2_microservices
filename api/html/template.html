@@ -38,6 +38,11 @@
     .highcharts-data-table tr:hover {
         background: #f1f7ff;
     }
+    .date{
+    float:right;
+    margin: 20px;
+    font-size: 18px;
+}
 </style>
 </head>
    <script  src= "https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
@@ -51,13 +56,27 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.3/jspdf.min.js"></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.js"></script>
   <body>
-    <button onclick="getPDF()" id="downloadbtn"><b>Click to Download as PDF</b></button>
+  <button onclick="getPDF({{filename}})" id="downloadbtn"><b>Click to Download as PDF</b></button>
     <div id="content" class="canvas_div_pdf">
-      {% block content %}{% endblock %}
+       <br /> 
+       <br /> 
+        <a rel="noopener noreferrer" href="https://www.orxagrid.com/" target="_blank">
+        <img src="/static/media/ORXA_Logo_Wordmark.d3f19fea.png" class="logo" alt="OrxaGrid" style="height: 4vh; margin-right: 40px;"></a>
+        <span class="date" id="datetime" ></span>
+         {% block content %}{% endblock %}
+        <div id="app-footer" style="z-index: 100; text-align: center;">
+            <strong>© 2017-2020 Copyright. 
+            <a href="http://www.orxagrid.com/"> Orxa Grid </a>
+            </strong>
+            All rights reserved.
+        </div>  
     </div>
   </body>
     <script>
-   function getPDF(){
+   var dt = new Date();
+    document.getElementById("datetime").innerHTML =  dt.toLocaleDateString();
+    
+   function getPDF(file){
 		$("#downloadbtn").hide();
 		$("#genmsg").show();
 		var HTML_Width = $(".canvas_div_pdf").width();
@@ -87,7 +106,7 @@
 				pdf.addImage(imgData, 'JPG', top_left_margin, -(PDF_Height*i)+(top_left_margin*4),canvas_image_width,canvas_image_height);
 			}
 			
-		    pdf.save("download.pdf");
+		    pdf.save(file);
 			
 			setTimeout(function(){ 			
 				$("#downloadbtn").show();
