@@ -353,7 +353,7 @@ def build_html_templates(inputs,outputs,dict_report):
     
     #Import/Export Yearly
     length=len(dict['output']['charts']['site']['import_export']['Import'])
-    dttimelabel =  pd.date_range('2018-12-31', periods=length, freq='60min')
+    dttimelabel =  pd.date_range('2018-12-31', periods=length, freq='60min')   
     dttimelabel = dttimelabel.strftime('%Y-%m-%d %H:%M').to_list()
     
     template = env.get_template('multiline_chart.html')

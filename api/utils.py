@@ -271,6 +271,9 @@ def requires_auth(f):
             jsonurl_ad = urlopen("https://" + "login.microsoftonline.com/" + \
                               "common" + "/discovery/v2.0/keys")
                 
+            #initialize domain
+            domain = None
+                
             #get unverified header from accesstoken
             unverified_header = jwt.get_unverified_header(token)
             #get unverified claims from accesstoken
@@ -284,6 +287,10 @@ def requires_auth(f):
             #get tenantid
             if val < 0:
                 tid = unverified_claims['tid']
+            else:
+                #orxagrid.com to provide unlimited access in FREE SSO
+                email = unverified_claims['emails']
+                domain = email[0].split(sep='@')[1]
             #select audience
             aud = cfg.CLIENT_ID if val > 0 else cfg.CLIENT_ID_AD_MULT
             #select issuer
@@ -326,6 +333,7 @@ def requires_auth(f):
 
             g.oid = payload['oid']
             g.tenant = tenant
+            g.domain = domain
             
             return f(*args, **kwargs)
         assert False, '401 invalid_header'

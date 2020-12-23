@@ -8,7 +8,7 @@ import psycopg2
 import subscription
 
 
-def check_subscription(object_id, SSO_type):
+def check_subscription(object_id, SSO_type, dom):
     
     sub_id, plan_id,used_no,max_no = None, None, None, None
     if not current_app.config['APPLY_BILLING']:
@@ -19,7 +19,11 @@ def check_subscription(object_id, SSO_type):
         return sub_id, plan_id, used_no, max_no
 
     elif SSO_type == 'b2c':
-        used_no=check_free_query_quota(object_id)
+        if dom == "orxagrid.com":
+            used_no=0
+        else:            
+            used_no=check_free_query_quota(object_id)
+            
         return sub_id, plan_id,used_no,cfg.MAX_FREE_CALLS
 
     assert False, '500 Unexpected SSO type'
