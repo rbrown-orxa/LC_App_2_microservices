@@ -27,11 +27,10 @@
          title: {
             text: 'Time'
         },
-        categories:  [
-          {% for item in labels %}
-                "{{ item }}",
-        {% endfor %}
-            ]
+         type: 'datetime',
+         labels: {
+            format: '{value:%H:%M}'
+         }
     },
 
     legend: {
@@ -51,8 +50,8 @@
     series: [{
         name: '',
         data: [  
-       {% for item in data %}
-       {{ item }},
+       {% for y,x in zip(data,labels) %}
+       {{ [x,y] }},
        {% endfor %}],
     }],
     responsive: {

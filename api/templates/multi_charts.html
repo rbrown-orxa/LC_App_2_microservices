@@ -50,7 +50,7 @@
         },
         categories:  [
          {% for item in data['output']['charts']['buildings'][0]['pv_cost_curve']['Size_kWp'] %}
-            "{{ item|round }}",
+            "{{ item|int }}",
          {% endfor %}
             ]
     },
@@ -115,7 +115,7 @@
         },
         categories:  [
          {% for item in data['output']['charts']['buildings'][1]['pv_cost_curve']['Size_kWp'] %}
-            "{{ item|round }}",
+            "{{ item|int }}",
          {% endfor %}
             ]
     },
@@ -180,7 +180,7 @@
         },
         categories:  [
          {% for item in data['output']['charts']['buildings'][2]['pv_cost_curve']['Size_kWp'] %}
-            "{{ item|round }}",
+            "{{ item|int }}",
          {% endfor %}
             ]
     },
@@ -243,7 +243,7 @@
         },
         categories:  [
          {% for item in data['output']['charts']['buildings'][3]['pv_cost_curve']['Size_kWp'] %}
-            "{{ item|round }}",
+            "{{ item|int }}",
          {% endfor %}
             ]
     },
@@ -306,7 +306,7 @@
         },
         categories:  [
          {% for item in data['output']['charts']['buildings'][4]['pv_cost_curve']['Size_kWp'] %}
-            "{{ item|round }}",
+            "{{ item|int }}",
          {% endfor %}
             ]
     },
@@ -369,7 +369,7 @@
         },
         categories:  [
          {% for item in data['output']['charts']['buildings'][5]['pv_cost_curve']['Size_kWp'] %}
-            "{{ item|round }}",
+            "{{ item|int }}",
          {% endfor %}
             ]
     },

@@ -131,18 +131,17 @@ def optimise():
     logging.info(f'json input schema: {request.json}')
 
     
-    object_id, tenant, sub_id, plan_id = None, None, None, None
+    object_id, tenant, sub_id, plan_id, domain  = None, None, None, None, None
     if app.config['REQUIRE_AUTH']:
         dict = get_fixed_fields(request.json,fields=['oid','sub_id','plan_id'])
         object_id = dict['oid']
         tenant = g.tenant
+        domain = g.domain
         sub_id = dict['sub_id']
-        plan_id = dict['plan_id']
-        
-    print(object_id , sub_id)
+        plan_id = dict['plan_id']        
 
     if sub_id is None:
-        free_quota = billing.check_free_query_quota(object_id)
+        free_quota = billing.check_free_query_quota(object_id,domain)
         logging.info(f'free quota used: {free_quota}')
        
     query_id = billing.query_started(sub_id, object_id, plan_id)

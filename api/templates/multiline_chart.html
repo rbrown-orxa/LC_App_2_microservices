@@ -59,11 +59,10 @@
          title: {
             text: 'Date'
         },
-        categories:  [
-              {% for item in labels %}
-                "{{ item }}",
-              {% endfor %}
-            ]
+        type: 'datetime',
+         labels: {
+            format: '{value:%Y-%m-%d}'
+         },
     },
 
     legend: {
@@ -86,26 +85,26 @@
     series: [{
         name: 'Generation',
         data: [  
-        {% for item in data['output']['charts']['site']['import_export']['Generation'][0:len] %}
-        {{ item }},
+        {% for y,x in zip(data['output']['charts']['site']['import_export']['Generation'][0:len],labels) %}
+        {{ [x,y] }},
         {% endfor %}]
     }, {
         name: 'Load',
-        data: [  
-        {% for item in data['output']['charts']['site']['import_export']['Load'][0:len] %}
-        {{ item }},
-       {% endfor %}]
+      data: [  
+        {% for y,x in zip(data['output']['charts']['site']['import_export']['Load'][0:len],labels) %}
+        {{  [x,y] }},
+        {% endfor %}]
     }, {
         name: 'Import',
         data: [  
-        {% for item in data['output']['charts']['site']['import_export']['Import'][0:len] %}
-        {{ item }},
+        {% for y,x in zip(data['output']['charts']['site']['import_export']['Import'][0:len],labels) %}
+        {{  [x,y] }},
         {% endfor %}]
     }, {
         name: 'export',
         data: [  
-        {% for item in data['output']['charts']['site']['import_export']['export'][0:len] %}
-        {{ item }},
+        {% for y,x in zip(data['output']['charts']['site']['import_export']['export'][0:len],labels) %}
+        {{ [x,y] }},
         {% endfor %}]
     }],
 

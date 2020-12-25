@@ -329,6 +329,8 @@ def build_html_templates(inputs,outputs,dict_report):
     #set template environment
     env = Environment( loader = FileSystemLoader('./templates') )
     
+    env.globals.update(zip=zip)
+    
     #Site summary
     template = env.get_template('sitesummary.html')
     
@@ -356,12 +358,15 @@ def build_html_templates(inputs,outputs,dict_report):
     dttimelabel =  pd.date_range('2018-12-31', periods=length, freq='60min')   
     dttimelabel = dttimelabel.strftime('%Y-%m-%d %H:%M').to_list()
     
+    for row in range(0,len(dttimelabel)):
+        dttimelabel[row] = datetime.datetime.strptime(dttimelabel[row],'%Y-%m-%d %H:%M').timestamp()*1000
+    
     template = env.get_template('multiline_chart.html')
     
     imp_exp_yr_str = template.render(labels=dttimelabel,
                                  data=dict,
                                  len = 8736,
-                                 title="Import/Export")
+                                 title="Import/Export",zip=zip)
           
     #Import/Export Weekly    
     template = env.get_template('multiline_chart.html')
@@ -404,12 +409,18 @@ def build_html_templates(inputs,outputs,dict_report):
     df = df.set_index('index',append=True)
     dttime = df.sort_values(by='Load',ascending=False).index[0][1]
     df_max = df.loc[df.index.get_level_values(1).strftime('%Y-%m-%d')==dttime.strftime('%Y-%m-%d')]
+     
+    
+    dttimelabel = df_max.index.get_level_values(1)    
+    dttimelabel = dttimelabel.strftime('%Y-%m-%d %H:%M').to_list()    
+    for row in range(0,len(dttimelabel)):
+        dttimelabel[row] = datetime.datetime.strptime(dttimelabel[row],'%Y-%m-%d %H:%M').timestamp()*1000
     
     template = env.get_template('singleline_chart.html')
     
-    load_profile_dmnd_str = template.render(labels=df_max.index.get_level_values(1),
+    load_profile_dmnd_str = template.render(labels=dttimelabel,
                                  data=df_max.Load,
-                                 title="Load Profile for highest demand day")
+                                 title="Load Profile for highest demand day: " + dttime.strftime('%Y-%m-%d'),zip=zip)
         
     #Master template
     env = Environment( loader = FileSystemLoader('./html') )

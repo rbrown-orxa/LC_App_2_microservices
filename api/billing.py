@@ -30,15 +30,20 @@ def check_subscription(object_id, SSO_type, dom):
  
 
 
-def check_free_query_quota(object_id):
-    free_queries_so_far =  get_unbillable_queries(
-        current_app.config['BILLING_DB_CONN_STR'],
-        object_id)
-    logging.info('Free queries used so far: ' + str(free_queries_so_far) + \
-    ' by user: ' + str(object_id))
-        
-    if free_queries_so_far <= current_app.config['MAX_FREE_CALLS']:
-        return free_queries_so_far
+def check_free_query_quota(object_id,dom):
+   
+    if dom == "orxagrid.com":
+         free_queries_so_far=0
+         return free_queries_so_far
+    else:
+         free_queries_so_far =  get_unbillable_queries(
+            current_app.config['BILLING_DB_CONN_STR'],
+            object_id)
+         logging.info('Free queries used so far: ' + str(free_queries_so_far) + \
+        ' by user: ' + str(object_id))
+     
+         if free_queries_so_far <= current_app.config['MAX_FREE_CALLS']:
+            return free_queries_so_far
 
     assert False, '402 Free quota query limits exceeded for user'
 
