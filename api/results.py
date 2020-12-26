@@ -377,8 +377,8 @@ def build_html_templates(inputs,outputs,dict_report):
                                  title="Sample Week")
     
     #PV Cost Curve    
-    template = env.get_template('multi_charts.html')
-    
+    template = env.get_template('multi_charts.html')    
+  
     pv_cost_curve_str = template.render(data=dict, title="PV Cost Curve",
                                  name="'" + "cost" + "'",
                                  len=len(inputs['building_data']))        
