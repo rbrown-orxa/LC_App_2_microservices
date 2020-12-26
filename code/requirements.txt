@@ -1,9 +1,0 @@
-flask
-pandas
-requests
-matplotlib
-nbimporter
-nbformat
-IPython
-html2text
-timezonefinder[numba]

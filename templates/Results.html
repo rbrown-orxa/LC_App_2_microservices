@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Result table</title>
+<style>
+table { 
+  width: 100%; 
+  border-collapse: collapse; 
+}
+th { 
+  background: #333; 
+  color: white; 
+  font-weight: bold; 
+}
+td, th { 
+  padding: 6px; 
+  border: 1px solid #ccc; 
+  text-align: left; 
+}
+</style>
+</head>
+<body>
+<br>
+<br>
+<h2>Results</h2>
+<div id="result" >
+<table>
+    <thead>
+        <tr>
+            <th>Battery Size(Kwh)</th>
+            <th>Annual Import Site(Kwh)</th>
+            <th>Annual Import EV(Kwh)</th>
+        </tr>
+    </thead>
+<tbody>
+    <tr>
+        <td>{{data['output']['results']['site']['battery_size_kwh']}}</td>
+        <td>{{data['output']['results']['site']['annual_import_site_kwh']}}</td>
+        <td>{{data['output']['results']['site']['annual_import_ev_kwh']}}</td>
+    </tr>
+</tbody>
+  <thead>
+        <tr>
+            <th>Annual Import Total(Kwh)</th>
+            <th>Annual Import with PV(Kwh)</th>
+            <th>Annual Import with PV and Battery(Kwh)</th>
+        </tr>
+    </thead>
+<tbody>
+    <tr>
+        <td>{{data['output']['results']['site']['annual_import_total_kwh']}}</td>
+        <td>{{data['output']['results']['site']['annual_import_with_pv_kwh']}}</td>
+        <td>{{data['output']['results']['site']['annual_import_with_pv_and_battery_kwh']}}</td>
+    </tr>
+</tbody>
+</tbody>
+  <thead>
+        <tr>
+            <th>Original Import Cost({{data['input']['currency']}})</th>
+            <th>With EV Import Cost({{data['input']['currency']}})</th>
+            <th>Total Import Cost({{data['input']['currency']}})</th>
+        </tr>
+    </thead>
+<tbody>
+    <tr>
+        <td>{{data['output']['results']['site']['original_import_cost']}}</td>
+        <td>{{data['output']['results']['site']['with_ev_import_cost']}}</td>
+        <td>{{data['output']['results']['site']['total_import_cost']}}</td>
+    </tr>
+</tbody>
+<thead>
+        <tr>
+            <th>With PV Optimised Import Cost({{data['input']['currency']}})</th>
+            <th>PV Size(Kwp)</th>
+            <th>With Battery Optimised Import Cost({{data['input']['currency']}})</th>
+        </tr>
+    </thead>
+<tbody>
+    <tr>
+        <td>{{data['output']['results']['site']['with_pv_optimised_import_cost']}}</td>
+        <td>{{pv_size}}</td>
+        <td>{{data['output']['results']['site']['with_battery_optimised_import_cost']}}</td>
+    </tr>
+</tbody>
+<thead>
+        <tr>
+            <th>Lifetime profit</th>
+            <th>ROI(%)</th>
+            <th>Payback period</th>
+        </tr>
+    </thead>
+<tbody>
+    <tr>
+        <td>{{data['output']['results']['site']['lifetime_profit']}}</td>
+        <td>{{data['output']['results']['site']['roi']}}</td>
+        <td>{{data['output']['results']['site']['payback_period']}}</td>
+    </tr>
+</tbody>
+</table>
+ </div>
+</body>
+</html>

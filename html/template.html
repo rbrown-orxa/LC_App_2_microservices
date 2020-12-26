@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+  <head></head>
+  <style>
+    .highcharts-figure, .highcharts-data-table table {
+        min-width: 360px; 
+        max-width: 800px;
+        margin: 1em auto;
+    }
+    .highcharts-credits {
+           display: none !important;
+           }
+    
+    .highcharts-data-table table {
+    	font-family: Verdana, sans-serif;
+    	border-collapse: collapse;
+    	border: 1px solid #EBEBEB;
+    	margin: 10px auto;
+    	text-align: center;
+    	width: 100%;
+    	max-width: 500px;
+    }
+    .highcharts-data-table caption {
+        padding: 1em 0;
+        font-size: 1.2em;
+        color: #555;
+    }
+    .highcharts-data-table th {
+    	font-weight: 600;
+        padding: 0.5em;
+    }
+    .highcharts-data-table td, .highcharts-data-table th, .highcharts-data-table caption {
+        padding: 0.5em;
+    }
+    .highcharts-data-table thead tr, .highcharts-data-table tr:nth-child(even) {
+        background: #f8f8f8;
+    }
+    .highcharts-data-table tr:hover {
+        background: #f1f7ff;
+    }
+    .date{
+    float:right;
+    margin: 20px;
+    font-size: 18px;
+    }
+    h1 {text-align: center;}
+</style>
+</head>
+   <script  src= "https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>    
+    <script src= "https://code.highcharts.com/highcharts-more.js"></script>    
+    <script src= "https://code.highcharts.com/modules/heatmap.js"></script>  
+    <script src="https://code.highcharts.com/modules/series-label.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.3/jspdf.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.js"></script>
+  <body>
+  
+
+  
+  <button onclick="getPDF({{filename}})" id="downloadbtn"><b>Click to Download as PDF</b></button>
+    <div id="content" class="canvas_div_pdf">
+    
+      <div class="dv_0 rt-2">
+       <h1>Low Carbon App Report</h1>
+       <br /> 
+       <br /> 
+        <a rel="noopener noreferrer" href="https://www.orxagrid.com/" target="_blank">
+        <img src="/static/media/ORXA_Logo_Wordmark.d3f19fea.png" class="logo" alt="OrxaGrid" style="height: 4vh; margin-right: 40px;"></a>
+        <span class="date" id="datetime" ></span>
+         {% block content %}{% endblock %}
+        <div id="app-footer" style="z-index: 100; text-align: center;">
+            <strong>© 2017-2020 Copyright. 
+            <a href="http://www.orxagrid.com/"> Orxa Grid </a>
+            </strong>
+            All rights reserved.
+        </div>  
+    </div>
+  </html>
+  </body>
+    <script>
+   var dt = new Date();
+   document.getElementById("datetime").innerHTML =  dt.toLocaleDateString();
+    
+ function getPDF(file) {
+        debugger;
+        $("#downloadbtn").hide();
+        $("#genmsg").show();
+        var HTML_Width = $(".canvas_div_pdf").width();
+        var HTML_Height = $(".canvas_div_pdf").height();
+        var top_left_margin = 15;
+        var PDF_Width = HTML_Width + (top_left_margin * 2);
+        var PDF_Height = (PDF_Width * 1.2) + (top_left_margin * 2);
+        var canvas_image_width = HTML_Width;
+        var canvas_image_height = HTML_Height;
+
+        var totalPDFPages = Math.ceil(HTML_Height / PDF_Height) - 1;
+
+
+        var pdf = new jsPDF('p', 'pt', [PDF_Width, PDF_Height]);
+        var ln = $(".rt-2");
+        var totalPDFPages = Math.ceil(HTML_Height/PDF_Height);
+        console.log(totalPDFPages);
+        var k = 0;
+        for (var x = 0; x < ln.length; x++) {
+            html2canvas($(".dv_" + x)[0], { allowTaint: true }).then(function (canvas) {
+                canvas.getContext('2d');
+                var ht = $(".dv_" + k).height();
+                var wt = $(".dv_" + k).width();
+                let imgData = canvas.toDataURL("image/jpeg", 1.0);
+
+                pdf.addImage(imgData, 'JPG', top_left_margin*4, top_left_margin*4, wt-top_left_margin*5, ht);
+                pdf.addPage(PDF_Width, PDF_Height);
+
+                if (ln.length-1 == k) {
+                    pdf.deletePage(pdf.internal.getNumberOfPages());
+                    pdf.save(file);
+                }
+                k++;
+                setTimeout(function () {
+                    $("#downloadbtn").show();
+                    $("#genmsg").hide();
+                }, 0);
+
+            });
+        }
+    };
+     </script>  
+</html>

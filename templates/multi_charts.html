@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Multi-Chart</title>
+</head>
+<body>
+<br>
+<br>
+<h2>{{title}}</h2>
+  <center>
+    <figure class="highcharts-figure">
+    {% if len > 0 %}
+    <div id="line-chart-1"></div>
+    {% endif %}
+    {% if len > 1 %}
+    <div id="line-chart-2"></div>
+    {% endif %}
+    {% if len > 2 %}
+    <div id="line-chart-3"></div>
+    {% endif %}
+    {% if len > 3 %}
+    <div id="line-chart-4"></div>
+    {% endif %}
+    {% if len > 4 %}
+    <div id="line-chart-5"></div>
+    {% endif %}
+    {% if len > 5 %}
+    <div id="line-chart-6"></div>
+    {% endif %}
+    </figure>
+   <script>
+    
+   {% if len > 0 %}
+   Highcharts.chart('line-chart-1', {
+
+    title: {
+        text: '{{data['output']['charts']['buildings'][0]['name']}}'
+    },
+
+    yAxis: {
+        title: {
+             text: 'Lifetime Profit({{data['input']['currency']}})'
+        }
+    },
+
+    xAxis: {
+         title: {
+            text: 'PV Size(Kwp)'
+        },
+        categories:  [
+         {% for item in data['output']['charts']['buildings'][0]['pv_cost_curve']['Size_kWp'] %}
+            "{{ item|int }}",
+         {% endfor %}
+            ]
+    },
+
+    legend: {
+       enabled: false
+    },
+
+    plotOptions: {
+        series: {
+            label: {
+                connectorAllowed: false
+            },
+            marker: {
+                enabled: false
+            }
+        }
+    },
+    series: [{
+        name: '',
+        data: [  
+        {% for item in data['output']['charts']['buildings'][0]['pv_cost_curve']['Profit_PA'] %}
+              {{ item }},
+        {% endfor %}]
+    }],
+    responsive: {
+        rules: [{
+            condition: {
+                maxWidth: 1600
+            },
+            chartOptions: {
+                legend: {
+                    layout: 'horizontal',
+                    align: 'center',
+                    verticalAlign: 'bottom'
+                }
+            }
+        }]
+    }
+
+});
+  {% endif %}
+  
+    
+  {% if len > 1 %}
+    
+   Highcharts.chart('line-chart-2', {
+
+    title: {
+        text: '{{data['output']['charts']['buildings'][1]['name']}}'
+    },
+
+    yAxis: {
+        title: {
+            text: 'Lifetime Profit({{data['input']['currency']}})'
+        }
+    },
+
+    xAxis: {
+         title: {
+            text: 'PV Size(Kwp)'
+        },
+        categories:  [
+         {% for item in data['output']['charts']['buildings'][1]['pv_cost_curve']['Size_kWp'] %}
+            "{{ item|int }}",
+         {% endfor %}
+            ]
+    },
+
+    legend: {
+       enabled: false
+    },
+
+    plotOptions: {
+        series: {
+            label: {
+                connectorAllowed: false
+            },
+            marker: {
+                enabled: false
+            }
+        }
+    },
+    series: [{
+        name: '',
+        data: [  
+        {% for item in data['output']['charts']['buildings'][1]['pv_cost_curve']['Profit_PA'] %}
+              {{ item }},
+        {% endfor %}]
+    }],
+    responsive: {
+        rules: [{
+            condition: {
+                maxWidth: 1600
+            },
+            chartOptions: {
+                legend: {
+                    layout: 'horizontal',
+                    align: 'center',
+                    verticalAlign: 'bottom'
+                }
+            }
+        }]
+    }
+
+});
+  {% endif %}
+  
+    
+    {% if len > 2 %}
+    
+    Highcharts.chart('line-chart-3', {
+
+    title: {
+        text: '{{data['output']['charts']['buildings'][2]['name']}}'
+    },
+
+    yAxis: {
+        title: {
+            text: 'Lifetime Profit({{data['input']['currency']}})'
+        }
+    },
+
+    xAxis: {
+         title: {
+            text: 'PV Size(Kwp)'
+        },
+        categories:  [
+         {% for item in data['output']['charts']['buildings'][2]['pv_cost_curve']['Size_kWp'] %}
+            "{{ item|int }}",
+         {% endfor %}
+            ]
+    },
+
+    legend: {
+       enabled: false
+    },
+
+    plotOptions: {
+        series: {
+            label: {
+                connectorAllowed: false
+            },
+            marker: {
+                enabled: false
+            }
+        }
+    },
+    series: [{
+        name: '',
+        data: [  
+        {% for item in data['output']['charts']['buildings'][2]['pv_cost_curve']['Profit_PA'] %}
+              {{ item }},
+        {% endfor %}]
+    }],
+    responsive: {
+        rules: [{
+            condition: {
+                maxWidth: 1600
+            },
+            chartOptions: {
+                legend: {
+                    layout: 'horizontal',
+                    align: 'center',
+                    verticalAlign: 'bottom'
+                }
+            }
+        }]
+    }
+
+});
+  {% endif %}
+  
+  {% if len > 3 %}
+   Highcharts.chart('line-chart-4', {
+
+    title: {
+        text: '{{data['output']['charts']['buildings'][3]['name']}}'
+    },
+
+    yAxis: {
+        title: {
+            text: 'Lifetime Profit({{data['input']['currency']}})'
+        }
+    },
+
+    xAxis: {
+         title: {
+            text: 'PV Size(Kwp)'
+        },
+        categories:  [
+         {% for item in data['output']['charts']['buildings'][3]['pv_cost_curve']['Size_kWp'] %}
+            "{{ item|int }}",
+         {% endfor %}
+            ]
+    },
+
+    legend: {
+      enabled: false
+    },
+
+    plotOptions: {
+        series: {
+            label: {
+                connectorAllowed: false
+            },
+            marker: {
+                enabled: false
+            }
+        }
+    },
+    series: [{
+        name: '',
+        data: [  
+        {% for item in data['output']['charts']['buildings'][3]['pv_cost_curve']['Profit_PA'] %}
+              {{ item }},
+        {% endfor %}]
+    }],
+    responsive: {
+        rules: [{
+            condition: {
+                maxWidth: 1600
+            },
+            chartOptions: {
+                legend: {
+                    layout: 'horizontal',
+                    align: 'center',
+                    verticalAlign: 'bottom'
+                }
+            }
+        }]
+    }
+
+});
+  {% endif %}
+  
+   {% if len > 4 %}
+    Highcharts.chart('line-chart-5', {
+
+    title: {
+        text: '{{data['output']['charts']['buildings'][4]['name']}}'
+    },
+
+    yAxis: {
+        title: {
+            text: 'Lifetime Profit({{data['input']['currency']}})'
+        }
+    },
+
+    xAxis: {
+         title: {
+            text: 'PV Size(Kwp)'
+        },
+        categories:  [
+         {% for item in data['output']['charts']['buildings'][4]['pv_cost_curve']['Size_kWp'] %}
+            "{{ item|int }}",
+         {% endfor %}
+            ]
+    },
+
+    legend: {
+       enabled: false
+    },
+
+    plotOptions: {
+        series: {
+            label: {
+                connectorAllowed: false
+            },
+            marker: {
+                enabled: false
+            }
+        }
+    },
+    series: [{
+        name: '',
+        data: [  
+        {% for item in data['output']['charts']['buildings'][4]['pv_cost_curve']['Profit_PA'] %}
+              {{ item }},
+        {% endfor %}]
+    }],
+    responsive: {
+        rules: [{
+            condition: {
+                maxWidth: 1600
+            },
+            chartOptions: {
+                legend: {
+                    layout: 'horizontal',
+                    align: 'center',
+                    verticalAlign: 'bottom'
+                }
+            }
+        }]
+    }
+
+});
+  {% endif %}
+  
+   {% if len > 5 %}
+    Highcharts.chart('line-chart-6', {
+
+    title: {
+        text: '{{data['output']['charts']['buildings'][5]['name']}}'
+    },
+
+    yAxis: {
+        title: {
+            text: 'Lifetime Profit({{data['input']['currency']}})'
+        }
+    },
+
+    xAxis: {
+         title: {
+            text: 'PV Size(Kwp)'
+        },
+        categories:  [
+         {% for item in data['output']['charts']['buildings'][5]['pv_cost_curve']['Size_kWp'] %}
+            "{{ item|int }}",
+         {% endfor %}
+            ]
+    },
+
+    legend: {
+       enabled: false
+    },
+
+    plotOptions: {
+        series: {
+            label: {
+                connectorAllowed: false
+            },
+            marker: {
+                enabled: false
+            }
+        }
+    },
+    series: [{
+        name: '',
+        data: [  
+        {% for item in data['output']['charts']['buildings'][5]['pv_cost_curve']['Profit_PA'] %}
+              {{ item }},
+        {% endfor %}]
+    }],
+    responsive: {
+        rules: [{
+            condition: {
+                maxWidth: 1600
+            },
+            chartOptions: {
+                legend: {
+                    layout: 'horizontal',
+                    align: 'center',
+                    verticalAlign: 'bottom'
+                }
+            }
+        }]
+    }
+
+});
+  {% endif %}
+    </script>
+  </center>
+</body>
+</html>
+
