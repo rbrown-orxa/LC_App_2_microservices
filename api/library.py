@@ -157,7 +157,8 @@ def _get_country_values(request):
     #get building type
 
     try:
-        annual_kwh = float( pd.read_csv(cfg.ANNUALS_BUILDING) [building_type] )
+        tmp_df = pd.read_csv(cfg.ANNUALS_BUILDING) [building_type]
+        annual_kwh =int(tmp_df.to_numpy().mean())
     except(KeyError):
         assert False, f'422 Building type \"{building_type}\" not found'
      
@@ -177,6 +178,11 @@ def _get_country_values(request):
         exchange_rate_usd = converter.get_rate('USD', currency_code)
     except: 
         assert False, f'422 exchange rate error \"{country}\" not found'
+        
+    if (bool([ele for ele in building_type if(ele in 'domestic')]) ):
+       building_type = 'domestic'
+    else:
+       building_type = 'commercial' 
     
     #get default values from postgre db    
     default_values = get_default_values(country,building_type,

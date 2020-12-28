@@ -403,24 +403,14 @@ def make_input_tables(conn_str):
 def get_default_values(country,building_type, annual_kwh, 
     exchange_rate_usd, currency_code):
     
-    if(building_type=='domestic' or building_type=='commercial' ):
-        SQL =   """
+   
+    SQL =   """
                 SELECT country, currency, import_cost_kwh, export_price_kwh, 
                 solarpv_installation_cost_kwp, storage_battery_system_cost_kwh, 
                 expected_life_solar_years, discharge_cycles_battery 
                 from lcappinputvalues
                 where country = %s and type = %s 
                 -- and year = date_part('year', now())
-                order by id desc 
-                limit 1;
-                """
-    else:
-         SQL =  """
-                SELECT country, currency, import_cost_kwh, export_price_kwh, 
-                solarpv_installation_cost_kwp, storage_battery_system_cost_kwh, 
-                expected_life_solar_years,discharge_cycles_battery 
-                from lcappinputvalues
-                where country = %s and type ='commercial'
                 order by id desc 
                 limit 1;
                 """

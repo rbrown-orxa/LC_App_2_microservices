@@ -25,8 +25,18 @@
     {% if pv_cost_curve_str %}
         {{pv_cost_curve_str}}
     {% endif %}
-    </div>
+     {% if length >= 0 and length <= 1 %}
      <div class="dv_3 rt-2">
+     {% endif %}
+     {% if length >= 2 and length <= 3 %}
+     <div class="dv_4 rt-2">
+     {% endif %}
+     {% if length >= 4 and length <= 5 %}
+     <div class="dv_5 rt-2">
+     {% endif %} 
+     {% if length >= 6 %}
+     <div class="dv_6 rt-2">
+     {% endif %} 
     {% if energy_heat_map_str %}
          {{energy_heat_map_str}}
     {% endif %}

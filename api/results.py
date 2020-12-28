@@ -381,7 +381,8 @@ def build_html_templates(inputs,outputs,dict_report):
   
     pv_cost_curve_str = template.render(data=dict, title="PV Cost Curve",
                                  name="'" + "cost" + "'",
-                                 len=len(inputs['building_data']))        
+                                 length=len(inputs['building_data']))
+    
     #Heat Map    
     template = env.get_template('heat_map.html')
     df = pd.DataFrame(dict['output']['charts']['site']['import_export'])
@@ -442,6 +443,7 @@ def build_html_templates(inputs,outputs,dict_report):
                                 energy_heat_map_str=energy_heat_map_str,
                                 load_profile_dmnd_str=load_profile_dmnd_str,
                                 report_str=report_str,
+                                length=len(inputs['building_data']), 
                                 filename = "'" + filename + "'")
     return(master_str)
     
