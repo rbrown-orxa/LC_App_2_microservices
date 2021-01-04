@@ -28,8 +28,12 @@ def _get_annual_import_site_kwh(schema):
      #get base load
      base_load = pd.DataFrame()
      
+     #list of consumption
+     consumption=[]
+     
      #sum base loads
      for load in get_base_loads(schema):
+         consumption.append(int(load.sum()[0]))
          base_load = load.add(base_load, fill_value=0)
          
      cost_kwh = get_fixed_fields(schema,fields=['import_cost_kwh'])
@@ -38,7 +42,7 @@ def _get_annual_import_site_kwh(schema):
          
      import_cost = annual_cosumption_kwh*cost_kwh['import_cost_kwh']
          
-     return(base_load,annual_cosumption_kwh,import_cost)      
+     return(base_load,annual_cosumption_kwh,import_cost,consumption)      
     
          
 def _get_annual_import_ev_kwh(schema):
@@ -157,7 +161,7 @@ def get_optimise_results(schema):
      #Base load
      (base_load,
         annual_import_site_kwh,
-        original_import_cost) = _get_annual_import_site_kwh(schema)
+        original_import_cost,consump) = _get_annual_import_site_kwh(schema)
      
      #EV load
      (ev_load,
@@ -293,6 +297,11 @@ def get_optimise_results(schema):
      
      #call html templates build function
      inputs=schema
+     
+     #update the annual_kwh_consumption_optional value
+     for bld,con in zip(inputs['building_data'],consump):
+             bld['annual_kwh_consumption_optional']=con
+     
      outputs = {'results':merge_results,'charts':merge_charts}
      master_str = build_html_templates(inputs,outputs,dict_report)
      
