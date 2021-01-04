@@ -1,0 +1,46 @@
+{% extends 'template.html' %}
+{% block content %}
+    {% if site_summary_str %}
+        {{site_summary_str}}
+    {% endif %}
+    {% if result_str %}
+       {{result_str}}
+    {% endif %}
+    {% if report_str %}
+         {{report_str}}
+    {% endif %}
+    </div>
+    <div class="dv_1 rt-2">
+    {% if batt_cost_curve_str %}
+       {{batt_cost_curve_str}}
+    {% endif %}
+    {% if imp_exp_yr_str %}
+       {{imp_exp_yr_str}}
+    {% endif %}
+    </div>
+    <div class="dv_2 rt-2">
+     {% if imp_exp_wk_str %}
+         {{imp_exp_wk_str}}
+    {% endif %}    
+    {% if pv_cost_curve_str %}
+        {{pv_cost_curve_str}}
+    {% endif %}
+     {% if length >= 0 and length <= 1 %}
+     <div class="dv_3 rt-2">
+     {% endif %}
+     {% if length >= 2 and length <= 3 %}
+     <div class="dv_4 rt-2">
+     {% endif %}
+     {% if length >= 4 and length <= 5 %}
+     <div class="dv_5 rt-2">
+     {% endif %} 
+     {% if length >= 6 %}
+     <div class="dv_6 rt-2">
+     {% endif %} 
+    {% if energy_heat_map_str %}
+         {{energy_heat_map_str}}
+    {% endif %}
+    {% if load_profile_dmnd_str %}
+         {{load_profile_dmnd_str}}
+    {% endif %}
+{% endblock %}

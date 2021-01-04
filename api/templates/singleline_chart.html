@@ -1,0 +1,82 @@
+<head>
+<meta charset="utf-8" />
+<title>Single-Line Chart</title>
+<body>
+<br>
+<br>
+<h2>{{title}}</h2>
+  <center>  
+  <figure class="highcharts-figure">
+    <div id="singleline-chart"></div>
+  </figure>
+    
+    <script>
+   Highcharts.chart('singleline-chart', {
+
+    title: {
+        text: ''
+    },
+
+    yAxis: {
+        title: {
+            text: 'Kwh'
+        }
+    },
+    xAxis: {
+         title: {
+            text: 'Time'
+        },
+         type: 'datetime',
+         labels: {
+            format: '{value:%H:%M}'
+         }
+    },
+     tooltip: {
+        valueDecimals: 2
+    },
+
+    legend: {
+        enabled: false
+    },
+
+    plotOptions: {
+        series: {
+            label: {
+                connectorAllowed: false
+            },
+            marker: {
+                enabled: false
+            }
+        }
+    },
+    series: [{
+        name: '',
+        data: [  
+       {% for y,x in zip(data,labels) %}
+       {{ [x,y] }},
+       {% endfor %}],
+    }],
+    responsive: {
+        rules: [{
+            condition: {
+                maxWidth: 1600
+            },
+            chartOptions: {
+                legend: {
+                    layout: 'horizontal',
+                    align: 'center',
+                    verticalAlign: 'bottom'
+                }
+            }
+        }]
+    }
+
+});
+
+    </script>
+  </center>
+</body>
+</html>
+
+
+

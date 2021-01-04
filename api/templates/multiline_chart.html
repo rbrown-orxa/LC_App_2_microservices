@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Multi-line chart</title>
+<body>
+{% if len <= 24*7 %}
+<br/>
+<br/>
+{% endif %}
+{% if len  > 24*7 %}
+<br>
+<br>
+{% endif %}
+
+<h2>{{title}}</h2>
+  <center>  
+  <figure class="highcharts-figure">
+    {% if len <= 24*7 %}   
+    <div id="weekly"></div>
+    {% endif %}
+    {% if len > 24*7 %}   
+    <div id="yearly"></div>
+    {% endif %}
+  </figure>
+    
+    <script>
+    
+   {% if len <= 24*7 %} 
+   Highcharts.chart('weekly', {
+   {% endif %}
+   
+   {% if len > 24*7 %} 
+    Highcharts.chart('yearly', {
+   {% endif %}
+    title: {
+        text: ''
+    },
+
+    yAxis: {
+        title: {
+            text: 'Energy(kWh)'
+        }
+    },
+
+    xAxis: {
+         title: {
+            text: 'Date'
+        },
+        type: 'datetime',
+         labels: {
+            format: '{value:%Y-%m-%d}'
+         },
+    },
+     tooltip: {
+        valueDecimals: 2
+    },
+    legend: {
+        layout: 'vertical',
+        align: 'right',
+        verticalAlign: 'middle'
+    },
+
+    plotOptions: {
+        series: {
+            label: {
+                connectorAllowed: false
+            },
+            marker: {
+                enabled: false
+            }
+        }
+    },
+
+    series: [{
+        name: 'Generation',
+        data: [  
+        {% for y,x in zip(data['output']['charts']['site']['import_export']['Generation'][0:len],labels) %}
+        {{ [x,y] }},
+        {% endfor %}]
+    }, {
+        name: 'Load',
+      data: [  
+        {% for y,x in zip(data['output']['charts']['site']['import_export']['Load'][0:len],labels) %}
+        {{  [x,y] }},
+        {% endfor %}]
+    }, {
+        name: 'Import',
+        data: [  
+        {% for y,x in zip(data['output']['charts']['site']['import_export']['Import'][0:len],labels) %}
+        {{  [x,y] }},
+        {% endfor %}]
+    }, {
+        name: 'export',
+        data: [  
+        {% for y,x in zip(data['output']['charts']['site']['import_export']['export'][0:len],labels) %}
+        {{ [x,y] }},
+        {% endfor %}]
+    }],
+
+    responsive: {
+        rules: [{
+            condition: {
+                maxWidth: 1600
+            },
+            chartOptions: {
+                legend: {
+                    layout: 'horizontal',
+                    align: 'center',
+                    verticalAlign: 'bottom'
+                }
+            }
+        }]
+    }
+
+});
+
+    </script>
+  </center>
+</body>
+</html>
+

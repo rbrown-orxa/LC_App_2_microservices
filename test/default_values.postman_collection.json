@@ -1,0 +1,40 @@
+{
+	"info": {
+		"_postman_id": "1b2303ca-22e7-468f-9c20-73d07d9b7117",
+		"name": "default_values",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "default_country_values",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"lat\":51.492736516996715,\n    \"lon\":-0.10390484894335872,\n    \"building_type\":\"domestic\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5000/default_country_values",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"default_country_values"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

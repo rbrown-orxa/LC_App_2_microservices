@@ -1,0 +1,117 @@
+{
+	"info": {
+		"_postman_id": "e9487d10-d1c8-4032-9eee-0cc31858b6f3",
+		"name": "SaaS Billing",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Post a bill",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "content-type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "x-ms-requestid",
+						"value": "",
+						"type": "text"
+					},
+					{
+						"key": "x-ms-correlationid",
+						"value": "",
+						"type": "text"
+					},
+					{
+						"key": "authorization",
+						"value": "Bearer {{access_token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\"resourceId\": \"68649575-e1e7-7864-ba8f-7ec24b0ee66e\", \n\"quantity\": 1, \n\"dimension\": \"result\", \n\"effectiveStartTime\": \"2020-10-14T11:00:00\", \n\"planId\": \"m1\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://marketplaceapi.microsoft.com/api/usageEvent?api-version=2018-08-31",
+					"protocol": "https",
+					"host": [
+						"marketplaceapi",
+						"microsoft",
+						"com"
+					],
+					"path": [
+						"api",
+						"usageEvent"
+					],
+					"query": [
+						{
+							"key": "api-version",
+							"value": "2018-08-31"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "74698812-bdf7-4d24-9537-296a412de334",
+				"type": "text/javascript",
+				"exec": [
+					"var client_id      = pm.environment.get(\"client_id\");",
+					"var client_sercret = pm.environment.get(\"client_secret\");",
+					"var token_endpoint = pm.environment.get(\"token_endpoint\");",
+					"var resource       = pm.environment.get(\"resource\");",
+					"",
+					"pm.sendRequest({",
+					"    url: token_endpoint,",
+					"    method: 'POST',",
+					"    header: {",
+					"        'Content-Type': 'multipart/form-data',",
+					"          },",
+					"      body: {",
+					"          mode: 'formdata',",
+					"          formdata: [",
+					"            {key: \"grant_type\"    , value: \"client_credentials\"}, ",
+					"            {key: \"client_id\"     , value: client_id},",
+					"            {key: \"client_secret\" , value: client_sercret},",
+					"            {key: \"resource\"      , value: resource}      ",
+					"        ]",
+					"      }",
+					"},  function(err, response) {",
+					"  const jsonResponse = response.json();",
+					"  ",
+					"  console.log(jsonResponse);",
+					"",
+					"  pm.environment.set(\"access_token\", jsonResponse.access_token);",
+					"  console.log(pm.environment.get(\"access_token\"));",
+					"",
+					"});"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "ec8b96ad-f034-4344-870a-bc3cf3db69b2",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"protocolProfileBehavior": {}
+}

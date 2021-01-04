@@ -1,0 +1,82 @@
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Line Chart</title>
+<body>
+<br/>
+<br/>
+<h2>{{title}}</h2>
+  <center>  
+  <figure class="highcharts-figure">      
+    <div id="line-chart-batt"></div>
+  </figure>
+    
+    <script>
+   Highcharts.chart('line-chart-batt', {
+
+    title: {
+        text: ''
+    },
+
+    yAxis: {
+        title: {
+            text: 'Cost({{data['input']['currency']}})'
+        }
+    },
+
+    xAxis: {
+         title: {
+            text: 'Battery Size(Kwh)'
+        },
+        categories:  [
+          {% for item in data['output']['charts']['site']['battery_cost_curve']['batt_size'] %}
+            "{{ item }}",
+          {% endfor %}
+            ]
+    },
+     tooltip: {
+        valueDecimals: 2
+    },
+    legend: {
+        enabled: false
+    },
+    plotOptions: {
+        series: {
+            label: {
+                connectorAllowed: false
+            },
+            marker: {
+                enabled: true
+            }
+        }
+    },
+    series: [{
+        name: '',
+        data: [  
+        {% for item in data['output']['charts']['site']['battery_cost_curve']['total_cost'] %}
+            {{ item }},
+        {% endfor %}]
+    }],
+    responsive: {
+        rules: [{
+            condition: {
+                maxWidth: 1600
+            },
+            chartOptions: {
+                legend: {
+                    layout: 'horizontal',
+                    align: 'center',
+                    verticalAlign: 'bottom'
+                }
+            }
+        }]
+    }
+
+});
+
+    </script>
+  </center>
+</body>
+</html>
+
+
