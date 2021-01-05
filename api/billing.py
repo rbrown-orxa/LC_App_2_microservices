@@ -22,7 +22,7 @@ def check_subscription(object_id, SSO_type, dom):
         if dom == "orxagrid.com":
             used_no=0
         else:            
-            used_no=check_free_query_quota(object_id)
+            used_no=check_free_query_quota(object_id,dom)
             
         return sub_id, plan_id,used_no,cfg.MAX_FREE_CALLS
 
