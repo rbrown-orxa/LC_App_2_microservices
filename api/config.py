@@ -3,6 +3,7 @@ UPLOAD_EXTENSIONS = ['.csv', ]
 UPLOAD_PATH = 'tmp'
 
 PROFILES_BUILDING = './profiles/building_profiles.csv'
+PROFILES_BUILDING_2 = './profiles/building_profiles_2.csv'
 PROFILES_EV = './profiles/profiles_for_production_use.csv'
 ANNUALS_BUILDING = './profiles/building_annual_kWh.csv'
 COUNTRY_DETAILS = './profiles/country.csv'

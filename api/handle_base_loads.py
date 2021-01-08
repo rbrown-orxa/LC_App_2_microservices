@@ -4,7 +4,7 @@ import os
 import config as cfg
 import pandas as pd
 import logging
-
+import pycountry_convert as pc
 import utils
 
 def list_buildings(query):
@@ -24,14 +24,25 @@ def list_buildings(query):
     
     return(building_loads)
 
-
+def country_to_continent(country_name):
+    try:
+        country_alpha2 = pc.country_name_to_country_alpha2(country_name)
+        country_continent_code = pc.country_alpha2_to_continent_code(country_alpha2)
+        country_continent_name = pc.convert_continent_code_to_continent_name(country_continent_code)
+        return country_continent_name
+    except:
+        assert False, '502 invalid country name'
 
 
 def get_base_loads(schema):
     
     #Check total building profile
-    dict = get_fixed_fields(schema,fields=['load_profile_csv_optional'])
+    dict = get_fixed_fields(schema,fields=['load_profile_csv_optional','country'])
     handler = dict['load_profile_csv_optional']
+    continent=country_to_continent(dict['country'])
+    
+    1 if continent in ['Europe','South America','North America','Australia'] else 2
+   
     list_of_base_load = []
     
     if not handler:
@@ -43,7 +54,11 @@ def get_base_loads(schema):
        for load,btype in zip(building_load.values(),building_type):
            if type(load).__name__=='float' or type(load).__name__=='int':
                #Consumption
-               df=get_consumption_profile(cfg.PROFILES_BUILDING,load,btype)
+               profile = 1 if continent in ['Europe','South America','North America','Australia'] else 2
+               if profile==1:
+                  df=get_consumption_profile(cfg.PROFILES_BUILDING,load,btype)
+               else:
+                  df=get_consumption_profile(cfg.PROFILES_BUILDING_2,load,btype) 
            else:
                #handler
                 df = pd.read_csv('./' + cfg.UPLOAD_PATH + '/' + load)
