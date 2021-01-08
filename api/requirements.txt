@@ -36,4 +36,4 @@ Werkzeug==1.0.1
 zipp==3.1.0
 pdfkit==0.6.1
 python-exchangeratesapi==0.0.2
-pycountry_convert=0.7.2
+pycountry_convert==0.7.2
