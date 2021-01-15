@@ -23,7 +23,7 @@ td, th {
 <body>
 <br>
 <h2>Report</h2>
-<div id="rep" >
+<div id="rep1" style="display:block;">
 <table>
     <thead>
         <tr>
@@ -107,5 +107,71 @@ td, th {
 </tbody>
 </table>
  </div>
+ 
+ <div id="rep2" style="display:none;">
+<table>
+    <thead>
+        <tr>
+            <th></th>
+            <th>BASE CASE</th>
+            <th>SOLAR ONLY</th>
+        </tr>
+    </thead>
+<tbody>
+    <tr>
+        <td style="background: #eee;">SYSTEM SIZE</td>
+        <td style="background: #eee;"></td>
+        <td style="background: #eee;"></td>
+    </tr>
+       <tr>
+        <td>PV Size(Kwp)</td>
+        <td></td>
+        <td>{{data['sys_size_pv']}}</td>
+    </tr>
+    <tr>
+        <td style="background: #eee;">COST AND SAVINGS</td>
+        <td style="background: #eee;"></td>
+        <td style="background: #eee;"></td>
+    </tr>
+    <tr>
+        <td>Capex({{input['currency']}})</td>
+        <td>0</td>
+        <td>{{data['capex_pv']}}</td>
+    </tr>
+       <tr>
+        <td>Opex({{input['currency']}})</td>
+        <td>{{data['opex_base']}}</td>
+        <td>{{data['opex_pv']}}</td>
+    </tr>
+     <tr>
+        <td style="background: #eee;">ECONOMIC METRICS</td>
+        <td style="background: #eee;"></td>
+        <td style="background: #eee;"></td>
+    </tr>
+    </tr>
+       <tr>
+        <td>payback time(yrs)</td>
+        <td></td>
+        <td>{{data['payback_yrs_pv']}}</td>
+    </tr>
+       <tr>
+        <td>ROI(%)</td>
+        <td></td>
+        <td>{{data['irr_pv']}}</td>
+    </tr>
+     <tr>
+        <td style="background: #eee;">ENVIRONMENTAL IMPACT</td>
+        <td style="background: #eee;"></td>
+        <td style="background: #eee;"></td>
+    </tr>
+       <tr>
+        <td>CO2 emission(metric ton/year)</td>
+        <td>{{data['co2_base']}}</td>
+        <td>{{data['co2_pv']}}</td>
+    </tr>
+</tbody>
+</table>
+ </div>
+ 
 </body>
 </html>

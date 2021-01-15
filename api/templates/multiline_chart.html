@@ -13,25 +13,40 @@
 <br>
 {% endif %}
 
-<h2>{{title}}</h2>
+{% if len <= 24*7 %}   
+<h2 id="title2" style="display:block;">{{title}}</h2>
+{% endif %}
+
+{% if len > 24*7 %}   
+<h2 id="title3" style="display:block;">{{title}}</h2>
+{% endif %}
+
+{% if len <= 24*7 %}   
+<h2 id="title4" style="display:none;">{{title}}</h2>
+{% endif %}
+
+{% if len > 24*7 %}   
+<h2 id="title5" style="display:none;">{{title}}</h2>
+{% endif %}
+ 
   <center>  
   <figure class="highcharts-figure">
     {% if len <= 24*7 %}   
-    <div id="weekly"></div>
+    <div id="weekly1"  style="display:block;"></div>
     {% endif %}
     {% if len > 24*7 %}   
-    <div id="yearly"></div>
+    <div id="yearly1"  style="display:block;"></div>
     {% endif %}
   </figure>
     
     <script>
     
    {% if len <= 24*7 %} 
-   Highcharts.chart('weekly', {
+   Highcharts.chart('weekly1', {
    {% endif %}
    
    {% if len > 24*7 %} 
-    Highcharts.chart('yearly', {
+    Highcharts.chart('yearly1', {
    {% endif %}
     title: {
         text: ''
@@ -71,7 +86,30 @@
             }
         }
     },
-
+    rangeSelector:{
+                enabled:true,
+                buttons: [{
+				type: 'day',
+				count: 1,
+				text: '1d'
+			}, {
+				type: 'week',
+				count: 1,
+				text: '1w'
+			}, {
+				type: 'month',
+				count: 1,
+				text: '1m'
+			},{
+				type: 'year',
+				count: 1,
+				text: '1y'
+			},{
+				type: 'ytd',
+				count: 1,
+				text: 'YTD'
+			}]
+    },
     series: [{
         name: 'Generation',
         data: [  
@@ -116,6 +154,132 @@
 });
 
     </script>
+    
+     <figure class="highcharts-figure">
+    {% if len <= 24*7 %}   
+    <div id="weekly2"  style="display:none;"></div>
+    {% endif %}
+    {% if len > 24*7 %}   
+    <div id="yearly2"  style="display:none;"></div>
+    {% endif %}
+  </figure>
+    
+    <script>
+    
+   {% if len <= 24*7 %} 
+   Highcharts.chart('weekly2', {
+   {% endif %}
+   
+   {% if len > 24*7 %} 
+    Highcharts.chart('yearly2', {
+   {% endif %}
+    title: {
+        text: ''
+    },
+
+    yAxis: {
+        title: {
+            text: 'Energy(kWh)'
+        }
+    },
+
+    xAxis: {
+         title: {
+            text: 'Date'
+        },
+        type: 'datetime',
+         labels: {
+            format: '{value:%Y-%m-%d}'
+         },
+    },
+     tooltip: {
+        valueDecimals: 2
+    },
+    legend: {
+        layout: 'vertical',
+        align: 'right',
+        verticalAlign: 'middle'
+    },
+
+    plotOptions: {
+        series: {
+            label: {
+                connectorAllowed: false
+            },
+            marker: {
+                enabled: false
+            }
+        }
+    },
+    rangeSelector:{
+                enabled:true,
+                buttons: [{
+				type: 'day',
+				count: 1,
+				text: '1d'
+			}, {
+				type: 'week',
+				count: 1,
+				text: '1w'
+			}, {
+				type: 'month',
+				count: 1,
+				text: '1m'
+			},{
+				type: 'year',
+				count: 1,
+				text: '1y'
+			},{
+				type: 'ytd',
+				count: 1,
+				text: 'YTD'
+			}]
+    },
+    series: [{
+        name: 'Generation',
+        data: [  
+        {% for y,x in zip(data['output']['charts']['site']['import_export_pv']['gen_kwh'][0:len],labels) %}
+        {{ [x,y] }},
+        {% endfor %}]
+    }, {
+        name: 'Load',
+      data: [  
+        {% for y,x in zip(data['output']['charts']['site']['import_export_pv']['load_kWh'][0:len],labels) %}
+        {{  [x,y] }},
+        {% endfor %}]
+    }, {
+        name: 'Import',
+        data: [  
+        {% for y,x in zip(data['output']['charts']['site']['import_export_pv']['import_kWh'][0:len],labels) %}
+        {{  [x,y] }},
+        {% endfor %}]
+    }, {
+        name: 'export',
+        data: [  
+        {% for y,x in zip(data['output']['charts']['site']['import_export_pv']['export_kWh'][0:len],labels) %}
+        {{ [x,y] }},
+        {% endfor %}]
+    }],
+
+    responsive: {
+        rules: [{
+            condition: {
+                maxWidth: 1600
+            },
+            chartOptions: {
+                legend: {
+                    layout: 'horizontal',
+                    align: 'center',
+                    verticalAlign: 'bottom'
+                }
+            }
+        }]
+    }
+
+});
+
+    </script>
+    
   </center>
 </body>
 </html>

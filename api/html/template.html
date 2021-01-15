@@ -47,8 +47,8 @@
 </style>
 </head>
    <script  src= "https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-    <script src="https://code.highcharts.com/highcharts.js"></script>    
-    <script src= "https://code.highcharts.com/highcharts-more.js"></script>    
+    <script src= "https://code.highcharts.com/highcharts-more.js"></script>
+    <script src="http://code.highcharts.com/stock/highstock.js"></script>   
     <script src= "https://code.highcharts.com/modules/heatmap.js"></script>  
     <script src="https://code.highcharts.com/modules/series-label.js"></script>
     <script src="https://code.highcharts.com/modules/exporting.js"></script>
@@ -65,10 +65,11 @@
     
       <div class="dv_0 rt-2">
        <h1>Low Carbon App Report</h1>
-       <br /> 
+       <br />
         <a rel="noopener noreferrer" href="https://www.orxagrid.com/" target="_blank">
         <img src="/static/media/ORXA_Logo_Wordmark.d3f19fea.png" class="logo" alt="OrxaGrid" style="height: 4vh; margin-right: 40px;"></a>
         <span class="date" id="datetime" ></span>
+        <button id="button" onclick="showhide()" class="date">Solar+Battery</button>
          {% block content %}{% endblock %}
         <div id="app-footer" style="z-index: 100; text-align: center;">
             <strong>© 2017-2020 Copyright. 
@@ -82,6 +83,56 @@
     <script>
    var dt = new Date();
    document.getElementById("datetime").innerHTML =  dt.toLocaleDateString();
+   
+  
+   function showhide() {
+        d1 = document.getElementById("result1");
+        d1.style.display = (d1.style.display !== "none") ? "none" : "block";
+        
+        d2 = document.getElementById("result2");
+        d2.style.display = (d2.style.display !== "none") ? "none" : "block";
+        
+        d3 = document.getElementById("button");
+        d3.innerHTML = (d3.innerHTML === "Solar+Battery") ? "Solar Only": "Solar+Battery"
+        
+        d4 = document.getElementById("rep1");
+        d4.style.display = (d4.style.display !== "none") ? "none" : "block";
+        
+        d5 = document.getElementById("rep2");
+        d5.style.display = (d5.style.display !== "none") ? "none" : "block";
+        
+        d6 = document.getElementById("title1");
+        d6.style.display = (d6.style.display !== "none") ? "none" : "block";
+        
+        d7 = document.getElementById("line-chart-batt");
+        d7.style.display = (d7.style.display !== "none") ? "none" : "block";
+        
+        d8 = document.getElementById("weekly1");
+        d8.style.display = (d8.style.display !== "none") ? "none" : "block";
+        
+        d9 = document.getElementById("yearly1");
+        d9.style.display = (d9.style.display !== "none") ? "none" : "block";
+        
+        d10 = document.getElementById("title2");
+        d10.style.display = (d10.style.display !== "none") ? "none" : "block";
+        
+        d11 = document.getElementById("title3");
+        d11.style.display = (d11.style.display !== "none") ? "none" : "block";
+        
+        d12 = document.getElementById("weekly2");
+        d12.style.display = (d12.style.display !== "none") ? "none" : "block";
+        
+        d13 = document.getElementById("yearly2");
+        d13.style.display = (d13.style.display !== "none") ? "none" : "block";
+        
+        d14 = document.getElementById("title4");
+        d14.style.display = (d14.style.display !== "none") ? "none" : "block";
+        
+        d15 = document.getElementById("title5");
+        d15.style.display = (d15.style.display !== "none") ? "none" : "block";
+        
+        
+   }
     
  function getPDF(file) {
         debugger;

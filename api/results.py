@@ -177,7 +177,7 @@ def get_optimise_results(schema):
      #PV optimised load
      (annual_import_with_pv_kwh,
         pv_optimised_cost,
-        df,
+        import_export_pv_df,
         pv_size,
         pv_cost_curve,
         pay_back_yrs_pv,
@@ -188,7 +188,7 @@ def get_optimise_results(schema):
         annual_import_with_pv_and_battery_kwh,
         battery_optimised_cost,battery_cost_curve,import_export_df) = \
             _get_annual_import_with_pv_and_battery_kwh(
-                schema,df,pv_size)
+                schema,import_export_pv_df,pv_size)
   
     #Get lifetime profit, ROI, payback period in years
      lifetime_profit,ROI,payback_period,pv_cost, battery_cost, savings_batt = \
@@ -273,7 +273,8 @@ def get_optimise_results(schema):
      site = {
              'success': True,
              'battery_cost_curve' :  battery_cost_curve.to_dict(orient='list'),
-             'import_export' : import_export_df.to_dict(orient='list')
+             'import_export' : import_export_df.to_dict(orient='list'),
+             'import_export_pv' : import_export_pv_df.to_dict(orient='list')
             }
      
      
