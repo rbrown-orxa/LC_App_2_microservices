@@ -21,32 +21,35 @@ MAX_CALLS_BASIC_PLAN = 5
 MAX_CALLS_SILVER_PLAN_MONTHLY = 20
 MAX_CALLS_SILVER_PLAN_ANNUAL = 240
 MAX_CALLS_GOLD_PLAN = 'unlimited'
- 
-#Use these for local testing:
-#BILLING_DB_CONN_STR = "host=localhost "\
-#                      + "user=postgres "\
-#                      + "dbname=postgres "\
-#                      + "password=password "\
-#                      + "sslmode=allow"    
 
-#SUBSCRIPTION_DB_CONN_STR = "host=localhost "\
-#                       + "user=postgres "\
-#                       + "dbname=postgres "\
-#                       + "password=password "\
-#                       + "sslmode=allow"         
+#Start local DB:
+#docker run --name orxa-postgres -p 5432:5432 -e POSTGRES_PASSWORD=password -d postgres 
+#Use these for local testing:
+
+BILLING_DB_CONN_STR = "host=localhost "\
+                     + "user=postgres "\
+                     + "dbname=postgres "\
+                     + "password=password "\
+                     + "sslmode=allow"    
+
+SUBSCRIPTION_DB_CONN_STR = "host=localhost "\
+                      + "user=postgres "\
+                      + "dbname=postgres "\
+                      + "password=password "\
+                      + "sslmode=allow"         
 
 #Use these  for production:
-BILLING_DB_CONN_STR = "host=lcapppostgreserver.postgres.database.azure.com "\
-                     + "user=lcapp@lcapppostgreserver "\
-                     + "dbname=postgres "\
-                     + "password=SANorxagrid12 "\
-                     + "sslmode=require"
+# BILLING_DB_CONN_STR = "host=lcapppostgreserver.postgres.database.azure.com "\
+#                      + "user=lcapp@lcapppostgreserver "\
+#                      + "dbname=postgres "\
+#                      + "password=SANorxagrid12 "\
+#                      + "sslmode=require"
 
-SUBSCRIPTION_DB_CONN_STR = "host=lcapppostgreserver.postgres.database.azure.com "\
-                         + "user=lcapp@lcapppostgreserver "\
-                         + "dbname=Azuresubscriptiondb "\
-                         + "password=SANorxagrid12 "\
-                         + "sslmode=require"         
+# SUBSCRIPTION_DB_CONN_STR = "host=lcapppostgreserver.postgres.database.azure.com "\
+#                          + "user=lcapp@lcapppostgreserver "\
+#                          + "dbname=Azuresubscriptiondb "\
+#                          + "password=SANorxagrid12 "\
+#                          + "sslmode=require"         
 
 SUBSCRIPTION_URL = 'https://marketplaceapi.microsoft.com/api/saas/subscriptions'
 
