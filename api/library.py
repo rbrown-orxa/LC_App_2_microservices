@@ -50,7 +50,7 @@ def _optimise(request):
     try:
         jsonschema.validate(instance=content, schema=schema)
     except Exception as err:
-        assert False, f'422 {err}'
+        assert False, f'422 JSON validation error: {err}'
 
     results = get_optimise_results(content)
     return results        
