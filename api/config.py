@@ -10,9 +10,9 @@ COUNTRY_DETAILS = './profiles/country.csv'
 
 DEBUG_MODE = False # Sets log level to debug if True
 
-REQUIRE_AUTH = True
+REQUIRE_AUTH = False
 
-APPLY_BILLING = True # Affects AAD users
+APPLY_BILLING = False # Affects AAD users
 MAX_FREE_CALLS = 5 # Affects B2C users
 APPLY_DEFAULT_VALUES = True
 
