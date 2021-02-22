@@ -7,8 +7,6 @@
     "default": {},
     "examples": [
         {   
-            "sub": "1f75f128-e047-4b3f-ae1a-cdc4961b59e3",
-            "oid": "1f75f128-e047-4b3f-ae1a-cdc4961b59e3",
             "lat": 1.0,
             "lon": 1.0,
             "import_cost_kwh": 1.0,
@@ -45,8 +43,6 @@
         }
     ],
     "required": [
-        "sub",
-        "oid",
         "lat",
         "lon",
         "import_cost_kwh",
@@ -59,28 +55,6 @@
         "building_data"
     ],
     "properties": {
-        "sub": {
-            "$id": "#/properties/sub",
-            "type": "string",
-            "format": "uuid",
-            "title": "The sub schema",
-            "description": "An explanation about the purpose of this instance.",
-            "default": [],
-            "examples": [
-                "1f75f128-e047-4b3f-ae1a-cdc4961b59e3"
-            ]
-        },
-        "oid": {
-            "$id": "#/properties/oid",
-            "type": "string",
-            "format": "uuid",
-            "title": "The oid schema",
-            "description": "An explanation about the purpose of this instance.",
-            "default": [],
-            "examples": [
-                "1f75f128-e047-4b3f-ae1a-cdc4961b59e3"
-            ]
-        },
         "lat": {
             "$id": "#/properties/lat",
             "type": "number",
