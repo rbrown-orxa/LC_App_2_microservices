@@ -45,7 +45,7 @@ if app.config['APPLY_DEFAULT_VALUES']:
 @utils.handle_exceptions
 @auto.doc()
 @cross_origin(allow_headers=['Content-Type', 'Authorization'])
-@utils.requires_auth
+# @utils.requires_auth
 def optimise():
     """Optimise a solar and battery system size
 
@@ -68,27 +68,27 @@ def optimise():
     logging.info(f'json input schema: {request.json}')
 
     
-    object_id, tenant, sub_id, plan_id, domain  = None, None, None, None, None
-    if app.config['REQUIRE_AUTH']:
-        dict = get_fixed_fields(request.json,fields=['oid','sub_id','plan_id'])
-        object_id = dict['oid']
-        tenant = g.tenant
-        domain = g.domain
-        sub_id = dict['sub_id']
-        plan_id = dict['plan_id']        
+    # object_id, tenant, sub_id, plan_id, domain  = None, None, None, None, None
+    # if app.config['REQUIRE_AUTH']:
+    #     dict = get_fixed_fields(request.json,fields=['oid','sub_id','plan_id'])
+    #     object_id = dict['oid']
+    #     tenant = g.tenant
+    #     domain = g.domain
+    #     sub_id = dict['sub_id']
+    #     plan_id = dict['plan_id']        
 
-    if sub_id is None:
-        free_quota = billing.check_free_query_quota(object_id,domain)
-        logging.info(f'free quota used: {free_quota}')
+    # if sub_id is None:
+    #     free_quota = billing.check_free_query_quota(object_id,domain)
+    #     logging.info(f'free quota used: {free_quota}')
        
-    query_id = billing.query_started(sub_id, object_id, plan_id)
+    # query_id = billing.query_started(sub_id, object_id, plan_id)
 
     rv = library._optimise(request)
 
     if app.config['PICKLE_RESULTS']:
         utils.pickle_results(rv, sub_id, app.config['UPLOAD_PATH'])
     
-    billing.query_successful(query_id)
+    # billing.query_successful(query_id)
 
     return (rv,
             200, 
