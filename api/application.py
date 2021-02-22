@@ -40,69 +40,6 @@ if app.config['APPLY_DEFAULT_VALUES']:
     make_input_tables(app.config['BILLING_DB_CONN_STR'])
 
 
-# @app.route("/register_plan_purchase/<plan_token>", methods=['POST'])
-# @auto.doc()
-# @utils.handle_exceptions
-# @cross_origin(allow_headers=['Content-Type', 'Authorization'])
-# @utils.requires_auth
-# def register_plan_purchase(plan_token):
-#     SSO_token = utils.get_token_auth_header()
-    
-
-# @app.route("/optimise", methods=['GET','POST'])
-# @utils.handle_exceptions
-# @auto.doc()
-# @cross_origin(allow_headers=['Content-Type', 'Authorization'])
-# @utils.requires_auth
-# def optimise():
-#     """Optimise a solar and battery system size
-
-#     Request:
-#         Content-Type: application/json
-#         Body: According to /schema
-
-#     Return:
-#         Content-Type: application/json
-#         According to /result_schema
-#     """
-
-#     # Replace these with actual values sent from frontend
-#     # email = app.config['EMAIL']
-#     # subscription_id = app.config['SUBSCRIPTION_ID']
-    
-#     # subscription_id = billing.check_user_subscribed()
-
-#     logging.info('got an optimise request')
-
-#     #object_id, tenant, sub_id, plan_id = None, None, None, None
-#     #if app.config['REQUIRE_AUTH']:
-# 	#    # object_id = request.json['oid'] # get oid from request.json
-# 	#    object_id = g.oid # get oid from JWT claim instead of request.json
-# 	#    tenant = g.tenant
-# 	#    logging.info(f'got oid: {object_id}')
-# 	#    sub_id, plan_id = billing.check_subscription(object_id, tenant)
-        
-#     object_id, tenant, sub_id, plan_id, used_no, max_no = None, None, None, None, None, None
-#     if app.config['REQUIRE_AUTH']:
-# 	    # object_id = request.json['oid'] # get oid from request.json
-# 	    object_id = g.oid # get oid from JWT claim instead of request.json
-# 	    tenant = g.tenant
-# 	    logging.info(f'got oid: {object_id}')
-# 	    sub_id, plan_id, used_no, max_no = billing.check_subscription(object_id, tenant)
-
-
-#     query_id = billing.query_started(sub_id, object_id, plan_id)
-
-#     rv = library._optimise(request)
-
-#     if app.config['PICKLE_RESULTS']:
-#         utils.pickle_results(rv, sub_id, app.config['UPLOAD_PATH'])
-    
-#     billing.query_successful(query_id)
-
-#     return (rv,
-#             200, 
-#             {'Content-Type': 'application/json; charset=utf-8'})
 
 @app.route("/optimise", methods=['GET','POST'])
 @utils.handle_exceptions
