@@ -81,14 +81,14 @@ def optimise():
     #     free_quota = billing.check_free_query_quota(object_id,domain)
     #     logging.info(f'free quota used: {free_quota}')
        
-    # query_id = billing.query_started(sub_id, object_id, plan_id)
+    query_id = billing.query_started()
 
     rv = library._optimise(request)
 
     if app.config['PICKLE_RESULTS']:
         utils.pickle_results(rv, sub_id, app.config['UPLOAD_PATH'])
     
-    # billing.query_successful(query_id)
+    billing.query_successful(query_id)
 
     return (rv,
             200, 

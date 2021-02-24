@@ -94,7 +94,7 @@ def make_tables(conn_str):
 
 
 
-def query_started(subscription_id, oid, plan_id):
+def query_started():
     
     if not current_app.config['APPLY_BILLING']:
         subscription_id = None
@@ -104,14 +104,14 @@ def query_started(subscription_id, oid, plan_id):
     
     SQL =  """
             INSERT INTO queries
-            (subscription_id, object_id, plan_id)
-            VALUES (%s, %s, %s) 
+            (success)
+            VALUES (%s) 
             RETURNING id;
             """
 
     with psycopg2.connect(conn_str) as conn:
         cur = conn.cursor()
-        cur.execute( SQL, (subscription_id, oid, plan_id) )
+        cur.execute( SQL, (False, ) )
         conn.commit()
         id = cur.fetchone()[0]
         cur.close()

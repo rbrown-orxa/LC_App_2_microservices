@@ -1,5 +1,22 @@
 
 
+-- queries
+
+CREATE TABLE
+IF NOT EXISTS queries (
+    id SERIAL PRIMARY KEY,
+    started TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    success BOOLEAN NOT NULL DEFAULT FALSE,
+    -- subscription_id UUID,
+    -- plan_id TEXT,
+    -- object_id UUID,
+    completed TIMESTAMPTZ
+    -- billed BOOLEAN NOT NULL DEFAULT FALSE,
+    -- date_billed TIMESTAMPTZ 
+);
+
+
+
 -- subscriptiondetails
 
 CREATE TABLE
@@ -17,21 +34,6 @@ CREATE TABLE
         unique(subscriptionid)
     );
 
-
--- queries
-
-CREATE TABLE
-IF NOT EXISTS queries (
-    id SERIAL PRIMARY KEY,
-    started TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    success BOOLEAN NOT NULL DEFAULT FALSE,
-    subscription_id UUID,
-    plan_id TEXT,
-    object_id UUID,
-    completed TIMESTAMPTZ,
-    billed BOOLEAN NOT NULL DEFAULT FALSE,
-    date_billed TIMESTAMPTZ 
-);
 
 
 -- lcappinputvalues
