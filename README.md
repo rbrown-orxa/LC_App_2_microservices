@@ -1,10 +1,12 @@
+	
 	cd api
 	python3 -m venv venv
 	source venv/bin/activate
 	pip install -r requirements.txt
 	python3 application.py
 
-	docker run --rm -d --name orxa_postgres -p 5432:5432 -e POSTGRES_PASSWORD=password postgres
+	cd db
+	docker run --rm -d --name orxa_postgres -p 5432:5432 -e POSTGRES_PASSWORD=password -v "$PWD/startup_scripts":/docker-entrypoint-initdb.d postgres
 
 Point broswer at localhost:5000 for API documentation
 

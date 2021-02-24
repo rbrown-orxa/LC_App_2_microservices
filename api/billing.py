@@ -49,48 +49,48 @@ def check_free_query_quota(object_id,dom):
 
 
 def make_tables(conn_str):
-
-    success = False
-    while not success:
-        logging.info('Trying to make query table if not exist')
-        try:
-            with psycopg2.connect(conn_str) as conn:
-                SQL =   """
-                        CREATE TABLE
-                        IF NOT EXISTS queries (
-                            id SERIAL PRIMARY KEY,
-                            started TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-                            success BOOLEAN NOT NULL DEFAULT FALSE,
-                            subscription_id UUID,
-                            plan_id TEXT,
-                            object_id UUID,
-                            completed TIMESTAMPTZ,
-                            billed BOOLEAN NOT NULL DEFAULT FALSE,
-                            date_billed TIMESTAMPTZ 
-                        );
+    pass
+    # success = False
+    # while not success:
+    #     logging.info('Trying to make query table if not exist')
+    #     try:
+    #         with psycopg2.connect(conn_str) as conn:
+    #             SQL =   """
+    #                     CREATE TABLE
+    #                     IF NOT EXISTS queries (
+    #                         id SERIAL PRIMARY KEY,
+    #                         started TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    #                         success BOOLEAN NOT NULL DEFAULT FALSE,
+    #                         subscription_id UUID,
+    #                         plan_id TEXT,
+    #                         object_id UUID,
+    #                         completed TIMESTAMPTZ,
+    #                         billed BOOLEAN NOT NULL DEFAULT FALSE,
+    #                         date_billed TIMESTAMPTZ 
+    #                     );
                         
-                         --   CREATE TABLE
-                         --   IF NOT EXISTS bills (
-                         --     id SERIAL PRIMARY KEY,
-                         --     subscription_id UUID NOT NULL,
-                         --     plan_id TEXT NOT NULL, 
-                         --     units INT NOT NULL,
-                         --     created TIMESTAMPTZ NOT NULL DEFAULT NOW()
-                         -- ) ;
-                        """
+    #                      --   CREATE TABLE
+    #                      --   IF NOT EXISTS bills (
+    #                      --     id SERIAL PRIMARY KEY,
+    #                      --     subscription_id UUID NOT NULL,
+    #                      --     plan_id TEXT NOT NULL, 
+    #                      --     units INT NOT NULL,
+    #                      --     created TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    #                      -- ) ;
+    #                     """
                         
 
-                cur = conn.cursor()
-                cur.execute(SQL)
-                conn.commit()
-                cur.close()
+    #             cur = conn.cursor()
+    #             cur.execute(SQL)
+    #             conn.commit()
+    #             cur.close()
 
-            logging.info('Success')
-            success = True
+    #         logging.info('Success')
+    #         success = True
 
-        except Exception as err:
-                logging.info(err)
-                time.sleep(5)
+    #     except Exception as err:
+    #             logging.info(err)
+    #             time.sleep(5)
 
 
 
@@ -187,7 +187,8 @@ def get_billed_queries(conn_str,sid='',stdt='',enddt='',plan_id=''):
 if __name__ != '__main__':
 
     if cfg.APPLY_BILLING:
-        make_tables(cfg.BILLING_DB_CONN_STR)
+        pass
+        # make_tables(cfg.BILLING_DB_CONN_STR)
 
 else: #run inline tests
 
@@ -205,7 +206,7 @@ else: #run inline tests
         'postgres://postgres:password@localhost:5432/postgres'
     current_app.config['APPLY_BILLING'] = True
 
-    make_tables(current_app.config['BILLING_DB_CONN_STR'])
+    # make_tables(current_app.config['BILLING_DB_CONN_STR'])
 
 
     logging.debug('Creating query entry with subscription_id for AAD')

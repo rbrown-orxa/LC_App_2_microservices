@@ -127,28 +127,29 @@ def get_subscription_details(subscription_id, token):
 
 
 def create_test_table():
+    pass
+    
+    # SQL =   """
+    #         CREATE TABLE if not exists 
+    #             subscriptiondetails
+    #             (
+    #                 id serial primary key,
+    #                 objectid uuid not null,
+    #                 subscriptionid uuid not null,
+    #                 subscriptionname text not null,
+    #                 offerid text not null,
+    #                 planid text not null,
+    #                 purchasertenantid uuid not null,
+    #                 subscriptionstatus text not null,
+    #                 created timestamptz not null default NOW(),
+    #                 unique(subscriptionid)
+    #             );
+    #         """
 
-    SQL =   """
-            CREATE TABLE if not exists 
-                subscriptiondetails
-                (
-                    id serial primary key,
-                    objectid uuid not null,
-                    subscriptionid uuid not null,
-                    subscriptionname text not null,
-                    offerid text not null,
-                    planid text not null,
-                    purchasertenantid uuid not null,
-                    subscriptionstatus text not null,
-                    created timestamptz not null default NOW(),
-                    unique(subscriptionid)
-                );
-            """
-
-    with psycopg2.connect(CONN_STR) as conn:
-        cur = conn.cursor()
-        cur.execute(SQL)
-        cur.close()
+    # with psycopg2.connect(CONN_STR) as conn:
+    #     cur = conn.cursor()
+    #     cur.execute(SQL)
+    #     cur.close()
 
 
 def insert_dummy_data(object_id, subscription_id, plan_id):
@@ -196,7 +197,7 @@ if __name__ == '__main__':
                         + "password=password "\
                         + "sslmode=allow"
 
-    create_test_table()
+    # create_test_table()
 
     # should pass
     print('\nTest 1 - this should pass')
