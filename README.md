@@ -1,3 +1,5 @@
+
+	docker run --rm -d -p 9000:9000 --name orxa_minio minio/minio server /data
 	
 	cd api
 	python3 -m venv venv
@@ -26,5 +28,4 @@ LC App Phase 2 consists of five services:
     - Subscription service (C# dotnet) - https://bitbucket.org/OrxaGridRepo/contosoampbasic/src/dev/
     - Frontend (React.js) - https://bitbucket.org/OrxaGridRepo/solarpv-phase2/src/master/
     - Database (postgres Azure) - lcapppostgreserver.postgres.database.azure.com
-
 

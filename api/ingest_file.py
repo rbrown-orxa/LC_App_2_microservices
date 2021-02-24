@@ -13,13 +13,13 @@ import datetime as dt
 import logging
 
 
-def columns_to_drop(filepath, skiprows):
+def columns_to_drop(f, skiprows):
     """
     Find columns to drop.
     Return names of columns that are in a known list or with one unique value.
     """
     candidates = ['unit', 'units', 'total', 'totals', 'id']
-    df = pd.read_csv(filepath, skiprows=skiprows, sep=None, engine='python')
+    df = pd.read_csv(f, skiprows=skiprows, sep=None, engine='python')
 #     return df
     drop = set()
     
@@ -52,41 +52,45 @@ def columns_to_drop(filepath, skiprows):
     return list(drop)
 
 
-def rows_to_skip(filepath):
+def rows_to_skip(f):
     """
     Find rows to skip when reading csv file into dataframe.
     Return rows with width less than the mode.
     """
 #     print(f'*** Type: {type(filepath)}')
-    with open(filepath) as f:
-        try:
-            dialect = csv.Sniffer().sniff(f.read(1024))
-            f.seek(0)
-            reader = csv.reader(f, dialect)
-        except:
-            f.seek(0)
-            reader = csv.reader(f)
-        widths = {i: len(row) for i, row in enumerate(reader)}
+
+    # with open(filepath) as f:
+    try:
+        dialect = csv.Sniffer().sniff(f.read(1024))
+        f.seek(0)
+        reader = csv.reader(f, dialect)
+    except:
+        f.seek(0)
+        reader = csv.reader(f)
+    widths = {i: len(row) for i, row in enumerate(reader)}
 #         print(widths)
-        mode = statistics.mode(widths.values())
-        return [row for row, width in widths.items() 
-                if width < mode]
+    mode = statistics.mode(widths.values())
+    f.seek(0)
+    # breakpoint()
+    return [row for row, width in widths.items() 
+            if width < mode]
 
 
-def get_format(filepath):
+def get_format(f):
     """
     Determine type of meter data file.
     Return 'row_per_day' or 'single_column'
     """
-    with open(filepath) as f:
-        try:
-            dialect = csv.Sniffer().sniff(f.read(1024))
-            f.seek(0)
-            reader = csv.reader(f, dialect)
-        except:
-            f.seek(0)
-            reader = csv.reader(f)
-        data = list(reader)
+    # with open(filepath) as f:
+    f.seek(0)
+    try:
+        dialect = csv.Sniffer().sniff(f.read(1024))
+        f.seek(0)
+        reader = csv.reader(f, dialect)
+    except:
+        f.seek(0)
+        reader = csv.reader(f)
+    data = list(reader)
     width = max([len(row) for row in data])
 #     print(width)
     
@@ -96,7 +100,7 @@ def get_format(filepath):
         return 'single_column'
 
 
-def get_units(filepath):
+def get_units(f):
     """
     Find first field containing a unit of power or energy.
     Return 'kw', 'kwh', 'mw', 'mwh', 'w'
@@ -114,15 +118,16 @@ def get_units(filepath):
                 'power':'W', 
                 'w':'W' }
     
-    with open(filepath) as f:
-        try:
-            dialect = csv.Sniffer().sniff(f.read(1024))
-            f.seek(0)
-            reader = csv.reader(f, dialect)
-        except:
-            f.seek(0)
-            reader = csv.reader(f)
-        data = list(reader)[:10] # don't look beyond line 10
+    # with open(filepath) as f:
+    f.seek(0)
+    try:
+        dialect = csv.Sniffer().sniff(f.read(1024))
+        f.seek(0)
+        reader = csv.reader(f, dialect)
+    except:
+        f.seek(0)
+        reader = csv.reader(f)
+    data = list(reader)[:10] # don't look beyond line 10
 #         print(data)
     for row in data:
         for word in row:
@@ -137,8 +142,9 @@ def get_units(filepath):
     return 'W'
 
 
-def date_column(filepath, skiprows, skipcolumns):
-    df = pd.read_csv(filepath, skiprows=skiprows, sep=None, engine='python')
+def date_column(f, skiprows, skipcolumns):
+    f.seek(0)
+    df = pd.read_csv(f, skiprows=skiprows, sep=None, engine='python')
     df = df.drop(columns = skipcolumns)
     df = df.head(10)
     
@@ -182,11 +188,12 @@ def date_column(filepath, skiprows, skipcolumns):
             return rv
 
 
-def datetime_column(filepath, skiprows, skipcolumns):
+def datetime_column(f, skiprows, skipcolumns):
     """
     Only a datetime column if date and time present
     """
-    df = pd.read_csv(filepath, skiprows=skiprows, sep=None, engine='python')
+    f.seek(0)
+    df = pd.read_csv(f, skiprows=skiprows, sep=None, engine='python')
     df = df.drop(columns = skipcolumns)
 #     df = df.head(10)
 
@@ -233,7 +240,7 @@ def datetime_column(filepath, skiprows, skipcolumns):
 
 
 
-def has_header_row(filepath, skiprows=[0]):
+def has_header_row(f, skiprows=[0]):
     """
     Determine whether first non-skipped row of csv file is a header.
     Return true if header present, otherwise false.
@@ -242,16 +249,17 @@ def has_header_row(filepath, skiprows=[0]):
         skiprows=max(skiprows)
     else:
         skiprows = 0
-    with open(filepath) as f:
-        try:
-            dialect = csv.Sniffer().sniff(f.read(1024))
-            f.seek(0)
-            reader = csv.reader(f, dialect)
-        except:
-            f.seek(0)
-            reader = csv.reader(f)
+    # with open(filepath) as f:
+    f.seek(0)
+    try:
+        dialect = csv.Sniffer().sniff(f.read(1024))
+        f.seek(0)
+        reader = csv.reader(f, dialect)
+    except:
+        f.seek(0)
+        reader = csv.reader(f)
 
-        data = list(reader)[skiprows:skiprows+10] # don't look beyond line 10
+    data = list(reader)[skiprows:skiprows+10] # don't look beyond line 10
 #         print(data)
     
     def isnumber(item):
@@ -274,8 +282,9 @@ def has_header_row(filepath, skiprows=[0]):
         return None
 
 
-def time_column(filepath, skiprows):
-    df = pd.read_csv(filepath, skiprows=skiprows, sep=None, engine='python')
+def time_column(f, skiprows):
+    f.seek(0)
+    df = pd.read_csv(f, skiprows=skiprows, sep=None, engine='python')
     #Fill NA values the previos value
     df=df.ffill(axis=1)
     s = df.nunique()
@@ -316,6 +325,7 @@ def time_periodic(df_or_file, skiprows, time_column):
     if isinstance(df_or_file, pd.core.frame.DataFrame):
         df = df_or_file
     else:
+        df_or_file.seek(0)
         df = pd.read_csv(
             df_or_file, 
             skiprows=skiprows, 
@@ -328,20 +338,20 @@ def time_periodic(df_or_file, skiprows, time_column):
     return None
 
 
-def make_schema(path):
+def make_schema(f):
     s = {}
-    s['skiprows'] = rows_to_skip(path)
-    s['skipcolumns'] = columns_to_drop(path, s['skiprows'])
+    s['skiprows'] = rows_to_skip(f)
+    s['skipcolumns'] = columns_to_drop(f, s['skiprows'])
     s['date_column'] = date_column(
-        path, s['skiprows'], s['skipcolumns'])
+        f, s['skiprows'], s['skipcolumns'])
     s['datetime_column'] = datetime_column(
-        path, s['skiprows'], s['skipcolumns'])
-    s['file_format'] = get_format(path)
-    s['units'] = get_units(path)
-    s['header'] = has_header_row(path, s['skiprows'])
-    s['time_column'] = time_column(path, s['skiprows'])
+        f, s['skiprows'], s['skipcolumns'])
+    s['file_format'] = get_format(f)
+    s['units'] = get_units(f)
+    s['header'] = has_header_row(f, s['skiprows'])
+    s['time_column'] = time_column(f, s['skiprows'])
     s['time_periodic'] = time_periodic(
-        path, s['skiprows'], s['time_column'])
+        f, s['skiprows'], s['time_column'])
     return s
 
 
@@ -366,12 +376,12 @@ def make_schema(path):
 #     s['time_periodic'] = time_periodic(path, s['skiprows'], s['time_column'])
 
 
-def make_df(path, schema):
+def make_df(f, schema):
     s = schema
 #     print('***', s['skipcolumns'])
-
+    f.seek(0)
     df = (
-    pd.read_csv(path,
+    pd.read_csv(f,
                 skiprows=s['skiprows'],
                 header=s['header'],
                 sep=None,
@@ -508,9 +518,9 @@ def sum_phases(df, schema):
     return rv
 
 
-def apply_schema(path):
-    s = make_schema(path)
-    df = make_df(path, s)
+def apply_schema(f):
+    s = make_schema(f)
+    df = make_df(f, s)
     df, s = wide_to_long(df, s)
     df, s = periodic_df(df, s)
     df, s = convert_times(df, s)
@@ -523,10 +533,10 @@ def is_tz_aware(load):
     return load.index[0].tzinfo is not None
 
 
-def csv_file_import(path, lat, lon):
+def csv_file_import(f, lat, lon):
     #Read csv, return df with naive local time and electrical unit
     
-    df, schema = apply_schema(path)
+    df, schema = apply_schema(f)
     units = schema['units']
     logging.info(f'Lat: {lat}, Lon: {lon}')
     
@@ -626,8 +636,8 @@ def clip_to_year(load):
     return load[:24*7*52]
 
 
-def process_load_file(path_in, lat, lon):
-    df, units = csv_file_import(path_in, lat, lon)
+def process_load_file(f, lat, lon):
+    df, units = csv_file_import(f, lat, lon)
     df = units_to_kwh(df, units)
     df = resample_hourly(df, units)
     assert is_full_year(df)

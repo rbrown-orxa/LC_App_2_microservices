@@ -7,6 +7,8 @@ IF NOT EXISTS queries (
     id SERIAL PRIMARY KEY,
     started TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     success BOOLEAN NOT NULL DEFAULT FALSE,
+    lat NUMERIC,
+    lon NUMERIC,
     -- subscription_id UUID,
     -- plan_id TEXT,
     -- object_id UUID,

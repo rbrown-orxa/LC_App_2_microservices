@@ -94,24 +94,28 @@ def make_tables(conn_str):
 
 
 
-def query_started():
+def query_started(lat, lon):
     
     if not current_app.config['APPLY_BILLING']:
         subscription_id = None
 
     conn_str = current_app.config['BILLING_DB_CONN_STR']
     logging.info('Registering query started')
+
+    if lat is not None and lon is not None:
+        lat, lon = float(lat), float(lon)
+
     
     SQL =  """
             INSERT INTO queries
-            (success)
-            VALUES (%s) 
+            (lat, lon)
+            VALUES (%s, %s) 
             RETURNING id;
             """
 
     with psycopg2.connect(conn_str) as conn:
         cur = conn.cursor()
-        cur.execute( SQL, (False, ) )
+        cur.execute( SQL, (lat, lon) )
         conn.commit()
         id = cur.fetchone()[0]
         cur.close()

@@ -15,31 +15,6 @@ import pandas as pd
 from exchangeratesapi import Api as Currency_converter
 
 
-def _upload(request):
-    logging.info('handling file upload request')
-    file = request.files.get('file', None)
-    lat, lon = ( request.form.get(num, None) for num in ['lat', 'lon'] )
-
-    assert all ([ lat, lon ]), '400 lat and lon fields required'
-    assert file and file.filename, '422 No file provided'
-    extension = os.path.splitext(file.filename)[1]
-
-    assert extension in current_app.config['UPLOAD_EXTENSIONS'], \
-            '415 Unsupported Media Type'
-
-    fd, raw_path = tempfile.mkstemp(dir=current_app.config['UPLOAD_PATH'])
-    with open(fd, 'wb') as temp_file:
-        file.save(temp_file)
-
-    fd, processed_path = tempfile.mkstemp(
-        dir=current_app.config['UPLOAD_PATH'])
-    df = process_load_file(path_in=raw_path, lat=lat, lon=lon)
-    
-    df.to_csv(processed_path, index=False)
-
-    return ( {'handle':os.path.basename(processed_path)} )
-
-
 def _optimise(request):
 
     logging.debug('starting optimisation')
@@ -54,14 +29,6 @@ def _optimise(request):
 
     results = get_optimise_results(content)
     return results        
-
-
-
-def _download(handle):
-    return send_from_directory(
-        current_app.config['UPLOAD_PATH'],
-        handle, 
-        as_attachment=True)
 
 
 def _file_requirements():
@@ -190,6 +157,39 @@ def _get_country_values(request):
         
 
     return default_values
+
+
+
+def _upload(request):
+    logging.info('handling file upload request')
+    file = request.files.get('file', None)
+    lat, lon = ( request.form.get(num, None) for num in ['lat', 'lon'] )
+
+    assert all ([ lat, lon ]), '400 lat and lon fields required'
+    assert file and file.filename, '422 No file provided'
+    extension = os.path.splitext(file.filename)[1]
+
+    assert extension in current_app.config['UPLOAD_EXTENSIONS'], \
+            '415 Unsupported Media Type'
+
+    fd, raw_path = tempfile.mkstemp(dir=current_app.config['UPLOAD_PATH'])
+    with open(fd, 'wb') as temp_file:
+        file.save(temp_file)
+
+    fd, processed_path = tempfile.mkstemp(
+        dir=current_app.config['UPLOAD_PATH'])
+    df = process_load_file(path_in=raw_path, lat=lat, lon=lon)
+    
+    df.to_csv(processed_path, index=False)
+
+    return ( {'handle':os.path.basename(processed_path)} )
+
+
+def _download(handle):
+    return send_from_directory(
+        current_app.config['UPLOAD_PATH'],
+        handle, 
+        as_attachment=True)
 
 
 

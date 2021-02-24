@@ -56,32 +56,15 @@ def optimise():
     Return:
         Content-Type: application/json
         According to /result_schema
-    """
-
-    # Replace these with actual values sent from frontend
-    # email = app.config['EMAIL']
-    # subscription_id = app.config['SUBSCRIPTION_ID']
-    
-    # subscription_id = billing.check_user_subscribed()
+    """    
 
     logging.info('got an optimise request')
     logging.info(f'json input schema: {request.json}')
 
-    
-    # object_id, tenant, sub_id, plan_id, domain  = None, None, None, None, None
-    # if app.config['REQUIRE_AUTH']:
-    #     dict = get_fixed_fields(request.json,fields=['oid','sub_id','plan_id'])
-    #     object_id = dict['oid']
-    #     tenant = g.tenant
-    #     domain = g.domain
-    #     sub_id = dict['sub_id']
-    #     plan_id = dict['plan_id']        
-
-    # if sub_id is None:
-    #     free_quota = billing.check_free_query_quota(object_id,domain)
-    #     logging.info(f'free quota used: {free_quota}')
-       
-    query_id = billing.query_started()
+    lat = request.json.get('lat', None)
+    lon = request.json.get('lon', None)
+    query_id = billing.query_started(lat, lon)
+    # breakpoint()
 
     rv = library._optimise(request)
 
