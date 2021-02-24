@@ -355,25 +355,7 @@ def make_schema(f):
     return s
 
 
-# def test(path):
-#     s = {}
-#     s['skiprows'] = rows_to_skip(path)
-#     print(s)
-#     s['skipcolumns'] = columns_to_drop(path, s['skiprows'])
-#     print(s)    
-#     s['date_column'] = date_column(path, s['skiprows'], s['skipcolumns'])
-#     print(s)
-#     s['datetime_column'] = datetime_column(path, s['skiprows'], s['skipcolumns'])
-#     print(s)
-#     s['file_format'] = get_format(path)
-#     print(s)
-#     s['units'] = get_units(path)
-#     print(s)
-#     s['header'] = has_header_row(path, s['skiprows'])
-#     print(s)
-#     s['time_column'] = time_column(path, s['skiprows'])
-#     print(s)
-#     s['time_periodic'] = time_periodic(path, s['skiprows'], s['time_column'])
+
 
 
 def make_df(f, schema):
@@ -658,7 +640,25 @@ if __name__ == '__main__':
     load = process_load_file(path, lat, lon)
 
 
-
+# def test(path):
+#     s = {}
+#     s['skiprows'] = rows_to_skip(path)
+#     print(s)
+#     s['skipcolumns'] = columns_to_drop(path, s['skiprows'])
+#     print(s)    
+#     s['date_column'] = date_column(path, s['skiprows'], s['skipcolumns'])
+#     print(s)
+#     s['datetime_column'] = datetime_column(path, s['skiprows'], s['skipcolumns'])
+#     print(s)
+#     s['file_format'] = get_format(path)
+#     print(s)
+#     s['units'] = get_units(path)
+#     print(s)
+#     s['header'] = has_header_row(path, s['skiprows'])
+#     print(s)
+#     s['time_column'] = time_column(path, s['skiprows'])
+#     print(s)
+#     s['time_periodic'] = time_periodic(path, s['skiprows'], s['time_column'])
 
 
 

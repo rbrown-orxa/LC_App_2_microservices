@@ -50,48 +50,6 @@ def check_free_query_quota(object_id,dom):
 
 def make_tables(conn_str):
     pass
-    # success = False
-    # while not success:
-    #     logging.info('Trying to make query table if not exist')
-    #     try:
-    #         with psycopg2.connect(conn_str) as conn:
-    #             SQL =   """
-    #                     CREATE TABLE
-    #                     IF NOT EXISTS queries (
-    #                         id SERIAL PRIMARY KEY,
-    #                         started TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    #                         success BOOLEAN NOT NULL DEFAULT FALSE,
-    #                         subscription_id UUID,
-    #                         plan_id TEXT,
-    #                         object_id UUID,
-    #                         completed TIMESTAMPTZ,
-    #                         billed BOOLEAN NOT NULL DEFAULT FALSE,
-    #                         date_billed TIMESTAMPTZ 
-    #                     );
-                        
-    #                      --   CREATE TABLE
-    #                      --   IF NOT EXISTS bills (
-    #                      --     id SERIAL PRIMARY KEY,
-    #                      --     subscription_id UUID NOT NULL,
-    #                      --     plan_id TEXT NOT NULL, 
-    #                      --     units INT NOT NULL,
-    #                      --     created TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    #                      -- ) ;
-    #                     """
-                        
-
-    #             cur = conn.cursor()
-    #             cur.execute(SQL)
-    #             conn.commit()
-    #             cur.close()
-
-    #         logging.info('Success')
-    #         success = True
-
-    #     except Exception as err:
-    #             logging.info(err)
-    #             time.sleep(5)
-
 
 
 def query_started(lat, lon):

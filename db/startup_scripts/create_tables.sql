@@ -9,12 +9,7 @@ IF NOT EXISTS queries (
     success BOOLEAN NOT NULL DEFAULT FALSE,
     lat NUMERIC,
     lon NUMERIC,
-    -- subscription_id UUID,
-    -- plan_id TEXT,
-    -- object_id UUID,
     completed TIMESTAMPTZ
-    -- billed BOOLEAN NOT NULL DEFAULT FALSE,
-    -- date_billed TIMESTAMPTZ 
 );
 
 

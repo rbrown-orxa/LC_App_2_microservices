@@ -58,6 +58,7 @@ def get_base_loads(schema):
         if type(load).__name__=='float' or type(load).__name__=='int':
           #Consumption
           df=get_consumption_profile(cfg.PROFILES_BUILDING,load,btype)
+          # breakpoint()
         else:
            #handler
 
@@ -68,7 +69,7 @@ def get_base_loads(schema):
           #TODO: Get encoding for use in decode() function below
           raw_buf_t = StringIO(raw_buf_b.read().decode())
           df = pd.read_csv(raw_buf_t)
-          list_of_base_load.append(df)
+        list_of_base_load.append(df)
     
     else:
       # Read pre-processed file from bucket into DataFrame
