@@ -1,4 +1,4 @@
-from flask import current_app, send_from_directory
+from flask import current_app, send_from_directory, Response
 import jsonschema
 import json
 import tempfile
@@ -13,6 +13,21 @@ from utils import get_fixed_fields, getplace, get_default_values
 import config as cfg
 import pandas as pd
 from exchangeratesapi import Api as Currency_converter
+from minio import Minio
+from minio.error import S3Error
+from uuid import uuid4
+from io import BytesIO, StringIO
+
+
+#TODO: Get constants from env
+MINIO_CONN_STR = 'localhost:9000'
+MINIO_USER = 'minioadmin'
+MINIO_PW = 'minioadmin'
+MINIO_SECURE = False
+MINIO_RAW_BUCKET = 'raw-uploads'
+MINIO_CLEANED_BUCKET = 'cleaned-uploads'
+
+
 
 
 def _optimise(request):
@@ -161,6 +176,7 @@ def _get_country_values(request):
 
 
 def _upload(request):
+
     logging.info('handling file upload request')
     file = request.files.get('file', None)
     lat, lon = ( request.form.get(num, None) for num in ['lat', 'lon'] )
@@ -172,24 +188,73 @@ def _upload(request):
     assert extension in current_app.config['UPLOAD_EXTENSIONS'], \
             '415 Unsupported Media Type'
 
-    fd, raw_path = tempfile.mkstemp(dir=current_app.config['UPLOAD_PATH'])
-    with open(fd, 'wb') as temp_file:
-        file.save(temp_file)
 
-    fd, processed_path = tempfile.mkstemp(
-        dir=current_app.config['UPLOAD_PATH'])
-    df = process_load_file(path_in=raw_path, lat=lat, lon=lon)
+    # Write raw file to bucket
+    raw_file_id = str(uuid4())
+    size = os.fstat(file.fileno()).st_size
+    content_type = file.content_type
+    client = Minio(MINIO_CONN_STR, MINIO_USER, "minioadmin", secure=False)
+    client.put_object(
+            MINIO_RAW_BUCKET, raw_file_id, file, size, content_type)
+
+    # Read raw file from bucket into DataFrame and pre-process
+    raw_file = client.get_object(MINIO_RAW_BUCKET, raw_file_id)
+    raw_buf_b = BytesIO(raw_file.read())
+    #TODO: Get encoding for use in decode() function below
+    raw_buf_t = StringIO(raw_buf_b.read().decode())
+    df = process_load_file(raw_buf_t, lat=lat, lon=lon)
+
+    # Write cleaned file to bucket
+    cleaned_file_id = str(uuid4())
+    cleaned_file = df.to_csv(index=False).encode('utf-8')
+    client.put_object(
+            MINIO_CLEANED_BUCKET,
+            cleaned_file_id,
+            BytesIO(cleaned_file),
+            len(cleaned_file),
+            content_type='application/csv')
+    rv = {'handle': cleaned_file_id, "raw_upload": raw_file_id}
+    logging.info(f'processed uploaded files: {rv}')
+
+    return ( rv )
+
+    # logging.info('handling file upload request')
+    # file = request.files.get('file', None)
+    # lat, lon = ( request.form.get(num, None) for num in ['lat', 'lon'] )
+
+    # assert all ([ lat, lon ]), '400 lat and lon fields required'
+    # assert file and file.filename, '422 No file provided'
+    # extension = os.path.splitext(file.filename)[1]
+
+    # assert extension in current_app.config['UPLOAD_EXTENSIONS'], \
+    #         '415 Unsupported Media Type'
+
+    # fd, raw_path = tempfile.mkstemp(dir=current_app.config['UPLOAD_PATH'])
+    # with open(fd, 'wb') as temp_file:
+    #     file.save(temp_file)
+
+    # fd, processed_path = tempfile.mkstemp(
+    #     dir=current_app.config['UPLOAD_PATH'])
+    # df = process_load_file(raw_path, lat=lat, lon=lon)
     
-    df.to_csv(processed_path, index=False)
+    # df.to_csv(processed_path, index=False)
 
-    return ( {'handle':os.path.basename(processed_path)} )
+    # return ( {'handle':os.path.basename(processed_path)} )
 
 
 def _download(handle):
-    return send_from_directory(
-        current_app.config['UPLOAD_PATH'],
-        handle, 
-        as_attachment=True)
+    # raise NotImplementedError('Need to change this to use bucket')
+    client = Minio(MINIO_CONN_STR, MINIO_USER, "minioadmin", secure=False)
+    try:
+        resp = client.get_object(MINIO_RAW_BUCKET, handle)
+    except S3Error:
+        resp = client.get_object(MINIO_CLEANED_BUCKET, handle)
+    return Response(resp, content_type=resp.headers['Content-Type'])
+    
+    # return send_from_directory(
+    #     current_app.config['UPLOAD_PATH'],
+    #     handle, 
+    #     as_attachment=True)
 
 
 

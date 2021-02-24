@@ -4,8 +4,22 @@ import os
 import config as cfg
 import pandas as pd
 import logging
+from minio import Minio
+from minio.error import S3Error
+from io import BytesIO, StringIO
 
 import utils
+
+
+#TODO: Get constants from env
+MINIO_CONN_STR = 'localhost:9000'
+MINIO_USER = 'minioadmin'
+MINIO_PW = 'minioadmin'
+MINIO_SECURE = False
+MINIO_RAW_BUCKET = 'raw-uploads'
+MINIO_CLEANED_BUCKET = 'cleaned-uploads'
+
+
 
 def list_buildings(query):
     # utils.call_trace()
@@ -30,30 +44,45 @@ def list_buildings(query):
 def get_base_loads(schema):
     
     #Check total building profile
-    dict = get_fixed_fields(schema,fields=['load_profile_csv_optional'])
-    handler = dict['load_profile_csv_optional']
+    _dict = get_fixed_fields(schema,fields=['load_profile_csv_optional'])
+    handler = _dict['load_profile_csv_optional']
     list_of_base_load = []
     
     if not handler:
       
-       building_load = list_buildings(schema) # API will be called
+      building_load = list_buildings(schema) # API will be called
 
-       dict = get_variable_fields(schema,fields=['building_type'])
-       building_type = dict['building_type'] # domestic,work,public,commercial,delivery
-       for load,btype in zip(building_load.values(),building_type):
-           if type(load).__name__=='float' or type(load).__name__=='int':
-               #Consumption
-               df=get_consumption_profile(cfg.PROFILES_BUILDING,load,btype)
-           else:
-               #handler
-                df = pd.read_csv('./' + cfg.UPLOAD_PATH + '/' + load)
-           list_of_base_load.append(df)
+      _dict = get_variable_fields(schema,fields=['building_type'])
+      building_type = _dict['building_type'] # domestic,work,public,commercial,delivery
+      for load,btype in zip(building_load.values(),building_type):
+        if type(load).__name__=='float' or type(load).__name__=='int':
+          #Consumption
+          df=get_consumption_profile(cfg.PROFILES_BUILDING,load,btype)
+        else:
+           #handler
+
+          # Read pre-processed file from bucket into DataFrame
+          client = Minio(MINIO_CONN_STR, MINIO_USER, "minioadmin", secure=False)
+          raw_file = client.get_object(MINIO_CLEANED_BUCKET, load)
+          raw_buf_b = BytesIO(raw_file.read())
+          #TODO: Get encoding for use in decode() function below
+          raw_buf_t = StringIO(raw_buf_b.read().decode())
+          df = pd.read_csv(raw_buf_t)
+          list_of_base_load.append(df)
+    
     else:
-       df = pd.read_csv('./' + cfg.UPLOAD_PATH + '/'+ handler)
-       dict = get_variable_fields(schema,fields=['roof_size_m2'])
-       roof_sizes_m2 = dict['roof_size_m2']
-       list_of_base_load = [roof / sum(roof_sizes_m2) * df 
-                            for roof in roof_sizes_m2]
+      # Read pre-processed file from bucket into DataFrame
+      client = Minio(MINIO_CONN_STR, MINIO_USER, "minioadmin", secure=False)
+      raw_file = client.get_object(MINIO_CLEANED_BUCKET, handler)
+      raw_buf_b = BytesIO(raw_file.read())
+      #TODO: Get encoding for use in decode() function below
+      raw_buf_t = StringIO(raw_buf_b.read().decode())
+      df = pd.read_csv(raw_buf_t)
+
+      _dict = get_variable_fields(schema,fields=['roof_size_m2'])
+      roof_sizes_m2 = _dict['roof_size_m2']
+      list_of_base_load = [roof / sum(roof_sizes_m2) * df 
+                          for roof in roof_sizes_m2]
     
     return(list_of_base_load)
 
@@ -63,3 +92,6 @@ if __name__ == '__main__':
     from api_mock import *
     
     print(get_base_loads(request.json))
+
+
+
