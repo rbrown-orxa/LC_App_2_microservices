@@ -1,5 +1,5 @@
 
-![Architecture Diagram](architecture.png)
+![Architecture Diagram](architecture-New.png)
 
 
 	docker run --rm -d -p 9000:9000 --name orxa_minio minio/minio server /data
