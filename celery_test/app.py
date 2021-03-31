@@ -20,15 +20,19 @@ def task():
 
 @app.route('/task_callback/<task_id>')
 def task_callback(task_id):
-    res = tasks.app.AsyncResult(task_id)
-    status = res.status
-    rv, code = '', 202
-    if status == 'SUCCESS':
-        rv, code = res.get(), 200
-    elif status == 'FAILURE':
-        code = 500
-    return {'Status': status, 'Result': rv}, code
-
+    try:
+        res = tasks.celery.AsyncResult(task_id)
+        print(type(res), res)
+        status = res.status
+        # print(status)
+        rv, code = '', 202
+        if status == 'SUCCESS':
+            rv, code = res.get(), 200
+        elif status == 'FAILURE':
+            code = 500
+        return {'Status': status, 'Result': rv}, code
+    except:
+        return {'Status': 'Failed', 'Result': None}, 500
 
 
 if __name__ == '__main__':
