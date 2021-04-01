@@ -24,6 +24,20 @@ services:
       - ./db/startup_scripts:/docker-entrypoint-initdb.d
 
 
+  rabbitmq:
+    image: rabbitmq
+    ports:
+      - '5672:5672'
+
+
+  mongo:
+    image: mongo
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo_vol:/data/db
+
+
   # api:
   #   build: api
   #   ports:
@@ -46,3 +60,4 @@ services:
 
 volumes:
   minio_vol:
+  mongo_vol:
