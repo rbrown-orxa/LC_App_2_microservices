@@ -1,4 +1,4 @@
-from flask import Flask, request, g, send_from_directory
+from flask import Flask, request, g, send_from_directory, url_for
 from flask_cors import CORS,cross_origin
 from flask_selfdoc import Autodoc
 import os
@@ -51,9 +51,55 @@ utils.init_file_handler(app.config['UPLOAD_PATH'])
 @app.route('/task')
 def task():
     res = tasks.add.delay(2, 3)
-    return res.task_id
-    # callback_url = url_for('task_callback', task_id=res.task_id)
-    # return {}, 202, {'Location': callback_url}
+    # return res.task_id
+    callback_url = url_for('task_callback', task_id=res.task_id)
+    return {}, 202, {'Location': callback_url}
+
+
+@app.route('/task_callback/<task_id>')
+def task_callback(task_id):
+    try:
+        res = tasks.celery.AsyncResult(task_id)
+        print(type(res), res)
+        status = res.status
+        # print(status)
+        rv, code = '', 202
+        if status == 'SUCCESS':
+            rv, code = res.get(), 200
+        elif status == 'FAILURE':
+            code = 500
+        return {'Status': status, 'Result': rv}, code
+    except:
+        return {'Status': 'Failed', 'Result': None}, 500
+
+
+@app.route("/task_optimise", methods=['GET','POST'])
+@utils.handle_exceptions
+@auto.doc()
+@cross_origin(allow_headers=['Content-Type', 'Authorization'])
+def task_optimise():
+    logging.info('got an optimise request')
+    logging.info(f'json input schema: {request.json}')
+
+    lat = request.json.get('lat', None)
+    lon = request.json.get('lon', None)
+    query_id = billing.query_started(lat, lon)
+    # breakpoint()
+
+    # rv = library._optimise(request)
+    
+    # billing.query_successful(query_id)
+
+    # return (rv,
+    #         200, 
+    #         {'Content-Type': 'application/json; charset=utf-8'})
+    
+    content = request.json
+
+    res = tasks.optimise.delay(content)
+    # return res.task_id
+    callback_url = url_for('task_callback', task_id=res.task_id)
+    return {}, 202, {'Location': callback_url}
 
 
 @retry(wait_fixed=5000)
@@ -106,7 +152,8 @@ def optimise():
     query_id = billing.query_started(lat, lon)
     # breakpoint()
 
-    rv = library._optimise(request)
+    content = request.json
+    rv = library._optimise(content)
 
     if app.config['PICKLE_RESULTS']:
         utils.pickle_results(rv, sub_id, app.config['UPLOAD_PATH'])

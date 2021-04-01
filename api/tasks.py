@@ -1,6 +1,7 @@
 from celery import Celery
 from time import sleep
 
+import library
 
 
 BROKER_URL = 'amqp://'
@@ -13,3 +14,8 @@ celery.config_from_object('celeryconfig')
 def add(x, y):
 	sleep(10)
 	return {'value': x + y}
+
+@celery.task
+def optimise(content):
+	return library._optimise(content)
+

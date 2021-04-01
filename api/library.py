@@ -30,10 +30,10 @@ MINIO_CLEANED_BUCKET = 'cleaned-uploads'
 
 
 
-def _optimise(request):
+def _optimise(content):
 
     logging.debug('starting optimisation')
-    content = request.json
+    # content = request.json
 
     with open('my-schema.json', 'r') as schema_file:
         schema = json.load(schema_file)
