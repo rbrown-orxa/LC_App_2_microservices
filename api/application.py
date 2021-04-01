@@ -30,6 +30,7 @@ import library
 import config
 import billing
 import subscription
+import tasks
 
 #TODO: Get constants from env
 MINIO_CONN_STR = 'localhost:9000'
@@ -46,6 +47,13 @@ CORS(app)
 auto = Autodoc(app)
 utils.init_file_handler(app.config['UPLOAD_PATH'])
 
+
+@app.route('/task')
+def task():
+    res = tasks.add.delay(2, 3)
+    return res.task_id
+    # callback_url = url_for('task_callback', task_id=res.task_id)
+    # return {}, 202, {'Location': callback_url}
 
 
 @retry(wait_fixed=5000)
