@@ -10,6 +10,7 @@ from utils import get_fixed_fields,make_input_tables
 from minio import Minio
 from minio.error import S3Error
 from retrying import retry
+import json
 
 
 import config as cfg
@@ -56,21 +57,26 @@ def task():
     return {}, 202, {'Location': callback_url}
 
 
-@app.route('/task_callback/<task_id>')
+@app.route('/task_callback/<task_id>', methods=['GET','POST'])
 def task_callback(task_id):
     try:
         res = tasks.celery.AsyncResult(task_id)
         print(type(res), res)
         status = res.status
         # print(status)
-        rv, code = '', 202
+        _rv, code = '', 202
+        _rv_json = json.loads('{}')
         if status == 'SUCCESS':
-            rv, code = res.get(), 200
+            _rv, code = res.get(), 200
+            # breakpoint()
+            _rv_json = json.loads(_rv)
         elif status == 'FAILURE':
             code = 500
-        return {'Status': status, 'Result': rv}, code
+        return _rv_json, code            
+        # return {'Status': status, 'Result': _rv_json}, code
     except:
-        return {'Status': 'Failed', 'Result': None}, 500
+        logging.exception('got error')
+        return {'Status': 'Failed'}, 500
 
 
 @app.route("/task_optimise", methods=['GET','POST'])
@@ -99,7 +105,7 @@ def task_optimise():
     res = tasks.optimise.delay(content)
     # return res.task_id
     callback_url = url_for('task_callback', task_id=res.task_id)
-    return {}, 202, {'Location': callback_url}
+    return {'Location': callback_url[1:]}, 202, {'Location': callback_url[1:]}
 
 
 @retry(wait_fixed=5000)
