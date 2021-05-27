@@ -2,6 +2,36 @@ version: '3'
 
 services:
 
+  worker:
+    build: api
+    environment:
+      - "PYTHONUNBUFFERED=1"
+      - "BROKER_URL=amqp://rabbitmq:5672"
+      - "CELERY_BACKEND=mongo"
+    command: celery -A tasks worker --loglevel=INFO
+    volumes:
+      - "./api:/app"    
+
+
+  api:
+    build: api
+    ports:
+      - '5000:5000'
+    environment:
+      - "PYTHONUNBUFFERED=1"
+      - "BROKER_URL=amqp://rabbitmq:5672"
+      - "CELERY_BACKEND=mongo"
+      - "MINIO_CONN_STR=minio:9000"
+      - "MINIO_USER=user"
+      - "MINIO_PW=password"
+      # - "MINIO_SECURE=False"
+      - "MINIO_RAW_BUCKET=raw-uploads"
+      - "MINIO_CLEANED_BUCKET=cleaned-uploads"
+      - 'BILLING_DB_CONN_STR=host=postgres user=postgres dbname=postgres password=password sslmode=allow'
+    volumes:
+      - "./api:/app"
+
+
   minio:
     image: minio/minio
     volumes:
@@ -38,23 +68,6 @@ services:
       - mongo_vol:/data/db
 
 
-  api:
-    build: api
-    ports:
-      - '5000:5000'
-    environment:
-      - "PYTHONUNBUFFERED=1"
-      - "BROKER_URL=amqp://rabbitmq:5672"
-      - "CELERY_BACKEND=mongo"
-      - "MINIO_CONN_STR=minio:9000"
-      - "MINIO_USER=user"
-      - "MINIO_PW=password"
-      # - "MINIO_SECURE=0"
-      - "MINIO_RAW_BUCKET=raw-uploads"
-      - "MINIO_CLEANED_BUCKET=cleaned-uploads"
-      - 'BILLING_DB_CONN_STR=host=postgres user=postgres dbname=postgres password=password sslmode=allow'
-    volumes:
-      - "./api:/app"
     
 
 volumes:
