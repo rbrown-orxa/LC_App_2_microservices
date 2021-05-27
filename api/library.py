@@ -38,9 +38,11 @@ def _optimise(content):
     try:
         jsonschema.validate(instance=content, schema=schema)
     except Exception as err:
+        logging.exception('error while validating input data')
         assert False, f'422 JSON validation error: {err}'
 
     results = get_optimise_results(content)
+    logging.info(f'**results: {type(results)}')
     return results        
 
 

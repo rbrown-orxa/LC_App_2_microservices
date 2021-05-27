@@ -8,6 +8,12 @@ services:
       - "PYTHONUNBUFFERED=1"
       - "BROKER_URL=amqp://rabbitmq:5672"
       - "CELERY_BACKEND=mongo"
+      - "MINIO_CONN_STR=minio:9000"
+      - "MINIO_USER=user"
+      - "MINIO_PW=password"
+      # - "MINIO_SECURE=False"
+      - "MINIO_RAW_BUCKET=raw-uploads"
+      - "MINIO_CLEANED_BUCKET=cleaned-uploads"
     command: celery -A tasks worker --loglevel=INFO
     volumes:
       - "./api:/app"    

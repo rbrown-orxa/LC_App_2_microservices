@@ -11,13 +11,12 @@ from io import BytesIO, StringIO
 import utils
 
 
-#TODO: Get constants from env
-MINIO_CONN_STR = 'localhost:9000'
-MINIO_USER = 'minioadmin'
-MINIO_PW = 'minioadmin'
-MINIO_SECURE = False
-MINIO_RAW_BUCKET = 'raw-uploads'
-MINIO_CLEANED_BUCKET = 'cleaned-uploads'
+MINIO_CONN_STR = cfg.MINIO_CONN_STR
+MINIO_USER = cfg.MINIO_USER
+MINIO_PW = cfg.MINIO_PW
+MINIO_SECURE = cfg.MINIO_SECURE
+MINIO_RAW_BUCKET = cfg.MINIO_RAW_BUCKET
+MINIO_CLEANED_BUCKET = cfg.MINIO_CLEANED_BUCKET
 
 
 
@@ -42,7 +41,11 @@ def list_buildings(query):
 
 
 def get_base_loads(schema):
-    
+
+    print(f'MINIO_CONN_STR: {MINIO_CONN_STR}')
+    print(f'MINIO_SECURE: {MINIO_SECURE}')
+
+
     #Check total building profile
     _dict = get_fixed_fields(schema,fields=['load_profile_csv_optional'])
     handler = _dict['load_profile_csv_optional']
@@ -63,7 +66,7 @@ def get_base_loads(schema):
            #handler
 
           # Read pre-processed file from bucket into DataFrame
-          client = Minio(MINIO_CONN_STR, MINIO_USER, "minioadmin", secure=False)
+          client = Minio(MINIO_CONN_STR, MINIO_USER, MINIO_PW, secure=MINIO_SECURE)
           raw_file = client.get_object(MINIO_CLEANED_BUCKET, load)
           raw_buf_b = BytesIO(raw_file.read())
           #TODO: Get encoding for use in decode() function below
@@ -73,7 +76,7 @@ def get_base_loads(schema):
     
     else:
       # Read pre-processed file from bucket into DataFrame
-      client = Minio(MINIO_CONN_STR, MINIO_USER, "minioadmin", secure=False)
+      client = Minio(MINIO_CONN_STR, MINIO_USER, MINIO_PW, secure=MINIO_SECURE)
       raw_file = client.get_object(MINIO_CLEANED_BUCKET, handler)
       raw_buf_b = BytesIO(raw_file.read())
       #TODO: Get encoding for use in decode() function below
