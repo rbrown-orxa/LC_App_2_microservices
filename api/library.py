@@ -20,14 +20,12 @@ from io import BytesIO, StringIO
 
 
 #TODO: Get constants from env
-MINIO_CONN_STR = 'localhost:9000'
-MINIO_USER = 'minioadmin'
-MINIO_PW = 'minioadmin'
-MINIO_SECURE = False
-MINIO_RAW_BUCKET = 'raw-uploads'
-MINIO_CLEANED_BUCKET = 'cleaned-uploads'
-
-
+MINIO_CONN_STR = cfg.MINIO_CONN_STR
+MINIO_USER = cfg.MINIO_USER
+MINIO_PW = cfg.MINIO_PW
+MINIO_SECURE = cfg.MINIO_SECURE
+MINIO_RAW_BUCKET = cfg.MINIO_RAW_BUCKET
+MINIO_CLEANED_BUCKET = cfg.MINIO_CLEANED_BUCKET
 
 
 def _optimise(content):
@@ -193,7 +191,7 @@ def _upload(request):
     raw_file_id = str(uuid4())
     size = os.fstat(file.fileno()).st_size
     content_type = file.content_type
-    client = Minio(MINIO_CONN_STR, MINIO_USER, "minioadmin", secure=False)
+    client = Minio(MINIO_CONN_STR, MINIO_USER, MINIO_PW, secure=False)
     client.put_object(
             MINIO_RAW_BUCKET, raw_file_id, file, size, content_type)
 
@@ -221,7 +219,7 @@ def _upload(request):
 
 def _download(handle):
     # raise NotImplementedError('Need to change this to use bucket')
-    client = Minio(MINIO_CONN_STR, MINIO_USER, "minioadmin", secure=False)
+    client = Minio(MINIO_CONN_STR, MINIO_USER, MINIO_PW, secure=False)
     try:
         resp = client.get_object(MINIO_RAW_BUCKET, handle)
     except S3Error:

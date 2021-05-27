@@ -114,15 +114,15 @@ def make_bucket(bucket_name):
     #TODO: don't block on this forever if object store is down
     #TODO: set bucket retention policy
     print('connecting to minio*')
-    client = Minio(MINIO_CONN_STR, MINIO_USER, MINIO_PW, secure=MINIO_SECURE)
+    client = Minio(cfg.MINIO_CONN_STR, cfg.MINIO_USER, cfg.MINIO_PW, secure=cfg.MINIO_SECURE)
     try:
         client.make_bucket(bucket_name)
         print('connected')
     except S3Error:
         pass #bucket already exists
 
-make_bucket(MINIO_RAW_BUCKET)
-make_bucket(MINIO_CLEANED_BUCKET)
+make_bucket(cfg.MINIO_RAW_BUCKET)
+make_bucket(cfg.MINIO_CLEANED_BUCKET)
 
 
 

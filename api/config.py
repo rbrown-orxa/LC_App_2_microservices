@@ -1,5 +1,14 @@
 import os
 
+
+MINIO_CONN_STR = os.getenv('MINIO_CONN_STR', 'localhost:9000')
+MINIO_USER = os.getenv('MINIO_USER', 'minioadmin')
+MINIO_PW = os.getenv('MINIO_PW', 'minioadmin')
+MINIO_SECURE = os.getenv('MINIO_SECURE', False)
+MINIO_RAW_BUCKET = os.getenv('MINIO_RAW_BUCKET', 'raw-uploads')
+MINIO_CLEANED_BUCKET = os.getenv('MINIO_CLEANED_BUCKET', 'cleaned-uploads')
+
+
 MAX_CONTENT_LENGTH = 1024 * 1024 * 5 # limit file upload size to 5 MB
 UPLOAD_EXTENSIONS = ['.csv', ]
 UPLOAD_PATH = 'tmp'
