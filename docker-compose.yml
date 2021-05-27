@@ -8,9 +8,9 @@ services:
       - minio_vol:/data
     ports:
       - '9000:9000'
-    # environment:
-    #   MINIO_ROOT_USER: root
-    #   MINIO_ROOT_PASSWORD: password
+    environment:
+      - 'MINIO_ROOT_USER=user'
+      - 'MINIO_ROOT_PASSWORD=password'
     command: server /data
 
 
@@ -38,24 +38,23 @@ services:
       - mongo_vol:/data/db
 
 
-  # api:
-  #   build: api
-  #   ports:
-  #     - '80:5000'
-  #   environment:
-  #     # - "PYTHONUNBUFFERED=1"
-  #     - "MINIO_CONN_STR=minio:9000"
-  #     - "MINIO_USER=farms"
-  #     - "MINIO_PW=uprooted"
-  #     # - "MINIO_SECURE=0"
-  #     - "MINIO_PHOTO_BUCKET=photos"
-  #     - "MONGO_CONN_STR=mongodb://root:pass@mongo:27017/"
-  #     - "PRINT_SERVER_HOST=http://print_server:5005/"
-  #     - "ROOT_URL=169.254.0.1:80/"
-  #     - "BASIC_AUTH_USERNAME=uprooted"
-  #     - "BASIC_AUTH_PASSWORD=farms"
-  #   # volumes:
-  #   #   - "./api:/app"
+  api:
+    build: api
+    ports:
+      - '5000:5000'
+    environment:
+      - "PYTHONUNBUFFERED=1"
+      - "BROKER_URL=amqp://rabbitmq:5672"
+      - "CELERY_BACKEND=mongo"
+      - "MINIO_CONN_STR=minio:9000"
+      - "MINIO_USER=user"
+      - "MINIO_PW=password"
+      # - "MINIO_SECURE=0"
+      - "MINIO_RAW_BUCKET=raw-uploads"
+      - "MINIO_CLEANED_BUCKET=cleaned-uploads"
+      - 'BILLING_DB_CONN_STR=host=postgres user=postgres dbname=postgres password=password sslmode=allow'
+    volumes:
+      - "./api:/app"
     
 
 volumes:

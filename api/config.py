@@ -1,3 +1,5 @@
+import os
+
 MAX_CONTENT_LENGTH = 1024 * 1024 * 5 # limit file upload size to 5 MB
 UPLOAD_EXTENSIONS = ['.csv', ]
 UPLOAD_PATH = 'tmp'
@@ -26,11 +28,12 @@ MAX_CALLS_GOLD_PLAN = 'unlimited'
 #docker run --name orxa-postgres -p 5432:5432 -e POSTGRES_PASSWORD=password -d postgres 
 #Use these for local testing:
 
-BILLING_DB_CONN_STR = "host=localhost "\
-                     + "user=postgres "\
-                     + "dbname=postgres "\
-                     + "password=password "\
-                     + "sslmode=allow"    
+BILLING_DB_CONN_STR = os.getenv( 'BILLING_DB_CONN_STR', \
+        "host=localhost "\
+         + "user=postgres "\
+         + "dbname=postgres "\
+         + "password=password "\
+         + "sslmode=allow" )  
 
 SUBSCRIPTION_DB_CONN_STR = "host=localhost "\
                       + "user=postgres "\

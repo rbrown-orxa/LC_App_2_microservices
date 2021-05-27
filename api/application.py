@@ -33,13 +33,13 @@ import billing
 import subscription
 import tasks
 
-#TODO: Get constants from env
-MINIO_CONN_STR = 'localhost:9000'
-MINIO_USER = 'minioadmin'
-MINIO_PW = 'minioadmin'
-MINIO_SECURE = False
-MINIO_RAW_BUCKET = 'raw-uploads'
-MINIO_CLEANED_BUCKET = 'cleaned-uploads'
+
+MINIO_CONN_STR = os.getenv('MINIO_CONN_STR', 'localhost:9000')
+MINIO_USER = os.getenv('MINIO_USER', 'minioadmin')
+MINIO_PW = os.getenv('MINIO_PW', 'minioadmin')
+MINIO_SECURE = os.getenv('MINIO_SECURE', False)
+MINIO_RAW_BUCKET = os.getenv('MINIO_RAW_BUCKET', 'raw-uploads')
+MINIO_CLEANED_BUCKET = os.getenv('MINIO_CLEANED_BUCKET', 'cleaned-uploads')
 
 
 app = Flask(__name__)
@@ -90,6 +90,7 @@ def task_optimise():
     lat = request.json.get('lat', None)
     lon = request.json.get('lon', None)
     query_id = billing.query_started(lat, lon)
+    print('got here')
     # breakpoint()
 
     # rv = library._optimise(request)
@@ -112,7 +113,7 @@ def task_optimise():
 def make_bucket(bucket_name):
     #TODO: don't block on this forever if object store is down
     #TODO: set bucket retention policy
-    print('connecting to minio')
+    print('connecting to minio*')
     client = Minio(MINIO_CONN_STR, MINIO_USER, MINIO_PW, secure=MINIO_SECURE)
     try:
         client.make_bucket(bucket_name)
@@ -128,8 +129,8 @@ make_bucket(MINIO_CLEANED_BUCKET)
 # if app.config['APPLY_BILLING']:
 #     billing.make_tables(app.config['BILLING_DB_CONN_STR'])
     
-if app.config['APPLY_DEFAULT_VALUES']: 
-    make_input_tables(app.config['BILLING_DB_CONN_STR'])
+# if app.config['APPLY_DEFAULT_VALUES']: 
+#     make_input_tables(app.config['BILLING_DB_CONN_STR'])
 
 
 
@@ -395,6 +396,6 @@ def documentation():
 
 if __name__ == '__main__':
     app.secret_key = os.urandom(12)
-    app.run(host='localhost', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
 
 app.secret_key = os.urandom(12)

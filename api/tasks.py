@@ -1,10 +1,11 @@
 from celery import Celery
 from time import sleep
+import os
 
 import library
 
 
-BROKER_URL = 'amqp://'
+BROKER_URL = os.getenv('BROKER_URL', 'amqp://')
 
 celery = Celery('tasks', broker=BROKER_URL)
 celery.config_from_object('celeryconfig')
