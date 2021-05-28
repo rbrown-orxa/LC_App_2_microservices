@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 import aggregate_loads as agg
 from utils import get_fixed_fields
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import logging
 
 def control(P_sun, P_load, E_sto, dt, E_rated):
