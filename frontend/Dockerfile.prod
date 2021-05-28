@@ -1,7 +1,7 @@
 # adapted from 
 # https://mherman.org/blog/dockerizing-a-react-app/
 # and
-# https://www.freecodecamp.org/news/how-to-implement-runtime-environment-variables-with-create-react-app-docker-and-nginx-7f9d42a91d70/
+# https://github.com/kunokdev/cra-runtime-environment-variables
 
 
 FROM node:10.24.1-alpine as build
@@ -19,5 +19,19 @@ FROM nginx:stable-alpine
 COPY --from=build /app/build /usr/share/nginx/html
 COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+
+
+# Copy .env file and shell script to container
+WORKDIR /usr/share/nginx/html
+COPY ./env.sh .
+COPY .env .
+
+
+# Make our shell script executable
+RUN chmod +x env.sh
+
+
+#CMD ["nginx", "-g", "daemon off;"]
+
+CMD ["/bin/sh", "-c", "/usr/share/nginx/html/env.sh && nginx -g \"daemon off;\""]
 

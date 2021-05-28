@@ -154,6 +154,11 @@ export default class SolarForm extends Component{
   }
 
     nextStep = () => {
+      // alert('got here')
+      // alert(window)
+      // console.log('window: ', window._env_)
+      console.log('GENERIC_API_URL: ', GENERIC_API_URL)
+      // alert('done')
       const {step} = this.state;
       let {maxReachedStep} = this.state;
       if(maxReachedStep<step) maxReachedStep=step;
@@ -258,6 +263,7 @@ export default class SolarForm extends Component{
   
       let results,charts,errorObj;
       let redirect_url = ''
+      console.log('GENERIC_API_URL axios.post:', GENERIC_API_URL+'task_optimise')
       await axios.post(GENERIC_API_URL+'task_optimise', bodyFormData, {headers:headers})
         .then(function (response) {
             console.log('optimise status code:', response.status)

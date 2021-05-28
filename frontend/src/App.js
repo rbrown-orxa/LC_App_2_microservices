@@ -23,16 +23,23 @@ class App extends PureComponent {
 
   }
 
+            // <p>API_URL: {window._env_.API_URL}</p>
+
+            // </Header>
   render(){      
     let {isSolarFormPage,togglerStyleClass,navStyle} = this.state;
     console.log('app props',this.props)
+    // alert('got here')
+    // alert(window._env_.GENERIC_API_URL)
     let props = this.props;
     return (
         <Router onUpdate={this.setMenuStyle}>
           <div className="App" >
             <Header togglerStyleClass={togglerStyleClass} isSolarFormPage={isSolarFormPage} navStyle={navStyle} 
             logout={this.props.logout} accountInfo={this.props.accountInfo}
-            />            
+            />
+
+
             <Switch>
               <Route path="/" exact component={HomePage} />
               <Route path="/ad" render={(routeProps) => (<SolarForm  {...routeProps}  {...props} />)} />
