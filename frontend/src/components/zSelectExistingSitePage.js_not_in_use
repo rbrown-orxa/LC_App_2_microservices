@@ -1,0 +1,74 @@
+import React,{PureComponent} from 'react';
+import rightArrow from '../img/right_arrow.png';
+import leftArrow from '../img/left_arrow.png';
+
+export default class SelectExistingSitePage extends PureComponent{
+
+    constructor(props){
+        super(props);   
+    }
+
+
+
+    render(){
+
+        return(
+          <div class="row">
+            <div class="caption">
+              <div class="col-md-12" >
+                Welcome Back, Bob
+                <p>We hope you are having a wonderful day!</p>
+              </div>
+            </div>
+            <div class="contents"  style={{borderRadius: (window.innerWidth > 500) ? '25px' : '0px',
+                                            marginLeft: (window.innerWidth > 500) ?'10%':'0%' }}>
+            <div class="col-md-12" style={{background:''}}>
+
+                <div className='col control-label-heading' >
+                   <img src={rightArrow} 
+                        style={{width:'35px',padding:'10px',background:'#4EA758',borderRadius:'50%',cursor:'pointer'}} 
+                    />
+                    &nbsp;
+                      EDIT AN EXISTING SITE
+                </div>
+                <div className='col'>
+
+                      <p>Select your site name
+                      <select  id='existingSiteName' style={{width:'80%'}} >
+                        <option>Sample</option>
+                      </select>
+                      </p>
+                </div>
+
+                <div className='col control-label-heading'>
+                   <img src={rightArrow} 
+                        style={{width:'35px',padding:'10px',background:'#4EA758',borderRadius:'50%',cursor:'pointer'}} 
+                    />
+                    &nbsp;  
+                      START A NEW SITE
+                </div>
+                <div className='col'>
+
+                      You have <b>2</b> remaining sites available on your free plan,<br/> upgrade for unlimited site and sharing ability
+
+                </div>
+                <br/><br/><br/>
+                <div class="arrowButtons">
+                  <img src={leftArrow} onClick={this.props.prevStep}
+                      style={{width:'35px',padding:'10px',background:'#6C6A68',borderRadius:'20%',cursor:'pointer',
+                            }} 
+                  />
+                  &nbsp;
+                  <img src={rightArrow} 
+                      style={{width:'35px',padding:'10px',background:'#4EA758',borderRadius:'20%',cursor:'pointer',
+                            }} 
+                  />
+                </div>
+              </div>
+            </div>
+
+          </div>
+            );
+    }
+
+}

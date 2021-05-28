@@ -2,6 +2,10 @@
 **/__pycache__/**
 
 
+**/node_modules/**
+**/build/**
+
+
 # app temp dir
 **/tmp/**
 

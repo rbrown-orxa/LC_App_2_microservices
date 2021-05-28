@@ -1,0 +1,57 @@
+import React,{PureComponent} from 'react';
+import rightArrow from '../img/right_arrow.png';
+import leftArrow from '../img/left_arrow.png';
+
+export default class CreateNewSitePage extends PureComponent{
+
+    constructor(props){
+        super(props);   
+    }
+
+
+
+    render(){
+
+        return(
+          <div class="row">
+            <div class="caption">
+              <div class="col-lg-12" >
+                Welcome Back, Bob
+                <p>We hope you are having a wonderful day!</p>
+              </div>
+            </div>
+            <div class="contents"  style={{borderRadius: (window.innerWidth > 500) ? '25px' : '0px',
+                                          marginLeft: (window.innerWidth > 500) ?'10%':'0%'}}>
+            <div class="col-lg-12" style={{background:''}}>
+            <br/><br/><br/>
+                <div className='col control-label-heading' >
+                   <img src={rightArrow} 
+                        style={{width:'35px',padding:'10px',background:'#4EA758',borderRadius:'50%',cursor:'pointer'}} 
+                    />
+                    &nbsp;
+                      NAME YOUR SITE
+                      <input type="text" id='siteName' style={{width:'100%'}} placeholder="Enter name here" />
+
+                </div>
+
+                <br/><br/><br/>
+                <br/><br/><br/>
+                <div class="arrowButtons">
+                  <img src={leftArrow} onClick={this.props.prevStep}
+                      style={{width:'35px',padding:'10px',background:'#6C6A68',borderRadius:'20%',cursor:'pointer',
+                            }} 
+                  />
+                  &nbsp;
+                  <img src={rightArrow} 
+                      style={{width:'35px',padding:'10px',background:'#4EA758',borderRadius:'20%',cursor:'pointer',
+                            }} 
+                  />
+                </div>
+              </div>
+            </div>
+
+          </div>
+            );
+    }
+
+}

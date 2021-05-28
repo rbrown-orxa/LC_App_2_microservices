@@ -1,0 +1,19 @@
+{
+    "bottomBar":[
+        {
+            "id":1,
+            "title":"Maximise Savings",
+            "subTitle":"Get the right system that lowers energy bills"
+        },
+        {
+            "id":2,
+            "title":"Quick Estimate",
+            "subTitle":"Get optimal plan within minutes"
+        },
+        {
+            "id":3,
+            "title":"Diversified Renewables",
+            "subTitle":"Get the ideal power mix"
+        }
+    ]
+}
