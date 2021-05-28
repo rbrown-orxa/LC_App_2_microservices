@@ -1,41 +1,26 @@
 version: '3'
 
-# TODO: Lock versions of images
 
 services:
 
-
-  # frontend:
-  #   build: frontend
-  #   environment:
-  #     - "CHOKIDAR_USEPOLLING=true" # hot reloading
-  #   tty: true # prevent react exiting with code 0
-  #   ports:
-  #     - '80:3000'
-  #   volumes:
-  #     - "./frontend:/app" # hot reloading
-  #     - '/app/node_modules' # don't overwrite node_modules with above line
-
-
-  worker:
-    build: api
-    environment:
-      - "PYTHONUNBUFFERED=1"
-      - "BROKER_URL=amqp://rabbitmq:5672"
-      - "CELERY_BACKEND=mongo"
-      - "MINIO_CONN_STR=minio:9000"
-      - "MINIO_USER=user"
-      - "MINIO_PW=password"
-      # - "MINIO_SECURE=False"
-      - "MINIO_RAW_BUCKET=raw-uploads"
-      - "MINIO_CLEANED_BUCKET=cleaned-uploads"
-    command: celery -A tasks worker --loglevel=INFO
-    volumes:
-      - "./api:/app"    
+  frontend:
+    container_name:
+      frontend-prod
+    build: 
+      context: frontend
+      dockerfile: Dockerfile.prod
+    restart: always
+    ports:
+      - '80:80'
 
 
   api:
-    build: api
+    container_name:
+      api-prod    
+    build: 
+      context: api
+      dockerfile: Dockerfile.prod
+    restart: always  
     ports:
       - '5000:5000'
     environment:
@@ -45,20 +30,37 @@ services:
       - "MINIO_CONN_STR=minio:9000"
       - "MINIO_USER=user"
       - "MINIO_PW=password"
-      # - "MINIO_SECURE=False"
       - "MINIO_RAW_BUCKET=raw-uploads"
       - "MINIO_CLEANED_BUCKET=cleaned-uploads"
       - 'BILLING_DB_CONN_STR=host=postgres user=postgres dbname=postgres password=password sslmode=allow'
-    volumes:
-      - "./api:/app"
+
+
+  worker:
+    container_name:
+      worker-prod
+    build: 
+      context: api
+      dockerfile: Dockerfile.prod
+    restart: always    
+    environment:
+      - "PYTHONUNBUFFERED=1"
+      - "BROKER_URL=amqp://rabbitmq:5672"
+      - "CELERY_BACKEND=mongo"
+      - "MINIO_CONN_STR=minio:9000"
+      - "MINIO_USER=user"
+      - "MINIO_PW=password"
+      - "MINIO_RAW_BUCKET=raw-uploads"
+      - "MINIO_CLEANED_BUCKET=cleaned-uploads"
+    command: celery -A tasks worker --loglevel=INFO
 
 
   minio:
-    image: minio/minio
+    container_name:
+      object-store-prod
+    image: minio/minio:RELEASE.2021-05-27T22-06-31Z
+    restart: always   
     volumes:
-      - minio_vol:/data
-    ports:
-      - '9000:9000'
+      - minio_vol_prod:/data
     environment:
       - 'MINIO_ROOT_USER=user'
       - 'MINIO_ROOT_PASSWORD=password'
@@ -66,9 +68,10 @@ services:
 
 
   postgres:
-    image: postgres
-    ports:
-      - '5432:5432'
+    container_name:
+      sql-db-prod    
+    image: postgres:11
+    restart: always  
     environment:
       - 'POSTGRES_PASSWORD=password'
     volumes:
@@ -76,21 +79,22 @@ services:
 
 
   rabbitmq:
-    image: rabbitmq
-    ports:
-      - '5672:5672'
+    container_name:
+      task-queue-prod    
+    image: rabbitmq:3.8.16
+    restart: always  
 
 
   mongo:
-    image: mongo
-    ports:
-      - '27017:27017'
+    container_name:
+      nosql-db-prod    
+    image: mongo:4.4.6
+    restart: always
     volumes:
-      - mongo_vol:/data/db
+      - mongo_vol_prod:/data/db
 
-
-    
 
 volumes:
-  minio_vol:
-  mongo_vol:
+  minio_vol_prod:
+  mongo_vol_prod:
+

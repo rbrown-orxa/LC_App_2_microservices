@@ -1,3 +1,5 @@
+# adapted from https://mherman.org/blog/dockerizing-a-react-app/
+
 FROM node:10.24.1-alpine
 
 WORKDIR /app
