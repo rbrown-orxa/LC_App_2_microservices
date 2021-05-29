@@ -32,3 +32,9 @@ LC App Phase 2 consists of five services:
     - Frontend (React.js) - https://bitbucket.org/OrxaGridRepo/solarpv-phase2/src/master/
     - Database (postgres Azure) - lcapppostgreserver.postgres.database.azure.com
 
+
+	docker build -t rabwent11/lcapp2:api-v1 -f ./api/Dockerfile.prod ./api
+	docker push rabwent11/lcapp2:api-v1
+	
+	docker build -t rabwent11/lcapp2:frontend-v1 -f ./frontend/Dockerfile.prod ./frontend
+	docker push rabwent11/lcapp2:frontend-v1
