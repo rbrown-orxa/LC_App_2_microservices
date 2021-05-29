@@ -16,6 +16,7 @@ from flask import request, g, _request_ctx_stack
 from urllib.request import urlopen
 import psycopg2
 
+
 CONN_STR = cfg.BILLING_DB_CONN_STR
 
 

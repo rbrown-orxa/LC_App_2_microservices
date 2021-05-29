@@ -54,7 +54,7 @@ services:
       # - "MINIO_SECURE=False"
       - "MINIO_RAW_BUCKET=raw-uploads"
       - "MINIO_CLEANED_BUCKET=cleaned-uploads"
-      - 'BILLING_DB_CONN_STR=host=postgres user=postgres dbname=postgres password=password sslmode=allow'
+      # - 'BILLING_DB_CONN_STR=host=postgres user=postgres dbname=postgres password=password sslmode=allow'
     volumes:
       - "./api:/app"
 
@@ -73,16 +73,16 @@ services:
     command: server /data
 
 
-  postgres:
-    container_name:
-      postgres_dev
-    image: postgres
-    ports:
-      - '5432:5432'
-    environment:
-      - 'POSTGRES_PASSWORD=password'
-    volumes:
-      - ./db/startup_scripts:/docker-entrypoint-initdb.d
+  # postgres:
+  #   container_name:
+  #     postgres_dev
+  #   image: postgres
+  #   ports:
+  #     - '5432:5432'
+  #   environment:
+  #     - 'POSTGRES_PASSWORD=password'
+  #   volumes:
+  #     - ./db/startup_scripts:/docker-entrypoint-initdb.d
 
 
   rabbitmq:
@@ -102,8 +102,6 @@ services:
     volumes:
       - mongo_vol_dev:/data/db
 
-
-    
 
 volumes:
   minio_vol_dev:

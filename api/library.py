@@ -28,6 +28,10 @@ MINIO_RAW_BUCKET = cfg.MINIO_RAW_BUCKET
 MINIO_CLEANED_BUCKET = cfg.MINIO_CLEANED_BUCKET
 
 
+def make_tables(conn_str):
+    pass
+    
+
 def _optimise(content):
 
     logging.debug('starting optimisation')

@@ -6,9 +6,10 @@ services:
   frontend:
     container_name:
       frontend-prod
-    build: 
-      context: frontend
-      dockerfile: Dockerfile.prod
+    image: rabwent11/lcapp2:frontend-v1
+    # build: 
+    #   context: frontend
+    #   dockerfile: Dockerfile.prod
     environment:
       - "GENERIC_API_URL_FROM_ENV=http://127.0.0.1:5000/"
       - "COMPANY_LOGO_URL=https://www.orxagrid.com/images/logo-03-02-2-250x72.png"
@@ -20,10 +21,8 @@ services:
 
   api:
     container_name:
-      api-prod    
-    build: 
-      context: api
-      dockerfile: Dockerfile.prod
+      api-prod
+    image: rabwent11/lcapp2:api-v1
     restart: always  
     ports:
       - '5000:5000'
@@ -36,15 +35,13 @@ services:
       - "MINIO_PW=password"
       - "MINIO_RAW_BUCKET=raw-uploads"
       - "MINIO_CLEANED_BUCKET=cleaned-uploads"
-      # - 'BILLING_DB_CONN_STR=host=postgres user=postgres dbname=postgres password=password sslmode=allow'
+      - 'BILLING_DB_CONN_STR=host=postgres user=postgres dbname=postgres password=password sslmode=allow'
 
 
   worker:
     container_name:
       worker-prod
-    build: 
-      context: api
-      dockerfile: Dockerfile.prod
+    image: rabwent11/lcapp2:api-v1
     restart: always    
     environment:
       - "PYTHONUNBUFFERED=1"
@@ -64,22 +61,22 @@ services:
     image: minio/minio:RELEASE.2021-05-27T22-06-31Z
     restart: always   
     volumes:
-      - minio_vol_prod:/data
+      - minio_vol_deploy:/data
     environment:
       - 'MINIO_ROOT_USER=user'
       - 'MINIO_ROOT_PASSWORD=password'
     command: server /data
 
 
-  # postgres:
-  #   container_name:
-  #     sql-db-prod    
-  #   image: postgres:11
-  #   restart: always  
-  #   environment:
-  #     - 'POSTGRES_PASSWORD=password'
-  #   volumes:
-  #     - ./db/startup_scripts:/docker-entrypoint-initdb.d
+  postgres:
+    container_name:
+      sql-db-prod    
+    image: postgres:11
+    restart: always  
+    environment:
+      - 'POSTGRES_PASSWORD=password'
+    volumes:
+      - ./db/startup_scripts:/docker-entrypoint-initdb.d
 
 
   rabbitmq:
@@ -95,10 +92,10 @@ services:
     image: mongo:4.4.6
     restart: always
     volumes:
-      - mongo_vol_prod:/data/db
+      - mongo_vol_deploy:/data/db
 
 
 volumes:
-  minio_vol_prod:
-  mongo_vol_prod:
+  minio_vol_deploy:
+  mongo_vol_deploy:
 

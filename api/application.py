@@ -6,7 +6,7 @@ import logging
 import time
 from pathlib import Path
 import pickle
-from utils import get_fixed_fields,make_input_tables
+from utils import get_fixed_fields, make_input_tables
 from minio import Minio
 from minio.error import S3Error
 from retrying import retry
@@ -51,12 +51,12 @@ auto = Autodoc(app)
 utils.init_file_handler(app.config['UPLOAD_PATH'])
 
 
-@app.route('/task')
-def task():
-    res = tasks.add.delay(2, 3)
-    # return res.task_id
-    callback_url = url_for('task_callback', task_id=res.task_id)
-    return {}, 202, {'Location': callback_url}
+# @app.route('/task')
+# def task():
+#     res = tasks.add.delay(2, 3)
+#     # return res.task_id
+#     callback_url = url_for('task_callback', task_id=res.task_id)
+#     return {}, 202, {'Location': callback_url}
 
 
 @app.route('/task_callback/<task_id>', methods=['GET','POST'])
@@ -91,7 +91,7 @@ def task_optimise():
 
     lat = request.json.get('lat', None)
     lon = request.json.get('lon', None)
-    query_id = billing.query_started(lat, lon)
+    # query_id = billing.query_started(lat, lon)
     print('got here')
     # breakpoint()
 
@@ -197,42 +197,42 @@ make_bucket(cfg.MINIO_CLEANED_BUCKET)
 
 
 
-@app.route("/optimise", methods=['GET','POST'])
-@utils.handle_exceptions
-@auto.doc()
-@cross_origin(allow_headers=['Content-Type', 'Authorization'])
-# @utils.requires_auth
-def optimise():
-    """Optimise a solar and battery system size
+# @app.route("/optimise", methods=['GET','POST'])
+# @utils.handle_exceptions
+# @auto.doc()
+# @cross_origin(allow_headers=['Content-Type', 'Authorization'])
+# # @utils.requires_auth
+# def optimise():
+#     """Optimise a solar and battery system size
 
-    Request:
-        Content-Type: application/json
-        Body: According to /schema
+#     Request:
+#         Content-Type: application/json
+#         Body: According to /schema
 
-    Return:
-        Content-Type: application/json
-        According to /result_schema
-    """    
+#     Return:
+#         Content-Type: application/json
+#         According to /result_schema
+#     """    
 
-    logging.info('got an optimise request')
-    logging.info(f'json input schema: {request.json}')
+#     logging.info('got an optimise request')
+#     logging.info(f'json input schema: {request.json}')
 
-    lat = request.json.get('lat', None)
-    lon = request.json.get('lon', None)
-    query_id = billing.query_started(lat, lon)
-    # breakpoint()
+#     lat = request.json.get('lat', None)
+#     lon = request.json.get('lon', None)
+#     query_id = billing.query_started(lat, lon)
+#     # breakpoint()
 
-    content = request.json
-    rv = library._optimise(content)
+#     content = request.json
+#     rv = library._optimise(content)
 
-    if app.config['PICKLE_RESULTS']:
-        utils.pickle_results(rv, sub_id, app.config['UPLOAD_PATH'])
+#     if app.config['PICKLE_RESULTS']:
+#         utils.pickle_results(rv, sub_id, app.config['UPLOAD_PATH'])
     
-    billing.query_successful(query_id)
+#     billing.query_successful(query_id)
 
-    return (rv,
-            200, 
-            {'Content-Type': 'application/json; charset=utf-8'})
+#     return (rv,
+#             200, 
+#             {'Content-Type': 'application/json; charset=utf-8'})
 
 
 
