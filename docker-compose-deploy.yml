@@ -7,9 +7,6 @@ services:
     container_name:
       frontend-prod
     image: rabwent11/lcapp2:frontend-v1
-    # build: 
-    #   context: frontend
-    #   dockerfile: Dockerfile.prod
     environment:
       - "GENERIC_API_URL_FROM_ENV=http://127.0.0.1:5000/"
       - "COMPANY_LOGO_URL=https://www.orxagrid.com/images/logo-03-02-2-250x72.png"
@@ -35,8 +32,7 @@ services:
       - "MINIO_PW=password"
       - "MINIO_RAW_BUCKET=raw-uploads"
       - "MINIO_CLEANED_BUCKET=cleaned-uploads"
-      - 'BILLING_DB_CONN_STR=host=postgres user=postgres dbname=postgres password=password sslmode=allow'
-
+      
 
   worker:
     container_name:
@@ -66,17 +62,6 @@ services:
       - 'MINIO_ROOT_USER=user'
       - 'MINIO_ROOT_PASSWORD=password'
     command: server /data
-
-
-  # postgres:
-  #   container_name:
-  #     sql-db-prod    
-  #   image: postgres:11
-  #   restart: always  
-  #   environment:
-  #     - 'POSTGRES_PASSWORD=password'
-  #   volumes:
-  #     - ./db/startup_scripts:/docker-entrypoint-initdb.d
 
 
   rabbitmq:

@@ -1,3 +1,22 @@
+# EDIT THE VALUES BELOW AS APPROPRIATE
+
+DEPLOY_KEY=<your_deploy_key_provided_by_orxagrid>
+SERVER_URL=http://<your_server_url_or_ip>
+COMPANY_LOGO_URL=<url_for_your_company_logo>
+COMPANY_WEBSITE_URL=<url_for_your_company_website>
+
+# DO NOT EDIT BELOW THIS LINE
+
+set -e
+
+curl -fsSL https://get.docker.com -o get-docker.sh
+sh get-docker.sh
+
+curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
+
+
+cat <<EOT > docker-compose-deploy.yml
 version: '3'
 
 
@@ -7,13 +26,10 @@ services:
     container_name:
       frontend-prod
     image: rabwent11/lcapp2:frontend-v1
-    # build: 
-    #   context: frontend
-    #   dockerfile: Dockerfile.prod
     environment:
-      - "GENERIC_API_URL_FROM_ENV=http://127.0.0.1:5000/"
-      - "COMPANY_LOGO_URL=https://www.orxagrid.com/images/logo-03-02-2-250x72.png"
-      - "COMPANY_WEBSITE_URL=https://www.orxagrid.com"
+      - "GENERIC_API_URL_FROM_ENV=$SERVER_URL:5000/"
+      - "COMPANY_LOGO_URL=$COMPANY_LOGO_URL"
+      - "COMPANY_WEBSITE_URL=$COMPANY_WEBSITE_URL"
     restart: always
     ports:
       - '80:80'
@@ -35,8 +51,7 @@ services:
       - "MINIO_PW=password"
       - "MINIO_RAW_BUCKET=raw-uploads"
       - "MINIO_CLEANED_BUCKET=cleaned-uploads"
-      - 'BILLING_DB_CONN_STR=host=postgres user=postgres dbname=postgres password=password sslmode=allow'
-
+      
 
   worker:
     container_name:
@@ -68,17 +83,6 @@ services:
     command: server /data
 
 
-  postgres:
-    container_name:
-      sql-db-prod    
-    image: postgres:11
-    restart: always  
-    environment:
-      - 'POSTGRES_PASSWORD=password'
-    volumes:
-      - ./db/startup_scripts:/docker-entrypoint-initdb.d
-
-
   rabbitmq:
     container_name:
       task-queue-prod    
@@ -98,4 +102,13 @@ services:
 volumes:
   minio_vol_deploy:
   mongo_vol_deploy:
+EOT
+
+docker login -u rabwent11 -p $DEPLOY_KEY
+
+docker-compose -f docker-compose-deploy.yml pull
+
+docker-compose -f docker-compose-deploy.yml up -d
+
+echo "installation completed"
 
