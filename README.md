@@ -33,8 +33,8 @@ LC App Phase 2 consists of five services:
     - Database (postgres Azure) - lcapppostgreserver.postgres.database.azure.com
 
 
-	docker build -t rabwent11/lcapp2:api-v1 ./api
-	orxagrid_lc_app_2 % docker push rabwent11/lcapp2:api-v1
+	docker build -t rabwent11/lcapp2:api-v1 -f ./api/Dockerfile.prod ./api
+	docker push rabwent11/lcapp2:api-v1
 	
-	docker build -t rabwent11/lcapp2:frontend-v1 ./frontend
+	docker build -t rabwent11/lcapp2:frontend-v1 -f ./frontend/Dockerfile.prod ./frontend
 	docker push rabwent11/lcapp2:frontend-v1
