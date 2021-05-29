@@ -15,3 +15,23 @@ else {
 }
 export const GENERIC_API_URL = _GENERIC_API_URL
 
+
+let _COMPANY_LOGO_URL = ''
+if (window._env_ !== undefined) {
+	_COMPANY_LOGO_URL = window._env_.COMPANY_LOGO_URL;
+}
+else {
+	_COMPANY_LOGO_URL = 'https://www.orxagrid.com/images/logo-03-02-2-250x72.png';
+}
+export const COMPANY_LOGO_URL = _COMPANY_LOGO_URL
+
+
+let _COMPANY_WEBSITE_URL = ''
+if (window._env_ !== undefined) {
+	_COMPANY_WEBSITE_URL = window._env_.COMPANY_WEBSITE_URL;
+}
+else {
+	_COMPANY_WEBSITE_URL = 'https://www.orxagrid.com';
+}
+export const COMPANY_WEBSITE_URL = _COMPANY_WEBSITE_URL
+

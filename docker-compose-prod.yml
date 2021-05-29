@@ -11,6 +11,8 @@ services:
       dockerfile: Dockerfile.prod
     environment:
       - "GENERIC_API_URL_FROM_ENV=http://127.0.0.1:5000/"
+      - "COMPANY_LOGO_URL=https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png"
+      - "COMPANY_WEBSITE_URL=https://www.orxagrid.com"
     restart: always
     ports:
       - '80:80'

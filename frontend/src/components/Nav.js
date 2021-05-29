@@ -3,7 +3,17 @@ import '../App.css';
 // import userIcon from '../img/usericon.png';
 // import userIconDark from '../img/usericon_dark.png';
 import logo from '../img/ORXA_Logo_Wordmark.png';
+
 import {Link} from 'react-router-dom';
+
+import {COMPANY_LOGO_URL} from '../common/constants'
+import {COMPANY_WEBSITE_URL} from '../common/constants'
+
+
+// let _logo = 'https://1000logos.net/wp-content/uploads/2021/05/Google-logo-500x281.png'
+let _logo = COMPANY_LOGO_URL
+let _logo_url = COMPANY_WEBSITE_URL
+
 
 class Nav extends Component{
 
@@ -56,7 +66,18 @@ class Nav extends Component{
     }
     return (
       <nav className={"navbar navbar-expand-lg"+togglerStyleClass} >
-      <a  rel="noopener noreferrer" style={{alignContent:'left'}} href='https://www.orxagrid.com/' target="_blank"><img src={logo} style={{height:'4vh',marginRight:'40px'}} className="logo" alt="OrxaGrid"/></a>
+
+      <a  
+      rel="noopener noreferrer" 
+      style={{alignContent:'left'}} 
+      href={_logo_url} 
+      target="_blank"
+      >
+      <img src={_logo} 
+      style={{height:'10vh',marginRight:'40px'}} 
+      className="logo" alt="OrxaGrid"/>
+      </a>
+
       <button className="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span className="navbar-toggler-icon">
           </span>
@@ -72,6 +93,8 @@ class Nav extends Component{
                 {/* <img src={questionIcon} style={{width:'30px',padding:'10px',}} /> */}
               {/* </span> */}
             {/* </li> */}
+
+            {/*}
            {isLoggedIn? 
             <li class="dropdown" style={{fontWeight:'400', fontSize:'16px',position:'absolute',right:'10px',}}>
                 <div class="dropdown-toggle nav-links" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="true">
@@ -86,8 +109,13 @@ class Nav extends Component{
                     <li><div onClick={this.props.logout}>Logout</div></li>
                 </ul>
             </li>
-            :<li className="nav-item nav-link"><a style={navStyle} href="https://lcappbeta.orxa.io/">Solar only version</a></li> 
-            }            
+            :
+            
+            <li className="nav-item nav-link"><a style={navStyle} href="https://lcappbeta.orxa.io/">Solar only version</a></li>
+            
+            }
+             */}     
+
         </ul>
       </span>
     </nav> 

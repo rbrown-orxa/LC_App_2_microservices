@@ -6,6 +6,8 @@ services:
 
 
   frontend:
+    container_name:
+      frontend_dev
     build: frontend
     environment:
       - "CHOKIDAR_USEPOLLING=true" # hot reloading
@@ -18,6 +20,8 @@ services:
 
 
   worker:
+    container_name:
+      worker_dev
     build: api
     environment:
       - "PYTHONUNBUFFERED=1"
@@ -35,6 +39,8 @@ services:
 
 
   api:
+    container_name:
+      api_dev
     build: api
     ports:
       - '5000:5000'
@@ -54,9 +60,11 @@ services:
 
 
   minio:
+    container_name:
+      minio_dev
     image: minio/minio
     volumes:
-      - minio_vol:/data
+      - minio_vol_dev:/data
     ports:
       - '9000:9000'
     environment:
@@ -66,6 +74,8 @@ services:
 
 
   postgres:
+    container_name:
+      postgres_dev
     image: postgres
     ports:
       - '5432:5432'
@@ -76,21 +86,26 @@ services:
 
 
   rabbitmq:
+    container_name:
+      rabbitmq_dev
     image: rabbitmq
     ports:
       - '5672:5672'
 
 
   mongo:
+    container_name:
+      mongo_dev
     image: mongo
     ports:
       - '27017:27017'
     volumes:
-      - mongo_vol:/data/db
+      - mongo_vol_dev:/data/db
 
 
     
 
 volumes:
-  minio_vol:
-  mongo_vol:
+  minio_vol_dev:
+  mongo_vol_dev:
+
