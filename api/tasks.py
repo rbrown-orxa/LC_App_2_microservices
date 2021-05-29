@@ -20,3 +20,8 @@ def add(x, y):
 def optimise(content):
 	return library._optimise(content)
 
+@celery.task
+def upload(raw_file_id, lat, lon):
+	return library._upload(raw_file_id, lat, lon)
+
+

@@ -1,4 +1,4 @@
-from flask import Flask, request, g, send_from_directory, url_for
+from flask import Flask, request, g, send_from_directory, url_for, current_app
 from flask_cors import CORS,cross_origin
 from flask_selfdoc import Autodoc
 import os
@@ -11,6 +11,8 @@ from minio import Minio
 from minio.error import S3Error
 from retrying import retry
 import json
+from uuid import uuid4
+
 
 
 import config as cfg
@@ -109,6 +111,67 @@ def task_optimise():
     return {'Location': callback_url[1:]}, 202, {'Location': callback_url[1:]}
 
 
+@app.route("/upload", methods=['POST'])
+@auto.doc()
+@utils.handle_exceptions
+def upload():
+    """Upload a file for later use
+    File properties must comply with /file_requirements
+
+    Request:
+        Content-Type: multipart/form-data
+
+        Content-Disposition: form-data; name="file"; 
+            filename="Factory_Heavy_loads_15min.csv"
+        Content-Type: text/csv
+        ProductDataStreamId,ReportedDateTime,RealPower1,RealPower2,RealPower3
+        964352,2019-03-01_00:00:50,85.7043,100.6254,47.9806
+        964361,2019-03-01_00:15:50,1013.299,2106.9419,83.0753
+        ...        
+
+        Content-Disposition: form-data; name="lat"
+        18.495858
+        
+        Content-Disposition: form-data; name="lon"
+        73.883544
+
+    Return:
+        Content-Type: application/json
+        { "handle" :str } if successful.
+        { "error": str } if not successul."""
+
+    logging.info('handling file upload request')
+    file = request.files.get('file', None)
+    lat, lon = ( request.form.get(num, None) for num in ['lat', 'lon'] )
+
+    assert all ([ lat, lon ]), '400 lat and lon fields required'
+    assert file and file.filename, '422 No file provided'
+
+
+    extension = os.path.splitext(file.filename)[1]
+
+    assert extension in current_app.config['UPLOAD_EXTENSIONS'], \
+            '415 Unsupported Media Type'
+
+
+    # Write raw file to bucket
+    raw_file_id = str(uuid4())
+    size = os.fstat(file.fileno()).st_size
+    content_type = file.content_type
+    client = Minio(MINIO_CONN_STR, MINIO_USER, MINIO_PW, secure=False)
+    client.put_object(
+            MINIO_RAW_BUCKET, raw_file_id, file, size, content_type)
+
+
+    task = tasks.upload.delay(raw_file_id, lat, lon)
+    # status = task.status
+    print(f'task: {task.status}')
+    res = task.get()
+
+    print(f'upload result: {res}')
+    return res
+
+
 @retry(wait_fixed=5000)
 def make_bucket(bucket_name):
     #TODO: don't block on this forever if object store is down
@@ -172,35 +235,7 @@ def optimise():
             {'Content-Type': 'application/json; charset=utf-8'})
 
 
-@app.route("/upload", methods=['POST'])
-@auto.doc()
-@utils.handle_exceptions
-def upload():
-    """Upload a file for later use
-    File properties must comply with /file_requirements
 
-    Request:
-        Content-Type: multipart/form-data
-
-        Content-Disposition: form-data; name="file"; 
-            filename="Factory_Heavy_loads_15min.csv"
-        Content-Type: text/csv
-        ProductDataStreamId,ReportedDateTime,RealPower1,RealPower2,RealPower3
-        964352,2019-03-01_00:00:50,85.7043,100.6254,47.9806
-        964361,2019-03-01_00:15:50,1013.299,2106.9419,83.0753
-        ...        
-
-        Content-Disposition: form-data; name="lat"
-        18.495858
-        
-        Content-Disposition: form-data; name="lon"
-        73.883544
-
-    Return:
-        Content-Type: application/json
-        { "handle" :str } if successful.
-        { "error": str } if not successul."""
-    return library._upload(request)
 
 
 @app.route("/activate", methods=['POST'])

@@ -46,6 +46,31 @@ def _optimise(content):
     return results        
 
 
+def _upload(raw_file_id, lat, lon):
+
+    client = Minio(MINIO_CONN_STR, MINIO_USER, MINIO_PW, secure=False)
+    # Read raw file from bucket into DataFrame and pre-process
+    raw_file = client.get_object(MINIO_RAW_BUCKET, raw_file_id)
+    raw_buf_b = BytesIO(raw_file.read())
+    #TODO: Get encoding for use in decode() function below
+    raw_buf_t = StringIO(raw_buf_b.read().decode())
+    df = process_load_file(raw_buf_t, lat=lat, lon=lon)
+
+    # Write cleaned file to bucket
+    cleaned_file_id = str(uuid4())
+    cleaned_file = df.to_csv(index=False).encode('utf-8')
+    client.put_object(
+            MINIO_CLEANED_BUCKET,
+            cleaned_file_id,
+            BytesIO(cleaned_file),
+            len(cleaned_file),
+            content_type='application/csv')
+    rv = {'handle': cleaned_file_id, "raw_upload": raw_file_id}
+    logging.info(f'processed uploaded files: {rv}')
+
+    return ( rv )
+
+
 def _file_requirements():
     return { 'max_size_bytes': current_app.config['MAX_CONTENT_LENGTH'],
              'valid_extensions': current_app.config['UPLOAD_EXTENSIONS'] }
@@ -175,48 +200,7 @@ def _get_country_values(request):
 
 
 
-def _upload(request):
 
-    logging.info('handling file upload request')
-    file = request.files.get('file', None)
-    lat, lon = ( request.form.get(num, None) for num in ['lat', 'lon'] )
-
-    assert all ([ lat, lon ]), '400 lat and lon fields required'
-    assert file and file.filename, '422 No file provided'
-    extension = os.path.splitext(file.filename)[1]
-
-    assert extension in current_app.config['UPLOAD_EXTENSIONS'], \
-            '415 Unsupported Media Type'
-
-
-    # Write raw file to bucket
-    raw_file_id = str(uuid4())
-    size = os.fstat(file.fileno()).st_size
-    content_type = file.content_type
-    client = Minio(MINIO_CONN_STR, MINIO_USER, MINIO_PW, secure=False)
-    client.put_object(
-            MINIO_RAW_BUCKET, raw_file_id, file, size, content_type)
-
-    # Read raw file from bucket into DataFrame and pre-process
-    raw_file = client.get_object(MINIO_RAW_BUCKET, raw_file_id)
-    raw_buf_b = BytesIO(raw_file.read())
-    #TODO: Get encoding for use in decode() function below
-    raw_buf_t = StringIO(raw_buf_b.read().decode())
-    df = process_load_file(raw_buf_t, lat=lat, lon=lon)
-
-    # Write cleaned file to bucket
-    cleaned_file_id = str(uuid4())
-    cleaned_file = df.to_csv(index=False).encode('utf-8')
-    client.put_object(
-            MINIO_CLEANED_BUCKET,
-            cleaned_file_id,
-            BytesIO(cleaned_file),
-            len(cleaned_file),
-            content_type='application/csv')
-    rv = {'handle': cleaned_file_id, "raw_upload": raw_file_id}
-    logging.info(f'processed uploaded files: {rv}')
-
-    return ( rv )
 
 
 def _download(handle):
