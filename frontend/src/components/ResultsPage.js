@@ -323,6 +323,8 @@ class ResultsPage extends Component {
                         Back
                     </button>
                 </div>
+                
+                {/*}
                 <div
                     class="contents col-md-2"
                     style={{
@@ -332,6 +334,7 @@ class ResultsPage extends Component {
                         background: "white",
                     }}
                 >
+                    
                     <div className="col control-label-heading">
                         <a href={AZURE_MARKET_PLACE_URL}>
                             <button className="arrow-round-btn">
@@ -363,6 +366,8 @@ class ResultsPage extends Component {
                         </ul>
                     </div>
                 </div>
+                */}
+                
                 <br />
 
                 {/* </div> */}
