@@ -204,6 +204,26 @@ Keep calling the endpoint
 - COMPANY_LOGO_URL - url for the logo of the company purchasing / hosting the app
 - COMPANY_WEBSITE_URL - url for the website of the company purchasing / hosting the app
 
+![whitelabel](img/whitelabel.png)
+
 - Click 'Create Instance'
 
 ### Attach static IP
+- Click on the instance, then select 'Networking'
+- Attach the static IP created in previous steps
+
+![attach](img/attach.png)
+
+### Open firewall ports
+- Ensure port 80 is open
+- Add a new rule to open port 5000
+
+![firewall](img/firewall.png)
+
+### Test the app
+
+- Wait 5 minutes for the app to come up after starting the instance with launch script
+- Navigate browser to Static IP address of instance
+- Web app logo and it's hyperlink should be as specified at top of launch script
+
+![deployed](img/deployed.png)
