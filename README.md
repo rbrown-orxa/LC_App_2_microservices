@@ -1,40 +1,72 @@
 
+# OrxaGrid B2B2C Low Carbon App 2
+
+## Description
+
+This application is a solar PV and battery system optimiser designed to be
+deployed by system installers for integration with their company website.
+
+
+## Architecture
+
+ - Reverse Proxy routes requests to the relevent service (todo)
+ - Web App serves HTML/CSS/JS content
+ - REST API interchanges data between the Web App and all other backend services
+ - Rate limiter prevents a single user over using the api (todo)
+ - Task queue routes work between API and data factories
+ - File processor is a data factory for cleaning uploaded files
+ - Low Carbon Optimiser is a data factory for sizing battery and solar PV systems
+ - Solar Hindcast provides solar generation data for a given location (todo)
+ - Object Store persists uploaded and cleaned files
+ - Document DB persists optimisation results
+ - Relational DB stores app usage statistics
+ - License Manager restricts operation of the optimiser to licensed installations (todo)
+ - Whitelabel Config enables custom branding of the Web App
+ - Whitelabel Templates enables custom branding of the optimisation reports (todo)
+ - Push Notifications generates sales leads and sends to system installers (todo)
+ - Dashboard displays business intelligence about how the app is being used (todo)
+
 ![Architecture Diagram](architecture.png)
 
+## Build Environment
+This application should be built using Linux Docker on a Mac, Linux or Windows
+host with x64 architecture.
 
-	docker run --rm -d -p 9000:9000 --name orxa_minio minio/minio server /data
-	
-	cd api
-	python3 -m venv venv
-	source venv/bin/activate
-	pip install -r requirements.txt
-	python3 application.py
+## Deploy Environment
+This application has been tested on a Linux Ubuntu host with x64 architecture,
+but should be deployable on any modern linux host with Docker installed.
 
-	cd db
-	docker run --rm -d --name orxa_postgres -p 5432:5432 -e POSTGRES_PASSWORD=password -v "$PWD/startup_scripts":/docker-entrypoint-initdb.d postgres
+## Development
+- Install Docker (https://docs.docker.com/get-docker/)
+- Insall Docker Compose (https://docs.docker.com/compose/install/)  
 
-Point broswer at localhost:5000 for API documentation
+### Run the following commands to start the app in dev mode
+	docker-compose pull
+	docker-compose build .
+	docker-compose up -d
 
 
-# LC App Phase 2
+### Check the services which came up
+ 	docker stats
 
-This repo contains the API and billing services for LC App Phase 2, which optimally sizes solar PV and battery storage for a complex containing one or more buildings.
+### Check the logs
+	docker-compose logs -f
 
-Instructions for testing and deploying these services are given in readme files at /api and /billing respectively.
 
-## Dependencies
+## Testing
 
-LC App Phase 2 consists of five services:
 
-	- API service (Python3 Flask) - https://bitbucket.org/OrxaGridRepo/solarpv_battery/src/master/api/
-    - Billing service (Python3 Docker) - https://bitbucket.org/OrxaGridRepo/solarpv_battery/src/master/billing/
-    - Subscription service (C# dotnet) - https://bitbucket.org/OrxaGridRepo/contosoampbasic/src/dev/
-    - Frontend (React.js) - https://bitbucket.org/OrxaGridRepo/solarpv-phase2/src/master/
-    - Database (postgres Azure) - lcapppostgreserver.postgres.database.azure.com
+## Local Deployment
+
+
+## Production Deployment (manual)
+
+
+## Production Deployment (automatic)
 
 
 	docker build -t rabwent11/lcapp2:api-v1 -f ./api/Dockerfile.prod ./api
 	docker push rabwent11/lcapp2:api-v1
-	
+
 	docker build -t rabwent11/lcapp2:frontend-v1 -f ./frontend/Dockerfile.prod ./frontend
 	docker push rabwent11/lcapp2:frontend-v1
