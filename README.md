@@ -60,8 +60,19 @@ but should be deployable on any modern linux host with Docker installed.
 
 ## Testing
 - Install Postman (https://www.postman.com/downloads/)
-- Import API endpoint tests into Postman ()
+- Import API endpoint tests into Postman (orxagrid_si.postman_collection.json) (included in root of this repo)
 - Run the following endpoints
+
+### File upload
+*Choose 'sample_load.csv' as 'file' (included in root of this repo)*
+![sample load](img/sample_load.png)
+
+Send the request, and note the returned file handles
+![file handles](img/file_handles.png)
+
+### File Download
+*Replace the file handle with that noted in previous step*
+![download](img/download.png)
 
 ### Optimise
 ![optimise](img/optimise.png)

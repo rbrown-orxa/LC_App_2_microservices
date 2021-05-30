@@ -1,0 +1,96 @@
+{
+	"info": {
+		"_postman_id": "08d1b637-3a53-4906-b59e-f59bac0db99b",
+		"name": "orxagrid_si",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "optimise",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "        {   \n            \"sub\": \"1f75f128-e047-4b3f-ae1a-cdc4961b59e3\",\n            \"oid\": \"1f75f128-e047-4b3f-ae1a-cdc4961b59e3\",\n            \"lat\": 51.492233,\n            \"lon\": -0.102547,\n            \"import_cost_kwh\": 0.14,\n            \"export_price_kwh\": 0.04,\n            \"pv_cost_kwp\": 1600,\n            \"pv_life_yrs\": 20,\n            \"battery_life_cycles\": 20,\n            \"battery_cost_kwh\": 1000,\n            \"load_profile_csv_optional\": \"\",\n            \"building_data\": [\n                {\n                    \"name\": \"building 1\",\n                    \"building_type\": \"domestic\",\n                    \"roof_size_m2\": 100,\n                    \"azimuth_deg\": 180,\n                    \"pitch_deg\": 30,\n                    \"num_ev_chargers\": 5,\n                    \"pv_size_kwp_optional\": 0.0,\n                    \"load_profile_csv_optional\": \"\",\n                    \"annual_kwh_consumption_optional\": 3000\n                },\n                {\n                    \"name\": \"building 2\",\n                    \"building_type\": \"commercial\",\n                    \"roof_size_m2\": 100,\n                    \"azimuth_deg\": 180,\n                    \"pitch_deg\": 30,\n                    \"num_ev_chargers\": 5,\n                    \"pv_size_kwp_optional\": 0.0,\n                    \"load_profile_csv_optional\": \"\",\n                    \"annual_kwh_consumption_optional\": 3000\n                }\n            ]\n        }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5000/task_optimise",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"task_optimise"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "file upload",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/home/robert/Downloads/sample_load.csv"
+						},
+						{
+							"key": "lat",
+							"value": "51.50635249404038",
+							"type": "text"
+						},
+						{
+							"key": "lon",
+							"value": "-0.10415590573792667",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:5000/upload",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"upload"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "file download",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:5000/download/a772e045-b4e9-4382-aa2d-7c4691a14cb5",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"download",
+						"a772e045-b4e9-4382-aa2d-7c4691a14cb5"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
