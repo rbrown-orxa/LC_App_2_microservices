@@ -6,6 +6,7 @@
 This application is a solar PV and battery system optimiser designed to be
 deployed by system installers for integration with their company website.
 
+![report](img/report.png)
 
 ## Architecture
 
@@ -52,8 +53,28 @@ but should be deployable on any modern linux host with Docker installed.
 ### Check the logs
 	docker-compose logs -f
 
+### Open app in browser
+	http://localhost
+
+![homepage](img/homepage.png)
 
 ## Testing
+- Install Postman (https://www.postman.com/downloads/)
+- Import API endpoint tests into Postman ()
+- Run the following endpoints
+
+### Optimise
+![optimise](img/optimise.png)
+
+### Follow the link given by Location in response header, using GET request
+![location](img/location.png)
+
+*Response status code should be 202 until the results are ready*
+![202](img/202.png)
+
+Keep calling the endpoint  
+*Response status code should be 200 when results are ready*
+![200](img/200.png)
 
 
 ## Local Deployment
