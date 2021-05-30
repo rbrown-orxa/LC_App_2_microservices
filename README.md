@@ -41,7 +41,10 @@ but should be deployable on any modern linux host with Docker installed.
 - Install Docker (https://docs.docker.com/get-docker/)
 - Insall Docker Compose (https://docs.docker.com/compose/install/)  
 
-### Run the following commands to start the app in dev mode
+### Run the following commands to start the app in dev mode  
+*Frontend and API services will hot-reload*  
+
+
 	docker-compose pull
 	docker-compose build .
 	docker-compose up -d
@@ -89,16 +92,94 @@ Keep calling the endpoint
 
 
 ## Local Deployment
+*Locally built images, with production web servers, no hot-reloading of code*
 
+	docker-compose -f docker-compose-prod.yml build
+	docker-compose -f docker-compose-prod.yml up -d
+
+![local deploy](img/local_deploy.png)
+
+	docker stats
+
+![stats](img/stats.png)
+
+*Open app in browser*
+
+	http://localhost
 
 ## Production Deployment (manual)
+
+### Build the API / Worker and Frontend images locally for remote deployment
+
+	docker build -t rabwent11/lcapp2:api-v1 -f ./api/Dockerfile.prod ./api
+	docker build -t rabwent11/lcapp2:frontend-v1 -f ./frontend/Dockerfile.prod ./frontend
+
+### Login to Dockerhub
+
+	docker login -u rabwent11 -p <password_or_token>
+
+![docker login](img/docker_login.png)
+
+### Push the images to Dockerhub
+
+	docker push rabwent11/lcapp2:api-v1
+	docker push rabwent11/lcapp2:frontend-v1
+
+![push](img/push.png)
+
+### Copy docker-compose-deploy.yml to remote server
+
+- e.g. using scp
+
+![scp](img/scp.png)
+
+### Open an ssh sesion to remote server
+
+- see (https://www.ssh.com/academy/ssh/command) for instructions
+- following steps are carried out on remote server over ssh
+
+
+### Edit the whitelabel configuration variables in docker-compose-deploy.yml
+
+	nano docker-compose-deploy.ym
+
+- GENERIC_API_URL_FROM_ENV - this should be the URL or IP of remote server, port 5000
+- COMPANY_LOGO_URL - url for the logo of the company purchasing / hosting the app
+- COMPANY_WEBSITE_URL - url for the website of the company purchasing / hosting the app
+
+![nano](img/nano.png)
+
+### Save the file and close
+
+	<CTRL-O>
+	<CTRL-X>
+
+### Set up Docker
+- Install Docker (https://docs.docker.com/get-docker/)
+- Insall Docker Compose (https://docs.docker.com/compose/install/)  
+- Login to Dockerhub
+
+
+	docker login -u rabwent11 -p <password_or_token>
+
+### Pull required images
+
+	docker-compose -f docker-compose-deploy.yml pull
+
+### Start app
+
+	docker-compose -f docker-compose-deploy.yml up -d
+
+### Configure firewall
+- Ensure ports 80 and 5000 are open
+
+### Test app
+- Open remote server url in a browser on local machine
 
 
 ## Production Deployment (automatic)
 
-
-	docker build -t rabwent11/lcapp2:api-v1 -f ./api/Dockerfile.prod ./api
-	docker push rabwent11/lcapp2:api-v1
-
-	docker build -t rabwent11/lcapp2:frontend-v1 -f ./frontend/Dockerfile.prod ./frontend
-	docker push rabwent11/lcapp2:frontend-v1
+### AWS Console
+- Sign up / sign in to (http://console.aws.amazon.com)
+- Select All Services >> Lighsail
+- 
