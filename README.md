@@ -182,4 +182,28 @@ Keep calling the endpoint
 ### AWS Console
 - Sign up / sign in to (http://console.aws.amazon.com)
 - Select All Services >> Lighsail
-- 
+- Select Networking >> Create Static IP >> Create
+
+![ip](img/ip.png)
+
+- Note the Static IP address
+
+![ip addr](img/ipaddr.png)
+
+- Navigate back to Lightsail Dashboard
+- Create Instance >> Linux (OS Only) >> Ubuntu 20
+- Select a machine with at least 2 CPUs and 4GB RAM
+- Click 'Add Launch Script'
+- Paste in contents of (install.sh) from root of this repo
+
+![launch script](img/launchscript.png)
+
+- Edit the whitelabel constants at top of launch script
+- DEPLOY_KEY - Dockerhub deploy key provided by OrxaGrid
+- SERVER_URL - Static IP noted above
+- COMPANY_LOGO_URL - url for the logo of the company purchasing / hosting the app
+- COMPANY_WEBSITE_URL - url for the website of the company purchasing / hosting the app
+
+- Click 'Create Instance'
+
+### Attach static IP
