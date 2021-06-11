@@ -73,7 +73,7 @@ services:
   minio:
     container_name:
       object-store-prod
-    image: minio/minio:RELEASE.2021-05-27T22-06-31Z
+    image: minio/minio
     restart: always   
     volumes:
       - minio_vol_deploy:/data
