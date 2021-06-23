@@ -46,7 +46,7 @@ but should be deployable on any modern linux host with Docker installed.
 
 
 	docker-compose pull
-	docker-compose build .
+	docker-compose build
 	docker-compose up -d
 
 
